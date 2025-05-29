@@ -17,6 +17,7 @@ An optimized higher-order component for creating compound icons that can switch 
 ```typescript
 import { bundleIcon } from 'fluentui-compat';
 import { HeartFilled, HeartRegular } from '@fluentui/react-icons';
+import { useCallback, useState } from 'react';
 
 // Create a bundled icon component
 const HeartIcon = bundleIcon(HeartFilled, HeartRegular);
@@ -25,10 +26,14 @@ const HeartIcon = bundleIcon(HeartFilled, HeartRegular);
 function MyComponent() {
   const [isFavorited, setIsFavorited] = useState(false);
   
+  const handleToggleFavorite = useCallback(() => {
+    setIsFavorited(prev => !prev);
+  }, []);
+  
   return (
     <HeartIcon 
       filled={isFavorited}
-      onClick={() => setIsFavorited(!isFavorited)}
+      onClick={handleToggleFavorite}
       className="heart-icon"
     />
   );

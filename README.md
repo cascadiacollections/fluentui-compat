@@ -1,2 +1,155 @@
 # fluentui-compat
-FluentUI React complimentary components and utilities focused on render performance
+
+> FluentUI React complimentary components and utilities focused on render performance
+
+This is a Rush monorepo containing performant utilities and components for FluentUI React.
+
+## Architecture
+
+This repository is organized as a Rush monorepo using [Rush.js](https://rushjs.io/) for build orchestration and dependency management.
+
+### Structure
+
+```
+fluentui-compat/
+├── packages/
+│   └── fluentui-compat/          # Core package
+│       ├── src/
+│       │   ├── bundleIcon.tsx    # Optimized bundled icon component
+│       │   └── index.ts          # Package exports
+│       └── dist/                 # Built output
+├── common/                       # Rush configuration
+└── rush.json                     # Rush configuration
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >=18.20.3
+- Rush CLI: `npm install -g @microsoft/rush`
+
+### Installation
+
+```bash
+# Install Rush globally
+npm install -g @microsoft/rush
+
+# Clone the repository
+git clone https://github.com/cascadiacollections/fluentui-compat.git
+cd fluentui-compat
+
+# Install dependencies
+rush update
+
+# Build all packages
+rush build
+```
+
+## Packages
+
+### `fluentui-compat`
+
+The core package containing optimized FluentUI components and utilities.
+
+## bundleIcon
+
+An optimized higher-order component for creating compound icons that can switch between filled and regular variants. This component is memoized for optimal render performance.
+
+### Usage
+
+```typescript
+import { bundleIcon } from 'fluentui-compat';
+import { HeartFilled, HeartRegular } from '@fluentui/react-icons';
+import { useCallback, useState } from 'react';
+
+// Create a bundled icon component
+const HeartIcon = bundleIcon(HeartFilled, HeartRegular);
+
+// Use the component
+function MyComponent() {
+  const [isFavorited, setIsFavorited] = useState(false);
+  
+  const handleToggleFavorite = useCallback(() => {
+    setIsFavorited(prev => !prev);
+  }, []);
+  
+  return (
+    <HeartIcon 
+      filled={isFavorited}
+      onClick={handleToggleFavorite}
+      className="heart-icon"
+    />
+  );
+}
+```
+
+### API
+
+#### `bundleIcon(FilledIcon, RegularIcon)`
+
+Creates a memoized compound icon component.
+
+**Parameters:**
+- `FilledIcon`: FluentIcon - The filled variant of the icon
+- `RegularIcon`: FluentIcon - The regular variant of the icon
+
+**Returns:**
+- A React component that accepts all standard SVG props plus:
+  - `filled?: boolean` - Whether to render the filled variant
+  - `className?: string` - CSS classes to apply
+  - `primaryFill?: string` - Fill color for the icon
+
+### Features
+
+- **Performance Optimized**: Uses React.memo for efficient re-renders
+- **Type Safe**: Full TypeScript support with proper type definitions
+- **Flexible**: Works with any FluentUI icon components
+- **Consistent**: Applies standard icon class names for styling
+
+## Development
+
+### Building
+
+```bash
+# Build all packages
+rush build
+
+# Build a specific package
+rush build --to fluentui-compat
+```
+
+### Testing
+
+```bash
+# Run tests for all packages
+rush test
+
+# Run tests for a specific package
+cd packages/fluentui-compat
+npm test
+```
+
+### Linting
+
+```bash
+# Lint all packages
+rush lint
+
+# Lint a specific package
+cd packages/fluentui-compat
+npm run lint
+```
+
+## Contributing
+
+1. Install Rush CLI: `npm install -g @microsoft/rush`
+2. Run `rush update` to install dependencies
+3. Make your changes
+4. Run `rush build` to ensure everything builds
+5. Run `rush test` to run tests
+6. Submit a pull request
+
+## License
+
+MIT

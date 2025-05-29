@@ -1,0 +1,41 @@
+name: CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Git config user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Verify Change Logs
+        run: node common/scripts/install-run-rush.js change --verify
+      - name: Rush Install
+        run: node common/scripts/install-run-rush.js install
+      - name: Rush rebuild
+        run: node common/scripts/install-run-rush.js rebuild --verbose
+      - name: Run tests
+        run: |
+          cd packages/fluentui-compat
+          npm test
+      - name: Package and test publish
+        run: |
+          cd packages/fluentui-compat
+          npm pack
+          npm publish --dry-run
+      - name: Upload package tarball
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: package-tarball
+          path: packages/fluentui-compat/*.tgz

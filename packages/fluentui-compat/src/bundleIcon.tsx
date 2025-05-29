@@ -15,6 +15,17 @@ const iconRegularClassName = 'fui-Icon--regular';
  * Creates an optimized bundled icon component that renders either a filled or regular icon
  * based on the `filled` prop. The component is memoized for optimal render performance.
  * 
+ * @example
+ * ```typescript
+ * import { bundleIcon } from 'fluentui-compat';
+ * import { HeartFilled, HeartRegular } from '@fluentui/react-icons';
+ * 
+ * const HeartIcon = bundleIcon(HeartFilled, HeartRegular);
+ * 
+ * // Usage in component
+ * <HeartIcon filled={isLiked} onClick={handleToggle} />
+ * ```
+ * 
  * @param FilledIcon - The filled variant of the icon
  * @param RegularIcon - The regular variant of the icon
  * @returns A memoized React component that renders the appropriate icon variant

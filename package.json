@@ -1,0 +1,31 @@
+{
+  "name": "fluentui-compat",
+  "version": "1.0.0",
+  "description": "FluentUI React complimentary components and utilities focused on render performance",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "jest"
+  },
+  "keywords": [
+    "fluentui",
+    "react",
+    "performance",
+    "icons"
+  ],
+  "author": "Cascadia Collections",
+  "license": "MIT",
+  "peerDependencies": {
+    "@fluentui/react-icons": ">=2.0.0",
+    "react": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.23",
+    "typescript": "^5.8.3"
+  },
+  "files": [
+    "dist"
+  ]
+}

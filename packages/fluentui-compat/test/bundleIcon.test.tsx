@@ -14,7 +14,7 @@ const MockFilledIcon: FluentIcon = jest.fn((props) => {
     'data-testid': 'filled-icon',
     'data-render-count': filledRenderCount
   });
-});
+}) as FluentIcon;
 
 const MockRegularIcon: FluentIcon = jest.fn((props) => {
   regularRenderCount++;
@@ -23,7 +23,7 @@ const MockRegularIcon: FluentIcon = jest.fn((props) => {
     'data-testid': 'regular-icon',
     'data-render-count': regularRenderCount
   });
-});
+}) as FluentIcon;
 
 // Reset counters before each test
 beforeEach(() => {

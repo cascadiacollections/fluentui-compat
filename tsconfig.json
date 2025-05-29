@@ -16,7 +16,8 @@
     "declaration": true,
     "outDir": "dist",
     "rootDir": "src",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "module": "commonjs"
   },
   "include": [
     "src/**/*"

@@ -1,5 +1,6 @@
 import React from 'react';
-import { bundleIcon, FluentIcon } from '../src';
+import { FluentIcon } from '@fluentui/react-icons';
+import { bundleIcon } from '../src';
 
 // Mock FluentIcon components for testing
 const MockFilledIcon: FluentIcon = (props) => 

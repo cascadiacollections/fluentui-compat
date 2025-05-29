@@ -22,6 +22,8 @@
     "react": ">=16.8.0"
   },
   "devDependencies": {
+    "@fluentui/react-components": "^9.0.0",
+    "@fluentui/react-utilities": "^9.0.0",
     "@types/react": "^18.3.23",
     "typescript": "^5.8.3"
   },

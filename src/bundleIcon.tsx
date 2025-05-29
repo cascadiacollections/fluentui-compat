@@ -1,6 +1,15 @@
 import React from 'react';
-import { FluentIcon, BundledIconProps } from './types';
-import { mergeClasses, iconFilledClassName, iconRegularClassName } from './utils';
+import { FluentIcon } from '@fluentui/react-icons';
+import { mergeClasses } from '@fluentui/react-components';
+
+export interface BundledIconProps extends React.SVGProps<SVGSVGElement> {
+  filled?: boolean;
+  primaryFill?: string;
+  className?: string;
+}
+
+const iconFilledClassName = 'fui-Icon--filled';
+const iconRegularClassName = 'fui-Icon--regular';
 
 /**
  * Creates an optimized bundled icon component that renders either a filled or regular icon
@@ -15,8 +24,8 @@ export const bundleIcon = (FilledIcon: FluentIcon, RegularIcon: FluentIcon): Rea
     const { className, filled, ...rest } = props;
     
     return filled ? 
-      React.createElement(FilledIcon, { ...rest, className: mergeClasses(iconFilledClassName, className) }) :
-      React.createElement(RegularIcon, { ...rest, className: mergeClasses(iconRegularClassName, className) });
+      <FilledIcon {...rest} className={mergeClasses(iconFilledClassName, className)} /> :
+      <RegularIcon {...rest} className={mergeClasses(iconRegularClassName, className)} />;
   });
   
   Component.displayName = "CompoundIcon";

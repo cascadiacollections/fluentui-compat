@@ -1,5 +1,5 @@
 {
-  "name": "fluentui-compat",
+  "name": "@cascadiacollections/fluentui-compat",
   "version": "1.0.0",
   "description": "FluentUI React complimentary components and utilities focused on render performance",
   "main": "dist/index.js",

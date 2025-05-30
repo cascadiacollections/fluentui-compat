@@ -16,15 +16,16 @@ A React hook that provides an Async instance from `@fluentui/utilities` that is 
 
 ```typescript
 import { useAsync } from 'fluentui-compat';
+import { useCallback } from 'react';
 
 function MyComponent() {
   const async = useAsync();
   
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     async.setTimeout(() => {
       console.log('Delayed action');
     }, 1000);
-  };
+  }, [async]);
   
   return <button onClick={handleClick}>Start Timer</button>;
 }

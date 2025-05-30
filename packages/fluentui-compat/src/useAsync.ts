@@ -8,14 +8,16 @@ import * as React from 'react';
  * 
  * @example
  * ```tsx
+ * import { useCallback } from 'react';
+ * 
  * function MyComponent() {
  *   const async = useAsync();
  *   
- *   const handleClick = () => {
+ *   const handleClick = useCallback(() => {
  *     async.setTimeout(() => {
  *       console.log('Delayed action');
  *     }, 1000);
- *   };
+ *   }, [async]);
  *   
  *   return <button onClick={handleClick}>Start Timer</button>;
  * }

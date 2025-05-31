@@ -42,10 +42,10 @@ fi
 echo "Checking for required change files before push..."
 
 # Run rush change --verify to ensure change files are present
-if ! node common/scripts/install-run-rush.js change --verify --no-fetch 2>/dev/null; then
+if ! node common/scripts/install-run-rush.js change --verify --no-fetch 2>error.log; then
     echo ""
     echo "❌ Push rejected: Missing change files"
-    echo ""
+    echo "For more details, see the error log: error.log"
     echo "This repository requires change files for all package modifications."
     echo "Please run 'rush change' to create the necessary change files before pushing."
     echo ""

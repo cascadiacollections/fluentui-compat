@@ -9,7 +9,7 @@
     "lint": "eslint src --ext .ts,.tsx",
     "test": "jest",
     "api-extract": "api-extractor run --local --verbose",
-    "docs": "npm run api-extract && api-documenter markdown --input-folder temp --output-folder docs",
+    "docs": "npm run api-extract && api-documenter markdown --input-folder temp --output-folder docs && node scripts/generate-docs-index.js",
     "docs:generate": "npm run docs"
   },
   "repository": {

@@ -345,7 +345,14 @@
       /**
        * The path to the project folder, relative to the rush.json config file.
        */
-      "projectFolder": "packages/fluentui-compat"
+      "projectFolder": "packages/fluentui-compat",
+
+      /**
+       * An optional version policy associated with the project.  Version policies are defined
+       * in "version-policies.json" file.  See the "rush publish" documentation for more info.
+       * NOTE: "versionPolicyName" and "shouldPublish" are alternatives; you cannot specify them both.
+       */
+      "versionPolicyName": "fluentui-compat"
     }
     // {
     //   /**

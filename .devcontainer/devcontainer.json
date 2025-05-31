@@ -3,7 +3,8 @@
   "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
   
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/postgres:1": {}
   },
 
   "customizations": {
@@ -17,7 +18,9 @@
         "formulahendry.auto-rename-tag",
         "christian-kohler.path-intellisense",
         "orta.vscode-jest",
-        "ms-vscode.vscode-test-adapter-api"
+        "ms-vscode.vscode-test-adapter-api",
+        "ms-vscode.node-debug2",
+        "cypress.cypress"
       ],
       "settings": {
         "editor.formatOnSave": true,
@@ -41,7 +44,7 @@
     "setup": "rush update"
   },
 
-  "forwardPorts": [],
+  "forwardPorts": [3000, 8080],
 
   "remoteUser": "node"
 }

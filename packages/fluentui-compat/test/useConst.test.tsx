@@ -84,6 +84,14 @@ describe('useConst', () => {
     // Test with function returning false
     const { result: falseResult } = renderHook(() => useConst(() => false));
     expect(falseResult.current).toBe(false);
+    
+    // Test with function returning empty string
+    const { result: emptyStringResult } = renderHook(() => useConst(() => ''));
+    expect(emptyStringResult.current).toBe('');
+    
+    // Test with function returning zero
+    const { result: zeroResult } = renderHook(() => useConst(() => 0));
+    expect(zeroResult.current).toBe(0);
   });
 
   test('should distinguish between function values and function initializers', () => {

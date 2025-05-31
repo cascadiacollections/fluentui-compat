@@ -20,7 +20,6 @@
 
 # Only run this check if we're pushing to the main branch or a branch that will be merged to main
 protected_branch='main'
-current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
 
 # Check if we're pushing to or from a branch that should require change files
 should_check_changes=false

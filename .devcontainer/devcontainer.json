@@ -1,5 +1,5 @@
 {
-  "name": "FluentUI Compat Development",
+  "name": "@cascadiacollections/fluent-compat devcontainer",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
   
   "features": {

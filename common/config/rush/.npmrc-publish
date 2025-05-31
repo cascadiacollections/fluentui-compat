@@ -19,8 +19,11 @@
 #   //registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}
 #
 
-# Explicitly specify the NPM registry that "rush publish" will use by default:
-registry=https://registry.npmjs.org/
+# Configure GitHub Packages registry for @cascadiacollections scope
+@cascadiacollections:registry=https://npm.pkg.github.com
 
-# Provide an authentication token for the above registry URL:
-# //registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}
+# Provide authentication token for GitHub Packages registry
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+
+# Default registry for unscoped packages (fallback)
+registry=https://registry.npmjs.org/

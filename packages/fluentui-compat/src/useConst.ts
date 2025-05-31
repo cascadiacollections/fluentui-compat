@@ -8,6 +8,17 @@ import * as React from 'react';
 const UNINITIALIZED = Symbol('useConst.uninitialized');
 
 /**
+ * Type predicate to safely identify initializer functions.
+ * This approach eliminates the need for type assertions in the main logic.
+ * @internal
+ */
+function isInitializerFunction<T>(
+  value: T | (() => T)
+): value is () => T {
+  return typeof value === 'function';
+}
+
+/**
  * Hook to initialize and return a constant value with stable identity.
  * 
  * Unlike `React.useMemo`, this hook guarantees:
@@ -73,12 +84,15 @@ export function useConst<T>(initialValue: T | (() => T)): T {
   
   // Only initialize if we haven't set a value yet
   if (ref.current === UNINITIALIZED) {
-    // Type-safe function detection and execution
-    ref.current = typeof initialValue === 'function' 
-      ? (initialValue as () => T)() 
-      : initialValue;
+    if (isInitializerFunction(initialValue)) {
+      // TypeScript now knows initialValue is definitely () => T
+      ref.current = initialValue(); // ✅ No casting needed!
+    } else {
+      // TypeScript now knows initialValue is definitely T
+      ref.current = initialValue; // ✅ No casting needed!
+    }
   }
   
-  // Type assertion is safe here because we guarantee initialization above
+  // This is the only remaining cast, and it's safe because we guarantee initialization
   return ref.current as T;
 }

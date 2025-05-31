@@ -14,7 +14,7 @@ try {
     apiData = JSON.parse(fs.readFileSync(apiJsonPath, 'utf8'));
   }
 } catch (error) {
-  console.warn('Could not read API data, using static content');
+  console.warn('Could not read API data, using static content. Error details:', error);
 }
 
 // Extract functions and interfaces from API data

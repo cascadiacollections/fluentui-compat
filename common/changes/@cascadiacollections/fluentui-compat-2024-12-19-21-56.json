@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Add useAsync hook with automatic cleanup and development warnings",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "41898282+github-actions[bot]@users.noreply.github.com"
+}

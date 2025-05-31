@@ -1,6 +1,5 @@
-import { getWindow } from './dom/getWindow';
+import { getWindow } from "@fluentui/utilities";
 
-// Enhanced type declarations with better specificity
 declare function setTimeout(callback: Function, delay: number): number;
 declare function setInterval(callback: Function, delay: number): number;
 
@@ -339,7 +338,7 @@ export class Async {
     }
     
     // Refresh cache with new window reference
-    this._cachedWindow = getWindow(targetElement);
+    this._cachedWindow = getWindow(targetElement) ?? null;
     this._windowCacheTimestamp = currentTime;
     
     return this._cachedWindow;
@@ -441,6 +440,7 @@ export class Async {
    * @param targetElement - Optional element for window context (unused but maintained for API compatibility)
    * @public
    */
+  // eslint-disable-next-line no-unused-vars
   public clearImmediate(timerId: number, targetElement?: Element | null): void {
     this.clearTimeout(timerId);
   }
@@ -529,7 +529,7 @@ export class Async {
     const throttleState = {
       lastExecutionTime: 0,
       lastResult: undefined as ReturnType<T>,
-      lastArguments: EMPTY_ARRAY as any[],
+      lastArguments: EMPTY_ARRAY as readonly any[],
       pendingTimeoutId: null as number | null,
     };
     
@@ -557,7 +557,7 @@ export class Async {
         }
         
         // Execute function with proper context and store result
-        throttleState.lastResult = func.apply(this._parent, throttleState.lastArguments);
+        throttleState.lastResult = func.apply(this._parent, [...throttleState.lastArguments]);
       } 
       // Schedule trailing execution if not already scheduled
       else if (throttleState.pendingTimeoutId === null && enableTrailingExecution) {
@@ -620,7 +620,7 @@ export class Async {
       lastCallTime: 0,
       lastExecutionTime: performance.now(),
       lastResult: undefined as ReturnType<T>,
-      lastArguments: EMPTY_ARRAY as any[],
+      lastArguments: EMPTY_ARRAY as readonly any[],
       pendingTimeoutId: null as number | null,
     };
 
@@ -644,7 +644,7 @@ export class Async {
      */
     const executeDebounceFunction = (executionTime: number): void => {
       markFunctionExecuted(executionTime);
-      debounceState.lastResult = func.apply(this._parent, debounceState.lastArguments);
+      debounceState.lastResult = func.apply(this._parent, [...debounceState.lastArguments]);
     };
 
     /**
@@ -807,6 +807,7 @@ export class Async {
    * @param targetElement - Optional element for window context (maintained for API compatibility)
    * @public
    */
+  // eslint-disable-next-line no-unused-vars
   public cancelAnimationFrame(frameId: number, targetElement?: Element | null): void {
     this._timerManager.removeTimer(frameId);
   }

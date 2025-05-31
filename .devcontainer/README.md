@@ -15,6 +15,7 @@ This DevContainer provides a consistent development environment for the fluentui
   - NPM script support
   - Auto-rename tag for React development
   - Path IntelliSense for file imports
+  - Node.js Debugger for debugging build processes and tests
 
 ## Automatic Setup
 
@@ -41,7 +42,26 @@ npm test
 # Lint code
 cd packages/fluentui-compat  
 npm run lint
+
+# Generate documentation
+cd packages/fluentui-compat
+npm run docs
 ```
+
+## Debugging
+
+The DevContainer includes the Node.js Debugger extension for debugging:
+
+- **Build processes**: Debug TypeScript compilation and build scripts
+- **Tests**: Set breakpoints in Jest tests for debugging
+- **Development**: Debug any Node.js scripts used in the project
+
+### Setting up debugging
+
+1. Open a file you want to debug
+2. Set breakpoints by clicking in the gutter
+3. Use the Debug panel (Ctrl/Cmd + Shift + D) to start debugging
+4. Select the appropriate debug configuration for your needs
 
 ## Troubleshooting
 
@@ -61,3 +81,10 @@ rush build
 The DevContainer should automatically install extensions. If they're missing:
 1. Open Command Palette (Ctrl/Cmd + Shift + P)
 2. Run "Developer: Reload Window"
+
+### Test issues
+If Jest tests aren't running properly:
+```bash
+cd packages/fluentui-compat
+npm test
+```

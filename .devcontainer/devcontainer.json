@@ -17,7 +17,8 @@
         "formulahendry.auto-rename-tag",
         "christian-kohler.path-intellisense",
         "orta.vscode-jest",
-        "ms-vscode.vscode-test-adapter-api"
+        "ms-vscode.vscode-test-adapter-api",
+        "ms-vscode.node-debug2"
       ],
       "settings": {
         "editor.formatOnSave": true,

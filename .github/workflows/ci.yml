@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Git config user
         run: |
           git config --global user.name "github-actions[bot]"
@@ -24,7 +24,10 @@ jobs:
         with:
           node-version: 20
       - name: Verify Change Logs
-        run: node common/scripts/install-run-rush.js change --verify
+        run: |
+          echo "Verifying that change files are present for all modified packages..."
+          node common/scripts/install-run-rush.js change --verify
+          echo "Change file verification completed successfully."
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
       - name: Rush rebuild

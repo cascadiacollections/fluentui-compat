@@ -1,0 +1,58 @@
+#!/bin/sh
+#
+# This Git hook is automatically installed by Rush when you run "rush install" or "rush update".
+# It enforces that change files are present for all modified packages.
+#
+# TO LEARN MORE ABOUT GIT HOOKS
+#
+# The Git documentation is here: https://git-scm.com/docs/githooks
+# Some helpful resources: https://githooks.com
+#
+# ABOUT THIS EXAMPLE
+#
+# The pre-push hook is called by "git push" after it has checked the remote status,
+# but before anything has been pushed.  If this script exits with a non-zero status
+# nothing will be pushed.
+#
+# This hook verifies that change files are present for all modified packages
+# by running "rush change --verify".
+
+# Only run this check if we're pushing to the main branch or a branch that will be merged to main
+protected_branch='main'
+
+# Check if we're pushing to or from a branch that should require change files
+should_check_changes=false
+
+# Read stdin to get the list of refs being pushed
+while read local_ref local_sha remote_ref remote_sha
+do
+    if [ "$remote_ref" = "refs/heads/$protected_branch" ]; then
+        should_check_changes=true
+        break
+    fi
+done
+
+# If this push doesn't affect the main branch, allow it
+if [ "$should_check_changes" = "false" ]; then
+    exit 0
+fi
+
+echo "Checking for required change files before push..."
+
+# Run rush change --verify to ensure change files are present
+if ! node common/scripts/install-run-rush.js change --verify --no-fetch 2>/dev/null; then
+    echo ""
+    echo "❌ Push rejected: Missing change files"
+    echo ""
+    echo "This repository requires change files for all package modifications."
+    echo "Please run 'rush change' to create the necessary change files before pushing."
+    echo ""
+    echo "If you're not modifying any packages, you can run:"
+    echo "  rush change --verify"
+    echo "to confirm that no change files are needed."
+    echo ""
+    exit 1
+fi
+
+echo "✅ Change file verification passed"
+exit 0

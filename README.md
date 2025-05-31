@@ -183,18 +183,22 @@ npm run lint
 1. Open the repository in VS Code with Dev Containers extension
 2. Reopen in container when prompted
 3. Make your changes
-4. Run `rush build` to ensure everything builds  
-5. Run tests: `cd packages/fluentui-compat && npm test`
-6. Submit a pull request
+4. **Create change files**: `rush change` (required for package modifications)
+5. Run `rush build` to ensure everything builds  
+6. Run tests: `cd packages/fluentui-compat && npm test`
+7. Submit a pull request
 
 ### Option 2: Local Development
 
 1. Install Rush CLI: `npm install -g @microsoft/rush`
 2. Run `rush update` to install dependencies
 3. Make your changes
-4. Run `rush build` to ensure everything builds
-5. Run tests: `cd packages/fluentui-compat && npm test`
-6. Submit a pull request
+4. **Create change files**: `rush change` (required for package modifications)
+5. Run `rush build` to ensure everything builds
+6. Run tests: `cd packages/fluentui-compat && npm test`
+7. Submit a pull request
+
+**Note**: Change files are required for all package modifications and are automatically verified by CI and git hooks. Git hooks are automatically installed when you run `rush update`. See [MONOREPO.md](MONOREPO.md) for more details.
 
 ## License
 

@@ -28,7 +28,8 @@ Full API documentation is automatically generated and published to GitHub Pages:
 
 The documentation is built using:
 - [API Extractor](https://api-extractor.com/) for generating API reports from TypeScript
-- [API Documenter](https://api-extractor.com/pages/setup/generating_docs/) for converting reports to web-friendly documentation
+- [API Documenter](https://api-extractor.com/pages/setup/generating_docs/) for converting reports to markdown
+- [DocFX](https://dotnet.github.io/docfx/) for generating the static documentation website
 
 ## Getting Started
 

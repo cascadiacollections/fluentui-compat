@@ -46,6 +46,32 @@ rush update
 rush build
 ```
 
+## DevContainer Support
+
+This repository includes DevContainer configuration for consistent development environments. The DevContainer provides:
+
+- Node.js 20 (LTS)
+- Rush CLI pre-installed
+- VS Code extensions for TypeScript, React, ESLint, and Jest
+- Automatic dependency installation
+
+### Using DevContainer
+
+1. **Prerequisites**: Install [Docker](https://docs.docker.com/get-docker/) and [VS Code](https://code.visualstudio.com/) with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+2. **Open in DevContainer**:
+   - Clone the repository
+   - Open the folder in VS Code
+   - When prompted, click "Reopen in Container" or use Command Palette > "Dev Containers: Reopen in Container"
+
+3. **Manual setup** (if auto-setup fails):
+   ```bash
+   rush update
+   rush build
+   ```
+
+The DevContainer will automatically run `rush update` after creation to install all dependencies.
+
 ## Packages
 
 ### `fluentui-compat`
@@ -143,11 +169,22 @@ npm run lint
 
 ## Contributing
 
+### Option 1: Using DevContainer (Recommended)
+
+1. Open the repository in VS Code with Dev Containers extension
+2. Reopen in container when prompted
+3. Make your changes
+4. Run `rush build` to ensure everything builds  
+5. Run tests: `cd packages/fluentui-compat && npm test`
+6. Submit a pull request
+
+### Option 2: Local Development
+
 1. Install Rush CLI: `npm install -g @microsoft/rush`
 2. Run `rush update` to install dependencies
 3. Make your changes
 4. Run `rush build` to ensure everything builds
-5. Run `rush test` to run tests
+5. Run tests: `cd packages/fluentui-compat && npm test`
 6. Submit a pull request
 
 ## License

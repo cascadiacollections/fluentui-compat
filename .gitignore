@@ -151,5 +151,9 @@ common/temp/
 **/coverage/
 **/nyc_output/
 
+# Auto-generated documentation (only generated in CI)
+packages/*/docs/
+packages/*/_site/
+
 # Rush logs
 **/*.log

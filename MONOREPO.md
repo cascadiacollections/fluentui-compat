@@ -58,12 +58,9 @@ rush change --verify
 
 **CI Enforcement**: The CI workflow automatically verifies that change files are present for all modified packages. Pushes and merges to main will be rejected if change files are missing.
 
-**Optional Git Hook**: For additional local protection, you can enable the pre-push git hook:
-```bash
-# Enable the pre-push hook to check change files before pushing
-cp common/git-hooks/pre-push.sample .git/hooks/pre-push
-chmod +x .git/hooks/pre-push
-```
+**Automatic Git Hook Protection**: Git hooks are automatically installed when you run `rush update` or `rush install`. The pre-push hook will prevent you from pushing changes without proper change files, providing immediate feedback during development.
+
+**DevContainer Support**: When using the DevContainer, git hooks are automatically installed during container setup, ensuring all developers have consistent protection.
 
 ### Manual Publishing
 ```bash

@@ -198,7 +198,7 @@ npm run lint
 6. Run tests: `cd packages/fluentui-compat && npm test`
 7. Submit a pull request
 
-**Note**: Change files are required for all package modifications and are automatically verified by CI. See [MONOREPO.md](MONOREPO.md) for more details.
+**Note**: Change files are required for all package modifications and are automatically verified by CI and git hooks. Git hooks are automatically installed when you run `rush update`. See [MONOREPO.md](MONOREPO.md) for more details.
 
 ## License
 

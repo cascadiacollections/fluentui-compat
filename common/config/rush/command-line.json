@@ -43,7 +43,7 @@
        *
        * In particular, this is needed for custom scripts that invoke other Rush commands.
        */
-      "safeForSimultaneousRushProcesses": false,
+      "safeForSimultaneousRushProcesses": true,
 
       /**
        * (Required) A script that will be invoked using the OS shell. The working directory will be

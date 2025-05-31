@@ -2,6 +2,8 @@
 
 > FluentUI React complimentary components and utilities focused on render performance
 
+📚 **[Full API Documentation](https://cascadiacollections.github.io/fluentui-compat/)**
+
 ## Installation
 
 ```bash

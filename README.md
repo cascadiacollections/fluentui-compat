@@ -22,6 +22,14 @@ fluentui-compat/
 └── rush.json                     # Rush configuration
 ```
 
+## API Documentation
+
+Full API documentation is automatically generated and published to GitHub Pages: [https://cascadiacollections.github.io/fluentui-compat/](https://cascadiacollections.github.io/fluentui-compat/)
+
+The documentation is built using:
+- [API Extractor](https://api-extractor.com/) for generating API reports from TypeScript
+- [API Documenter](https://api-extractor.com/pages/setup/generating_docs/) for converting reports to web-friendly documentation
+
 ## Getting Started
 
 ### Prerequisites

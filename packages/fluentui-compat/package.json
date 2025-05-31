@@ -8,7 +8,9 @@
     "build": "tsc && npm run api-extract",
     "lint": "eslint src --ext .ts,.tsx",
     "test": "jest",
-    "api-extract": "api-extractor run --local --verbose"
+    "api-extract": "api-extractor run --local --verbose",
+    "docs": "npm run api-extract && api-documenter markdown --input-folder temp --output-folder docs",
+    "docs:generate": "npm run docs"
   },
   "repository": {
     "type": "git",
@@ -35,6 +37,7 @@
   "devDependencies": {
     "@fluentui/react-components": "^9.0.0",
     "@fluentui/react-icons": "^2.0.253",
+    "@microsoft/api-documenter": "^7.25.17",
     "@microsoft/api-extractor": "^7.44.0",
     "@rushstack/heft": "^0.66.0",
     "@testing-library/jest-dom": "^6.6.3",

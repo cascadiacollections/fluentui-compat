@@ -8,17 +8,6 @@ import * as React from 'react';
 const UNINITIALIZED = Symbol('useConst.uninitialized');
 
 /**
- * Type predicate to safely identify initializer functions.
- * This approach eliminates the need for type assertions in the main logic.
- * @internal
- */
-function isInitializerFunction<T>(
-  value: T | (() => T)
-): value is () => T {
-  return typeof value === 'function';
-}
-
-/**
  * Hook to initialize and return a constant value with stable identity.
  * 
  * Unlike `React.useMemo`, this hook guarantees:
@@ -28,7 +17,6 @@ function isInitializerFunction<T>(
  * 
  * This is equivalent to setting a private member in a class constructor.
  * 
- * @template T - The type of the constant value
  * @param initialValue - The initial value or a function that returns the initial value.
  *                      Only the value/function passed on the first render is used.
  * @returns The constant value. The identity of this value will always be the same.
@@ -76,7 +64,6 @@ function isInitializerFunction<T>(
  * @see {@link https://react.dev/reference/react/useCallback | React.useCallback} for memoizing callbacks
  * 
  * @public
- * @since 1.0.0
  */
 export function useConst<T>(initialValue: T | (() => T)): T {
   // Use a ref to store the value with a union type that includes our sentinel
@@ -84,15 +71,12 @@ export function useConst<T>(initialValue: T | (() => T)): T {
   
   // Only initialize if we haven't set a value yet
   if (ref.current === UNINITIALIZED) {
-    if (isInitializerFunction(initialValue)) {
-      // TypeScript now knows initialValue is definitely () => T
-      ref.current = initialValue(); // ✅ No casting needed!
-    } else {
-      // TypeScript now knows initialValue is definitely T
-      ref.current = initialValue; // ✅ No casting needed!
-    }
+    // Type-safe function detection and execution
+    ref.current = typeof initialValue === 'function' 
+      ? (initialValue as () => T)() 
+      : initialValue;
   }
   
-  // This is the only remaining cast, and it's safe because we guarantee initialization
+  // Type assertion is safe here because we guarantee initialization above
   return ref.current as T;
 }

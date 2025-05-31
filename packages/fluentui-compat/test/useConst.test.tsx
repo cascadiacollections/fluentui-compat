@@ -97,8 +97,8 @@ describe('useConst', () => {
   test('should distinguish between function values and function initializers', () => {
     const testFunction = () => 'I am a function value';
     
-    // When passing a function as the value (not initializer)
-    const { result } = renderHook(() => useConst(testFunction));
+    // When storing a function as a value, wrap it in an initializer
+    const { result } = renderHook(() => useConst(() => testFunction));
     
     // Should return the function itself, not call it
     expect(result.current).toBe(testFunction);

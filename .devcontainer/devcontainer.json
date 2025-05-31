@@ -3,8 +3,7 @@
   "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
   
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers/features/postgres:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
 
   "customizations": {
@@ -19,8 +18,7 @@
         "christian-kohler.path-intellisense",
         "orta.vscode-jest",
         "ms-vscode.vscode-test-adapter-api",
-        "ms-vscode.node-debug2",
-        "cypress.cypress"
+        "ms-vscode.node-debug2"
       ],
       "settings": {
         "editor.formatOnSave": true,
@@ -44,7 +42,7 @@
     "setup": "rush update"
   },
 
-  "forwardPorts": [3000, 8080],
+  "forwardPorts": [],
 
   "remoteUser": "node"
 }

@@ -20,6 +20,9 @@ importers:
       '@fluentui/react-icons':
         specifier: ^2.0.253
         version: 2.0.301(react@18.3.1)
+      '@microsoft/api-documenter':
+        specifier: ^7.25.17
+        version: 7.26.27(@types/node@20.17.52)
       '@microsoft/api-extractor':
         specifier: ^7.44.0
         version: 7.52.8(@types/node@20.17.52)
@@ -2397,6 +2400,21 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+    dev: true
+
+  /@microsoft/api-documenter@7.26.27(@types/node@20.17.52):
+    resolution: {integrity: sha512-POELaGjCyxYBHP0vGUS9SoyClEEA3+YLeGYwEShJ+ttbB/DzdkWDH1IK5pUGxwe/J2bJ7SuRbI7u17O16MrxCA==}
+    hasBin: true
+    dependencies:
+      '@microsoft/api-extractor-model': 7.30.6(@types/node@20.17.52)
+      '@microsoft/tsdoc': 0.15.1
+      '@rushstack/node-core-library': 5.13.1(@types/node@20.17.52)
+      '@rushstack/terminal': 0.15.3(@types/node@20.17.52)
+      '@rushstack/ts-command-line': 5.0.1(@types/node@20.17.52)
+      js-yaml: 3.13.1
+      resolve: 1.22.10
+    transitivePeerDependencies:
+      - '@types/node'
     dev: true
 
   /@microsoft/api-extractor-model@7.30.6(@types/node@20.17.52):
@@ -5231,6 +5249,14 @@ packages:
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+
+  /js-yaml@3.13.1:
+    resolution: {integrity: sha512-YfbcO7jXDdyj0DGxYVSlSeQNHbD7XPWvrVWeVUujrQEoZzWJIRrCPoyk6kL6IAjAG2IolMK4T0hNUe0HOUs5Jw==}
+    hasBin: true
+    dependencies:
+      argparse: 1.0.10
+      esprima: 4.0.1
+    dev: true
 
   /js-yaml@3.14.1:
     resolution: {integrity: sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==}

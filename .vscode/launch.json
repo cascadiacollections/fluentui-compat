@@ -84,7 +84,11 @@
       "name": "Debug Webpack Plugin Example",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/packages/fluentui-compat-webpack-plugin/examples/webpack.config.js",
+      "program": "${workspaceFolder}/node_modules/.bin/webpack",
+      "args": [
+        "--config",
+        "examples/webpack.config.js"
+      ],
       "cwd": "${workspaceFolder}/packages/fluentui-compat-webpack-plugin/examples",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"

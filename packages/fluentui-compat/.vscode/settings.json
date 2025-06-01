@@ -1,10 +1,10 @@
 {
     // Jest configuration specific to this package
-    "jest.jestCommandLine": "npx jest --runInBand --no-coverage",
+    "jest.autoRun": "off",
     "jest.runMode": "on-demand",
     "jest.rootPath": ".",
+    "jest.jestCommandLine": "npx jest --runInBand --no-coverage",
     "jest.autoEnable": true,
-    "jest.disabledWorkspaceFolders": [],
     
     // Package-specific settings
     "typescript.preferences.includePackageJsonAutoImports": "on",
@@ -14,7 +14,8 @@
     "files.exclude": {
         "node_modules": true,
         "dist": true,
-        "test-results": true,
-        "coverage": true
+        "temp": true,
+        ".rush": true,
+        "rush-logs": true
     }
 }

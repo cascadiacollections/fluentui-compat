@@ -1,20 +1,68 @@
 {
     "folders": [
         {
-            "name": "fluentui-compat",
+            "name": "🏠 Root",
+            "path": "."
+        },
+        {
+            "name": "📦 fluentui-compat",
             "path": "./packages/fluentui-compat"
         },
         {
-            "name": "fluentui-compat-webpack-plugin",
+            "name": "🔧 webpack-plugin",
             "path": "./packages/fluentui-compat-webpack-plugin"
-        },
-        {
-            "name": "root",
-            "path": "."
         }
     ],
     "settings": {
-        "typescript.preferences.includePackageJsonAutoImports": "on",
-        "jest.disabledWorkspaceFolders": ["fluentui-compat", "root"]
+        // Inherit from .vscode/settings.json but override specific workspace settings
+        "jest.disabledWorkspaceFolders": ["🏠 Root"],
+        
+        // Workspace-specific settings
+        "files.exclude": {
+            "**/node_modules": true,
+            "**/dist": true,
+            "**/temp": true,
+            "**/.rush": true,
+            "**/rush-logs": true,
+            "**/*.log": true
+        },
+        
+        // Multi-root workspace specific settings
+        "search.useGlobalIgnoreFiles": true,
+        "search.useParentIgnoreFiles": true,
+        
+        // Terminal settings for monorepo
+        "terminal.integrated.cwd": "${workspaceFolder:🏠 Root}"
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-vscode.vscode-typescript-next",
+            "esbenp.prettier-vscode",
+            "dbaeumer.vscode-eslint",
+            "firsttris.vscode-jest-runner",
+            "eamodio.gitlens",
+            "christian-kohler.path-intellisense"
+        ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "🚀 Rush Build All",
+                "type": "shell",
+                "command": "rush",
+                "args": ["build"],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "panel": "shared"
+                },
+                "problemMatcher": ["$tsc"]
+            }
+        ]
     }
 }

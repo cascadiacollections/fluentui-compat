@@ -1,0 +1,41 @@
+{
+  "recommendations": [
+    // TypeScript and JavaScript
+    "ms-vscode.vscode-typescript-next",
+    
+    // Code formatting
+    "esbenp.prettier-vscode",
+    
+    // Linting
+    "dbaeumer.vscode-eslint",
+    
+    // Testing
+    "firsttris.vscode-jest-runner",
+    "ms-vscode.test-adapter-converter",
+    
+    // React development
+    "formulahendry.auto-rename-tag",
+    "bradlc.vscode-tailwindcss",
+    
+    // General development
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-json",
+    "ms-vscode.vscode-npm-scripts",
+    
+    // Git
+    "eamodio.gitlens",
+    
+    // Debugging
+    "ms-vscode.vscode-js-debug",
+    
+    // Documentation
+    "yzhang.markdown-all-in-one",
+    
+    // Monorepo support
+    "ms-vscode.vscode-workspace-trust"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript",
+    "hookyqr.beautify"
+  ]
+}

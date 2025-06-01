@@ -1,3 +1,77 @@
 {
-    "typescript.preferences.includePackageJsonAutoImports": "on"
+  // TypeScript settings
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.inlayHints.parameterNames.enabled": "all",
+  "typescript.inlayHints.variableTypes.enabled": true,
+  "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+
+  // Editor settings
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.rulers": [80, 120],
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+
+  // ESLint settings
+  "eslint.workingDirectories": [
+    "packages/fluentui-compat",
+    "packages/fluentui-compat-webpack-plugin"
+  ],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  // Jest settings
+  "jest.autoRun": "off",
+  "jest.runMode": "on-demand",
+
+  // File associations
+  "files.associations": {
+    "*.json": "jsonc"
+  },
+
+  // Search settings
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/temp": true,
+    "**/common/temp": true,
+    "**/.rush": true,
+    "**/rush-logs": true
+  },
+
+  // File watcher settings
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/temp/**": true,
+    "**/common/temp/**": true,
+    "**/.rush/**": true,
+    "**/rush-logs/**": true
+  },
+
+  // Git settings
+  "git.ignoreLimitWarning": true,
+
+  // NPM settings
+  "npm.packageManager": "pnpm",
+
+  // Explorer settings
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.d.ts.map",
+    "*.tsx": "${capture}.js, ${capture}.d.ts, ${capture}.d.ts.map",
+    "tsconfig.json": "tsconfig.*.json",
+    "package.json": "package-lock.json, pnpm-lock.yaml, yarn.lock"
+  }
 }

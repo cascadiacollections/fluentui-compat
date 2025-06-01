@@ -1,0 +1,141 @@
+version: 2
+updates:
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    reviewers:
+      - "KevinTCoughlin"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # Root npm dependencies (Rush configuration)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    labels:
+      - "dependencies"
+      - "npm"
+    reviewers:
+      - "KevinTCoughlin"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      rush-stack:
+        patterns:
+          - "@microsoft/rush*"
+          - "@rushstack/*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Main fluentui-compat package
+  - package-ecosystem: "npm"
+    directory: "/packages/fluentui-compat"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "06:00"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "fluentui-compat"
+    reviewers:
+      - "KevinTCoughlin"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      fluentui:
+        patterns:
+          - "@fluentui/*"
+        update-types:
+          - "minor"
+          - "patch"
+      microsoft-tools:
+        patterns:
+          - "@microsoft/*"
+        update-types:
+          - "minor"
+          - "patch"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@typescript-eslint/*"
+          - "@types/*"
+        update-types:
+          - "minor"
+          - "patch"
+      testing:
+        patterns:
+          - "jest*"
+          - "@testing-library/*"
+          - "ts-jest"
+        update-types:
+          - "minor"
+          - "patch"
+      linting:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint/*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Webpack plugin package
+  - package-ecosystem: "npm"
+    directory: "/packages/fluentui-compat-webpack-plugin"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "06:00"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "webpack-plugin"
+    reviewers:
+      - "KevinTCoughlin"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      babel:
+        patterns:
+          - "@babel/*"
+        update-types:
+          - "minor"
+          - "patch"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@typescript-eslint/*"
+          - "@types/*"
+        update-types:
+          - "minor"
+          - "patch"
+      testing:
+        patterns:
+          - "jest*"
+          - "ts-jest"
+          - "jest-junit"
+        update-types:
+          - "minor"
+          - "patch"
+      webpack:
+        patterns:
+          - "webpack*"
+          - "@types/webpack"
+        update-types:
+          - "minor"
+          - "patch"

@@ -1,11 +1,9 @@
 {
   "name": "@cascadiacollections/fluent-compat devcontainer",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
-  
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-
   "customizations": {
     "vscode": {
       "extensions": [
@@ -16,7 +14,7 @@
         "ms-vscode.vscode-npm-scripts",
         "formulahendry.auto-rename-tag",
         "christian-kohler.path-intellisense",
-        "orta.vscode-jest",
+        "firsttris.vscode-jest-runner",
         "ms-vscode.vscode-test-adapter-api",
         "ms-vscode.node-debug2"
       ],
@@ -29,20 +27,18 @@
         "typescript.preferences.importModuleSpecifier": "relative",
         "typescript.suggest.autoImports": true,
         "jest.autoRun": "off",
-        "eslint.workingDirectories": ["packages/fluentui-compat"]
+        "eslint.workingDirectories": [
+          "packages/fluentui-compat"
+        ]
       }
     }
   },
-
   "onCreateCommand": {
     "install-rush": "npm install -g @microsoft/rush"
   },
-
   "postCreateCommand": {
     "setup": "rush update"
   },
-
   "forwardPorts": [],
-
   "remoteUser": "node"
 }

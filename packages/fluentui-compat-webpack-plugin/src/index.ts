@@ -120,7 +120,7 @@ export class FluentUICompatPlugin implements WebpackPlugin {
     // Additional hook for handling require() calls and dynamic imports
     compiler.hooks.compilation.tap(pluginName, (compilation: any) => {
       // Hook into the parser to handle require() and import() expressions
-      compilation.hooks.normalModuleLoader.tap(pluginName, (loaderContext: any, module: any) => {
+      compilation.hooks.normalModuleLoader.tap(pluginName, () => {
         // This will be handled by the module rewriting logic above
         // Additional processing could be added here if needed
       });
@@ -143,7 +143,7 @@ export class FluentUICompatPlugin implements WebpackPlugin {
         
         // Check if we have specific export mappings
         if (mapping.exports) {
-          for (const [fromExport, toExport] of Object.entries(mapping.exports)) {
+          for (const [fromExport] of Object.entries(mapping.exports)) {
             if (subpath === fromExport || subpath.endsWith('/' + fromExport)) {
               // Map to the specific export in the target package
               return mapping.to;

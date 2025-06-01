@@ -5,8 +5,7 @@ module.exports = {
     '@typescript-eslint'
   ],
   extends: [
-    'eslint:recommended',
-    '@typescript-eslint/recommended'
+    'eslint:recommended'
   ],
   parserOptions: {
     ecmaVersion: 2020,
@@ -14,7 +13,7 @@ module.exports = {
   },
   rules: {
     '@typescript-eslint/no-unused-vars': 'error',
-    '@typescript-eslint/explicit-function-return-type': 'warn'
+    'no-unused-vars': 'off'
   },
   env: {
     node: true,

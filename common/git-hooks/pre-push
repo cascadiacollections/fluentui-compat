@@ -51,6 +51,9 @@ if ! node common/scripts/install-run-rush.js change --verify --no-fetch 2>/dev/n
     echo "  rush change --verify"
     echo "to confirm that no change files are needed."
     echo ""
+    echo "Note: For dependabot PRs, change files should be created when merging"
+    echo "to document the dependency updates in the changelog."
+    echo ""
     exit 1
 fi
 

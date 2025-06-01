@@ -24,6 +24,9 @@ jobs:
         with:
           node-version: 20
       - name: Verify Change Logs
+        # Skip change file verification for dependabot PRs since dependency updates
+        # are automated and don't require manual change file management
+        if: github.actor != 'dependabot[bot]'
         run: |
           echo "Verifying that change files are present for all modified packages..."
           node common/scripts/install-run-rush.js change --verify

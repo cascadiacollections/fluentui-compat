@@ -1,0 +1,65 @@
+name: Dependabot Lockfile Update
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-lockfile:
+    # Only run for dependabot PRs
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Git config user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Check if lockfile needs update
+        id: check-lockfile
+        run: |
+          # Try to run rush install to see if lockfile is out of date
+          if node common/scripts/install-run-rush.js install > /dev/null 2>&1; then
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+          else
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update lockfile
+        if: steps.check-lockfile.outputs.needs_update == 'true'
+        run: |
+          echo "Updating shrinkwrap file..."
+          node common/scripts/install-run-rush.js update
+
+      - name: Check for changes
+        if: steps.check-lockfile.outputs.needs_update == 'true'
+        id: check-changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit lockfile changes
+        if: steps.check-lockfile.outputs.needs_update == 'true' && steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          git add common/config/rush/pnpm-lock.yaml packages/*/pnpm-lock.yaml
+          git commit -m "chore: update pnpm lockfile for dependabot changes"
+          git push

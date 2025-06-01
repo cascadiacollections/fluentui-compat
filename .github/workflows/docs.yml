@@ -38,11 +38,6 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Install DocFX
         run: dotnet tool install -g docfx
-      - name: Rush Update (Dependabot)
-        # For dependabot PRs, run rush update to ensure the shrinkwrap file is updated
-        # when package.json files are modified by dependabot
-        if: github.actor == 'dependabot[bot]'
-        run: node common/scripts/install-run-rush.js update
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
       - name: Build packages

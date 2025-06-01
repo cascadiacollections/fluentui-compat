@@ -35,17 +35,30 @@ jobs:
         id: check-lockfile
         run: |
           # Try to run rush install to see if lockfile is out of date
-          if node common/scripts/install-run-rush.js install > /dev/null 2>&1; then
+          # Rush will exit with code 1 and show specific error message if shrinkwrap is out of date
+          if output=$(node common/scripts/install-run-rush.js install 2>&1); then
             echo "needs_update=false" >> $GITHUB_OUTPUT
+            echo "Rush install succeeded - lockfile is up to date"
           else
             echo "needs_update=true" >> $GITHUB_OUTPUT
+            echo "Rush install failed - checking if it's due to out-of-date lockfile"
+            echo "$output" | grep -q "shrinkwrap file.*is out of date\|do not match the current shrinkwrap" || {
+              echo "ERROR: Rush install failed for reasons other than out-of-date lockfile:"
+              echo "$output"
+              exit 1
+            }
+            echo "Confirmed: lockfile needs update"
           fi
 
       - name: Update lockfile
         if: steps.check-lockfile.outputs.needs_update == 'true'
         run: |
           echo "Updating shrinkwrap file..."
-          node common/scripts/install-run-rush.js update
+          if ! node common/scripts/install-run-rush.js update; then
+            echo "ERROR: Rush update failed"
+            exit 1
+          fi
+          echo "Rush update completed successfully"
 
       - name: Check for changes
         if: steps.check-lockfile.outputs.needs_update == 'true'
@@ -60,6 +73,16 @@ jobs:
       - name: Commit lockfile changes
         if: steps.check-lockfile.outputs.needs_update == 'true' && steps.check-changes.outputs.has_changes == 'true'
         run: |
-          git add common/config/rush/pnpm-lock.yaml packages/*/pnpm-lock.yaml
+          echo "Committing lockfile changes..."
+          # Add all pnpm lockfiles that may have been updated
+          git add common/config/rush/pnpm-lock.yaml packages/fluentui-compat-webpack-plugin/pnpm-lock.yaml
+          
+          # Check if anything was actually staged
+          if git diff --staged --quiet; then
+            echo "No lockfile changes to commit"
+            exit 0
+          fi
+          
           git commit -m "chore: update pnpm lockfile for dependabot changes"
           git push
+          echo "Successfully committed and pushed lockfile changes"

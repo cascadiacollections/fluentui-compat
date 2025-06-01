@@ -1,0 +1,7 @@
+{
+    "jest.jestCommandLine": "npx jest --runInBand --no-coverage",
+    "jest.runMode": "on-demand",
+    "jest.rootPath": ".",
+    "jest.autoEnable": true,
+    "jest.disabledWorkspaceFolders": []
+}

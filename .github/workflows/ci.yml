@@ -4,13 +4,18 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Git config user
         run: |
           git config --global user.name "github-actions[bot]"
@@ -19,7 +24,10 @@ jobs:
         with:
           node-version: 20
       - name: Verify Change Logs
-        run: node common/scripts/install-run-rush.js change --verify
+        run: |
+          echo "Verifying that change files are present for all modified packages..."
+          node common/scripts/install-run-rush.js change --verify
+          echo "Change file verification completed successfully."
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
       - name: Rush rebuild
@@ -39,3 +47,27 @@ jobs:
         with:
           name: package-tarball
           path: packages/fluentui-compat/*.tgz
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Git config user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Rush Install
+        run: node common/scripts/install-run-rush.js install
+      - name: Rush release
+        run: node common/scripts/install-run-rush.js release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

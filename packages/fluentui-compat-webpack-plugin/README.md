@@ -42,6 +42,7 @@ By default, the plugin includes these mappings:
 | Original Import | Rewritten To | Benefit |
 |----------------|-------------|---------|
 | `@fluentui/utilities` → `Async` | `@cascadiacollections/fluentui-compat` → `useAsync` | React hook with automatic cleanup |
+| `@fluentui/utilities` → `useConst` | `@cascadiacollections/fluentui-compat` → `useConst` | Optimized memoization hook |
 
 ### Example Transformation
 
@@ -84,7 +85,8 @@ new FluentUICompatPlugin({
       from: '@fluentui/utilities',
       to: '@cascadiacollections/fluentui-compat',
       exports: {
-        'Async': 'useAsync'
+        'Async': 'useAsync',
+        'useConst': 'useConst'
       }
     },
     {

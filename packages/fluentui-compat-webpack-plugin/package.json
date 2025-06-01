@@ -1,0 +1,47 @@
+{
+  "name": "@cascadiacollections/fluentui-compat-webpack-plugin",
+  "version": "1.0.0",
+  "description": "Webpack plugin that rewrites FluentUI imports to use fluentui-compat alternatives",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src --ext .ts",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cascadiacollections/fluentui-compat.git",
+    "directory": "packages/fluentui-compat-webpack-plugin"
+  },
+  "homepage": "https://github.com/cascadiacollections/fluentui-compat#readme",
+  "keywords": [
+    "webpack",
+    "plugin",
+    "fluentui",
+    "compat",
+    "performance",
+    "import-rewrite"
+  ],
+  "author": "Cascadia Collections",
+  "license": "MIT",
+  "peerDependencies": {
+    "webpack": "^4.0.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.0.0",
+    "@types/webpack": "^4.41.0 || ^5.28.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "~5.6.3",
+    "webpack": "^5.95.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

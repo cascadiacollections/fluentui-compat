@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Add VSCode configuration files for improved development experience",
+      "type": "none"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "41898282+github-actions[bot]@users.noreply.github.com"
+}

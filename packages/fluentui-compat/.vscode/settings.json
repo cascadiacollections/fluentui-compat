@@ -3,6 +3,7 @@
     "jest.autoRun": "off",
     "jest.runMode": "on-demand",
     "jest.rootPath": ".",
+    "jest.jestCommandLine": "npx jest --runInBand --no-coverage",
     "jest.autoEnable": true,
     
     // Package-specific settings

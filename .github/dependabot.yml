@@ -10,8 +10,6 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
-    reviewers:
-      - "KevinTCoughlin"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
@@ -28,8 +26,6 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    reviewers:
-      - "KevinTCoughlin"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
@@ -54,8 +50,6 @@ updates:
       - "dependencies"
       - "npm"
       - "fluentui-compat"
-    reviewers:
-      - "KevinTCoughlin"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
@@ -108,8 +102,6 @@ updates:
       - "dependencies"
       - "npm"
       - "webpack-plugin"
-    reviewers:
-      - "KevinTCoughlin"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"

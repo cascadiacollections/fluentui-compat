@@ -14,7 +14,7 @@ describe("FluentUICompatPlugin Integration", () => {
       },
       // Specific export
       {
-        input: "@fluentui/utilities/lib/Async",
+        input: "@fluentui/utilities/lib/useAsync",
         expected: "@cascadiacollections/fluentui-compat",
       },
       // Deep submodule that should be preserved

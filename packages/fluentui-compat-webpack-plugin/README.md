@@ -41,21 +41,17 @@ By default, the plugin includes these mappings:
 
 | Original Import | Rewritten To | Benefit |
 |----------------|-------------|---------|
-| `@fluentui/utilities` → `Async` | `@cascadiacollections/fluentui-compat` → `useAsync` | React hook with automatic cleanup |
+| `@fluentui/utilities` → `useAsync` | `@cascadiacollections/fluentui-compat` → `useAsync` | React hook with automatic cleanup |
 | `@fluentui/utilities` → `useConst` | `@cascadiacollections/fluentui-compat` → `useConst` | Optimized memoization hook |
 
 ### Example Transformation
 
 **Before:**
 ```typescript
-import { Async } from '@fluentui/utilities';
+import { useAsync } from '@fluentui/utilities';
 
 function MyComponent() {
-  const async = new Async();
-  
-  useEffect(() => {
-    return () => async.dispose(); // Manual cleanup required
-  }, []);
+  const async = useAsync(); // React hook usage
   
   // ... rest of component
 }
@@ -66,7 +62,7 @@ function MyComponent() {
 import { useAsync } from '@cascadiacollections/fluentui-compat';
 
 function MyComponent() {
-  const async = useAsync(); // Automatic cleanup on unmount
+  const async = useAsync(); // Optimized hook with automatic cleanup
   
   // ... rest of component
 }
@@ -85,7 +81,7 @@ new FluentUICompatPlugin({
       from: '@fluentui/utilities',
       to: '@cascadiacollections/fluentui-compat',
       exports: {
-        'Async': 'useAsync',
+        'useAsync': 'useAsync',
         'useConst': 'useConst'
       }
     },
@@ -226,7 +222,7 @@ module.exports = {
 2. **Add the plugin** to your webpack configuration
 3. **Build your project** - imports will be automatically rewritten
 4. **Test thoroughly** to ensure all functionality works correctly
-5. **Gradually remove manual cleanup code** that's no longer needed (like `useEffect` cleanup for `Async`)
+5. **Update import statements** if you were using the old `Async` class to use the `useAsync` hook instead
 
 ## Troubleshooting
 

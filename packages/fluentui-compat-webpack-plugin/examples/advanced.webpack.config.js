@@ -27,7 +27,7 @@ module.exports = {
           from: '@fluentui/utilities',
           to: '@cascadiacollections/fluentui-compat',
           exports: {
-            'Async': 'useAsync'
+            'useAsync': 'useAsync'
           }
         },
         {

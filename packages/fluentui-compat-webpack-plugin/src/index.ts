@@ -37,7 +37,7 @@ const DEFAULT_MAPPINGS: ImportMapping[] = [
     from: '@fluentui/utilities',
     to: '@cascadiacollections/fluentui-compat',
     exports: {
-      'Async': 'useAsync',
+      'useAsync': 'useAsync',
       'useConst': 'useConst'
     }
   }
@@ -62,7 +62,7 @@ const DEFAULT_MAPPINGS: ImportMapping[] = [
  *         {
  *           from: '@fluentui/utilities',
  *           to: '@cascadiacollections/fluentui-compat',
- *           exports: { 'Async': 'useAsync' }
+ *           exports: { 'useAsync': 'useAsync' }
  *         }
  *       ],
  *       verbose: true

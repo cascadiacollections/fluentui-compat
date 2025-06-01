@@ -2,7 +2,7 @@
 import importRewriteLoader from "../src/importRewriteLoader";
 describe("importRewriteLoader", () => {
   it("rewrites mapped imports to compat library", () => {
-    const input = `import { Async, useConst } from '@fluentui/utilities';`;
+    const input = `import { useAsync, useConst } from '@fluentui/utilities';`;
     const output = importRewriteLoader.call(
       { getOptions: () => ({ verbose: false }) },
       input
@@ -24,7 +24,7 @@ describe("importRewriteLoader", () => {
   });
 
   it("splits mapped and unmapped imports", () => {
-    const input = `import { Async, SomethingElse } from '@fluentui/utilities';`;
+    const input = `import { useAsync, SomethingElse } from '@fluentui/utilities';`;
     const output = importRewriteLoader.call(
       { getOptions: () => ({ verbose: false }) },
       input
@@ -183,7 +183,7 @@ describe("FluentUICompatPlugin", () => {
 
     it("should rewrite specific export imports", () => {
       const resolveData = {
-        request: "@fluentui/utilities/lib/Async",
+        request: "@fluentui/utilities/lib/useAsync",
       };
 
       resolveCallback(resolveData);

@@ -10,7 +10,7 @@ const DEFAULT_MAPPINGS: ImportMapping[] = [
     from: "@fluentui/utilities",
     to: "@cascadiacollections/fluentui-compat",
     exports: {
-      Async: "useAsync",
+      useAsync: "useAsync",
       useConst: "useConst",
       // Add more symbol mappings here
     },

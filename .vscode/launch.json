@@ -1,0 +1,93 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Jest Tests (fluentui-compat)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/packages/fluentui-compat/node_modules/.bin/jest",
+      "args": [
+        "--runInBand",
+        "--no-coverage",
+        "--config",
+        "jest.config.js"
+      ],
+      "cwd": "${workspaceFolder}/packages/fluentui-compat",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "test"
+      }
+    },
+    {
+      "name": "Debug Jest Tests (webpack-plugin)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/packages/fluentui-compat-webpack-plugin/node_modules/.bin/jest",
+      "args": [
+        "--runInBand",
+        "--no-coverage",
+        "--config",
+        "jest.config.js"
+      ],
+      "cwd": "${workspaceFolder}/packages/fluentui-compat-webpack-plugin",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "test"
+      }
+    },
+    {
+      "name": "Debug Current Jest Test File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": [
+        "--runInBand",
+        "--no-coverage",
+        "${relativeFile}"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "test"
+      }
+    },
+    {
+      "name": "Debug TypeScript Compilation",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/tsc",
+      "args": [
+        "--build",
+        "--verbose"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Debug Rush Build",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/rush",
+      "args": [
+        "build",
+        "--verbose"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Debug Webpack Plugin Example",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/packages/fluentui-compat-webpack-plugin/examples/webpack.config.js",
+      "cwd": "${workspaceFolder}/packages/fluentui-compat-webpack-plugin/examples",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

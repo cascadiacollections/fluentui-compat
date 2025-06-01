@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import { FluentUICompatPlugin } from '../src/index';
 
 describe('FluentUICompatPlugin Integration', () => {

@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import importRewriteLoader from "../src/importRewriteLoader";
 describe("importRewriteLoader", () => {
   it("rewrites mapped imports to compat library", () => {

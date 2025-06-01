@@ -1,0 +1,5 @@
+{
+    "jest.runMode": "on-demand",
+    "jest.autoEnable": true,
+    "jest.disabledWorkspaceFolders": []
+}

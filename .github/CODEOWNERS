@@ -1,0 +1,3 @@
+# Global default owner for all files
+# This ensures that all PRs, including those from Dependabot, are reviewed by the maintainer
+* @KevinTCoughlin

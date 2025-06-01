@@ -14,8 +14,11 @@ module.exports = {
   silent: false,
   roots: ["<rootDir>/src", "<rootDir>/test"],
   testTimeout: 10000,
-  reporters: ["default"],
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true,
+  // Optimized for VS Code Jest extension
+  reporters: ["default"],
+  collectCoverage: false,
+  errorOnDeprecated: false,
 };

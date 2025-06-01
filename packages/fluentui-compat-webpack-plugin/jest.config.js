@@ -21,7 +21,21 @@ module.exports = {
   resetMocks: true,
   restoreMocks: true,
   // Optimized for VS Code Jest extension
-  reporters: ["default"],
+  reporters: [
+    "default",
+    [
+      "jest-junit",
+      {
+        outputDirectory: "./test-results",
+        outputName: "junit.xml",
+        suiteName: "FluentUI Compat Webpack Plugin Tests",
+        classNameTemplate: "{classname}",
+        titleTemplate: "{title}",
+        ancestorSeparator: " › ",
+        usePathForSuiteName: true,
+      },
+    ],
+  ],
   collectCoverage: false,
   errorOnDeprecated: false,
 };

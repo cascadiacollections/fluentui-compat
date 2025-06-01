@@ -1,0 +1,20 @@
+{
+    "folders": [
+        {
+            "name": "fluentui-compat",
+            "path": "./packages/fluentui-compat"
+        },
+        {
+            "name": "fluentui-compat-webpack-plugin",
+            "path": "./packages/fluentui-compat-webpack-plugin"
+        },
+        {
+            "name": "root",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "typescript.preferences.includePackageJsonAutoImports": "on",
+        "jest.disabledWorkspaceFolders": ["fluentui-compat", "root"]
+    }
+}

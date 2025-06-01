@@ -155,5 +155,8 @@ common/temp/
 packages/*/docs/
 packages/*/_site/
 
+# Test results and reports
+**/test-results/
+
 # Rush logs
 **/*.log

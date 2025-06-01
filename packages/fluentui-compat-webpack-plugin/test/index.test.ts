@@ -1,116 +1,162 @@
-import { FluentUICompatPlugin, ImportMapping } from '../src/index';
+import importRewriteLoader from "../src/importRewriteLoader";
+describe("importRewriteLoader", () => {
+  it("rewrites mapped imports to compat library", () => {
+    const input = `import { Async, useConst } from '@fluentui/utilities';`;
+    const output = importRewriteLoader.call(
+      { getOptions: () => ({ verbose: false }) },
+      input
+    );
+    expect(output).toContain(`from "@cascadiacollections/fluentui-compat"`);
+    expect(output).toContain("useAsync");
+    expect(output).toContain("useConst");
+  });
+
+  it("leaves unmapped imports untouched", () => {
+    const input = `import { SomethingElse } from '@fluentui/utilities';`;
+    const output = importRewriteLoader.call(
+      { getOptions: () => ({ verbose: false }) },
+      input
+    );
+    expect(output).toContain(
+      `import { SomethingElse } from '@fluentui/utilities'`
+    );
+  });
+
+  it("splits mapped and unmapped imports", () => {
+    const input = `import { Async, SomethingElse } from '@fluentui/utilities';`;
+    const output = importRewriteLoader.call(
+      { getOptions: () => ({ verbose: false }) },
+      input
+    );
+    expect(output).toContain(`from "@cascadiacollections/fluentui-compat"`);
+    expect(output).toContain("useAsync");
+    expect(output).toContain(
+      `import { SomethingElse } from '@fluentui/utilities'`
+    );
+  });
+
+  it("handles default and namespace imports without mapping", () => {
+    const input = `import FluentUI, * as Fluent from '@fluentui/utilities';`;
+    const output = importRewriteLoader.call(
+      { getOptions: () => ({ verbose: false }) },
+      input
+    );
+    expect(output).toContain(
+      `import FluentUI, * as Fluent from '@fluentui/utilities'`
+    );
+  });
+});
+import { FluentUICompatPlugin, ImportMapping } from "../src/index";
 
 // Mock webpack compiler for testing
 const createMockCompiler = () => {
   const mockFactory = {
     hooks: {
       beforeResolve: { tap: jest.fn() },
-      resolver: { tap: jest.fn() }
-    }
+      resolver: { tap: jest.fn() },
+    },
   };
 
   const mockCompilation = {
     hooks: {
-      normalModuleLoader: { tap: jest.fn() }
-    }
+      normalModuleLoader: { tap: jest.fn() },
+    },
   };
 
   return {
     hooks: {
-      normalModuleFactory: { 
-        tap: jest.fn((name, callback) => callback(mockFactory))
+      normalModuleFactory: {
+        tap: jest.fn((name, callback) => callback(mockFactory)),
       },
-      compilation: { 
-        tap: jest.fn((name, callback) => callback(mockCompilation))
-      }
+      compilation: {
+        tap: jest.fn((name, callback) => callback(mockCompilation)),
+      },
     },
     mockFactory,
-    mockCompilation
+    mockCompilation,
   };
 };
 
-describe('FluentUICompatPlugin', () => {
-
-  describe('constructor', () => {
-    it('should use default options when none provided', () => {
+describe("FluentUICompatPlugin", () => {
+  describe("constructor", () => {
+    it("should use default options when none provided", () => {
       const plugin = new FluentUICompatPlugin();
       expect(plugin).toBeInstanceOf(FluentUICompatPlugin);
     });
 
-    it('should use provided options', () => {
+    it("should use provided options", () => {
       const customMappings: ImportMapping[] = [
         {
-          from: '@custom/package',
-          to: '@custom/replacement'
-        }
+          from: "@custom/package",
+          to: "@custom/replacement",
+        },
       ];
 
       const plugin = new FluentUICompatPlugin({
         mappings: customMappings,
-        verbose: true
+        verbose: true,
       });
-      
+
       expect(plugin).toBeInstanceOf(FluentUICompatPlugin);
     });
   });
 
-  describe('apply', () => {
-    it('should register webpack hooks', () => {
+  describe("apply", () => {
+    it("should register webpack hooks", () => {
       const mockCompiler = createMockCompiler();
       const plugin = new FluentUICompatPlugin();
       plugin.apply(mockCompiler as any);
 
       expect(mockCompiler.hooks.normalModuleFactory.tap).toHaveBeenCalledWith(
-        'FluentUICompatPlugin',
+        "FluentUICompatPlugin",
         expect.any(Function)
       );
       expect(mockCompiler.hooks.compilation.tap).toHaveBeenCalledWith(
-        'FluentUICompatPlugin',
+        "FluentUICompatPlugin",
         expect.any(Function)
       );
     });
 
-    it('should register factory hooks for Webpack 5', () => {
+    it("should register factory hooks for Webpack 5", () => {
       const mockCompiler = createMockCompiler();
       const plugin = new FluentUICompatPlugin();
       plugin.apply(mockCompiler as any);
 
-      expect(mockCompiler.mockFactory.hooks.beforeResolve?.tap).toHaveBeenCalledWith(
-        'FluentUICompatPlugin',
-        expect.any(Function)
-      );
+      expect(
+        mockCompiler.mockFactory.hooks.beforeResolve?.tap
+      ).toHaveBeenCalledWith("FluentUICompatPlugin", expect.any(Function));
     });
 
-    it('should register factory hooks for Webpack 4 fallback', () => {
+    it("should register factory hooks for Webpack 4 fallback", () => {
       // Create mock without Webpack 5 hook to simulate Webpack 4
       const mockFactoryWebpack4 = {
         hooks: {
-          resolver: { tap: jest.fn() }
-        }
+          resolver: { tap: jest.fn() },
+        },
       };
 
       const mockCompiler = {
         hooks: {
-          normalModuleFactory: { 
-            tap: jest.fn((name, callback) => callback(mockFactoryWebpack4))
+          normalModuleFactory: {
+            tap: jest.fn((name, callback) => callback(mockFactoryWebpack4)),
           },
-          compilation: { 
-            tap: jest.fn()
-          }
-        }
+          compilation: {
+            tap: jest.fn(),
+          },
+        },
       };
 
       const plugin = new FluentUICompatPlugin();
       plugin.apply(mockCompiler as any);
 
       expect(mockFactoryWebpack4.hooks.resolver.tap).toHaveBeenCalledWith(
-        'FluentUICompatPlugin',
+        "FluentUICompatPlugin",
         expect.any(Function)
       );
     });
   });
 
-  describe('import rewriting', () => {
+  describe("import rewriting", () => {
     let plugin: FluentUICompatPlugin;
     let resolveCallback: (resolveData: { request?: string }) => void;
 
@@ -120,63 +166,67 @@ describe('FluentUICompatPlugin', () => {
       plugin.apply(mockCompiler as any);
 
       // Get the resolve callback
-      resolveCallback = mockCompiler.mockFactory.hooks.beforeResolve?.tap.mock.calls[0][1];
+      resolveCallback =
+        mockCompiler.mockFactory.hooks.beforeResolve?.tap.mock.calls[0][1];
     });
 
-    it('should rewrite direct package imports', () => {
+    it("should rewrite direct package imports", () => {
       const resolveData = {
-        request: '@fluentui/utilities'
+        request: "@fluentui/utilities",
       };
 
       resolveCallback(resolveData);
 
-      expect(resolveData.request).toBe('@cascadiacollections/fluentui-compat');
+      expect(resolveData.request).toBe("@cascadiacollections/fluentui-compat");
     });
 
-    it('should rewrite specific export imports', () => {
+    it("should rewrite specific export imports", () => {
       const resolveData = {
-        request: '@fluentui/utilities/lib/Async'
+        request: "@fluentui/utilities/lib/Async",
       };
 
       resolveCallback(resolveData);
 
-      expect(resolveData.request).toBe('@cascadiacollections/fluentui-compat');
+      expect(resolveData.request).toBe("@cascadiacollections/fluentui-compat");
     });
 
-    it('should rewrite submodule imports when no specific mapping exists', () => {
+    it("should rewrite submodule imports when no specific mapping exists", () => {
       const plugin = new FluentUICompatPlugin({
         mappings: [
           {
-            from: '@fluentui/utilities',
-            to: '@cascadiacollections/fluentui-compat'
-          }
-        ]
+            from: "@fluentui/utilities",
+            to: "@cascadiacollections/fluentui-compat",
+          },
+        ],
       });
-      
+
       const mockCompiler = createMockCompiler();
       plugin.apply(mockCompiler as any);
-      const callback = mockCompiler.mockFactory.hooks.beforeResolve?.tap.mock.calls[0][1];
+      const callback =
+        mockCompiler.mockFactory.hooks.beforeResolve?.tap.mock.calls[0][1];
 
       const resolveData = {
-        request: '@fluentui/utilities/lib/SomeOtherUtility'
+        request: "@fluentui/utilities/lib/SomeOtherUtility",
       };
 
       callback(resolveData);
 
-      expect(resolveData.request).toBe('@cascadiacollections/fluentui-compat/lib/SomeOtherUtility');
+      expect(resolveData.request).toBe(
+        "@cascadiacollections/fluentui-compat/lib/SomeOtherUtility"
+      );
     });
 
-    it('should not rewrite unmatched imports', () => {
+    it("should not rewrite unmatched imports", () => {
       const resolveData = {
-        request: '@some/other-package'
+        request: "@some/other-package",
       };
 
       resolveCallback(resolveData);
 
-      expect(resolveData.request).toBe('@some/other-package');
+      expect(resolveData.request).toBe("@some/other-package");
     });
 
-    it('should handle requests without request property', () => {
+    it("should handle requests without request property", () => {
       const resolveData: { request?: string } = {};
 
       expect(() => resolveCallback(resolveData)).not.toThrow();
@@ -184,74 +234,77 @@ describe('FluentUICompatPlugin', () => {
     });
   });
 
-  describe('custom mappings', () => {
-    it('should use custom mapping rules', () => {
+  describe("custom mappings", () => {
+    it("should use custom mapping rules", () => {
       const customMappings: ImportMapping[] = [
         {
-          from: '@custom/package',
-          to: '@custom/replacement',
+          from: "@custom/package",
+          to: "@custom/replacement",
           exports: {
-            'SpecificExport': 'NewExport'
-          }
-        }
+            SpecificExport: "NewExport",
+          },
+        },
       ];
 
       const plugin = new FluentUICompatPlugin({
-        mappings: customMappings
+        mappings: customMappings,
       });
 
       const mockCompiler = createMockCompiler();
       plugin.apply(mockCompiler as any);
-      const resolveCallback = mockCompiler.mockFactory.hooks.beforeResolve?.tap.mock.calls[0][1];
+      const resolveCallback =
+        mockCompiler.mockFactory.hooks.beforeResolve?.tap.mock.calls[0][1];
 
       const resolveData = {
-        request: '@custom/package'
+        request: "@custom/package",
       };
 
       resolveCallback(resolveData);
 
-      expect(resolveData.request).toBe('@custom/replacement');
+      expect(resolveData.request).toBe("@custom/replacement");
     });
   });
 
-  describe('verbose logging', () => {
-    it('should log rewrite operations when verbose is enabled', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+  describe("verbose logging", () => {
+    it("should log rewrite operations when verbose is enabled", () => {
+      const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
       const plugin = new FluentUICompatPlugin({
-        verbose: true
+        verbose: true,
       });
 
       const mockCompiler = createMockCompiler();
       plugin.apply(mockCompiler as any);
-      const resolveCallback = mockCompiler.mockFactory.hooks.beforeResolve?.tap.mock.calls[0][1];
+      const resolveCallback =
+        mockCompiler.mockFactory.hooks.beforeResolve?.tap.mock.calls[0][1];
 
       const resolveData = {
-        request: '@fluentui/utilities'
+        request: "@fluentui/utilities",
       };
 
       resolveCallback(resolveData);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        '[FluentUICompatPlugin] Rewriting: @fluentui/utilities -> @cascadiacollections/fluentui-compat'
+        "[FluentUICompatPlugin] Rewriting: @fluentui/utilities -> @cascadiacollections/fluentui-compat"
       );
 
       consoleSpy.mockRestore();
     });
 
-    it('should not log when verbose is disabled', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    it("should not log when verbose is disabled", () => {
+      const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
       const plugin = new FluentUICompatPlugin({
-        verbose: false
+        verbose: false,
       });
 
       const mockCompiler = createMockCompiler();
       plugin.apply(mockCompiler as any);
-      const resolveCallback = mockCompiler.mockFactory.hooks.beforeResolve?.tap.mock.calls[0][1];
+      const resolveCallback =
+        mockCompiler.mockFactory.hooks.beforeResolve?.tap.mock.calls[0][1];
 
       const resolveData = {
-        request: '@fluentui/utilities'
+        request: "@fluentui/utilities",
       };
 
       resolveCallback(resolveData);

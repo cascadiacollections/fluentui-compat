@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Dependency update",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat"
+}

@@ -20,6 +20,9 @@ importers:
       '@fluentui/react-icons':
         specifier: ^2.0.253
         version: 2.0.301(react@18.3.1)
+      '@fluentui/react-shared-contexts':
+        specifier: ^9.23.0
+        version: 9.23.1(@types/react@18.3.23)(react@18.3.1)
       '@microsoft/api-documenter':
         specifier: ^7.25.17
         version: 7.26.27(@types/node@20.17.52)

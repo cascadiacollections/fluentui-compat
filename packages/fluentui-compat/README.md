@@ -95,6 +95,79 @@ Creates a memoized compound icon component.
 - **Flexible**: Works with any FluentUI icon components
 - **Consistent**: Applies standard icon class names for styling
 
+## SmartFluentProvider
+
+An intelligent FluentProvider that automatically detects when it would be redundant and either warns in development or skips creating a provider in production. This helps prevent unnecessary provider nesting while maintaining the same API as the standard FluentProvider.
+
+### Usage
+
+```typescript
+import { SmartFluentProvider } from 'fluentui-compat';
+import { webLightTheme, webDarkTheme } from '@fluentui/react-components';
+
+function App() {
+  return (
+    <SmartFluentProvider theme={webLightTheme}>
+      {/* Will automatically detect if this provider is redundant */}
+      <SmartFluentProvider theme={webLightTheme}>
+        <MyComponent /> {/* Warning in dev, optimized in production */}
+      </SmartFluentProvider>
+    </SmartFluentProvider>
+  );
+}
+```
+
+### API
+
+**Props:**
+- All standard `FluentProviderProps` from `@fluentui/react-components`
+- `forceRender?: boolean` - Whether to always render the provider even if redundant (useful for testing)
+
+### Features
+
+- **Anti-Deduplication**: Automatically detects redundant providers
+- **Development Warnings**: Warns about unnecessary nesting in development
+- **Production Optimized**: Skips redundant providers in production builds
+- **Same API**: Drop-in replacement for FluentProvider
+
+## FluentThemeConsumer
+
+A lightweight alternative to FluentProvider for simple theme overrides. Use this instead of nesting FluentProvider when you only need theme changes, providing better performance for theme-only modifications.
+
+### Usage
+
+```typescript
+import { FluentThemeConsumer } from 'fluentui-compat';
+
+function Sidebar() {
+  return (
+    <FluentThemeConsumer 
+      themeOverrides={{ colorBrandBackground: '#ff0000' }}
+      className="sidebar"
+    >
+      <MyComponents />
+    </FluentThemeConsumer>
+  );
+}
+
+// Instead of:
+// <FluentProvider theme={customTheme}><Sidebar /></FluentProvider>
+```
+
+### API
+
+**Props:**
+- `themeOverrides?: Partial<ThemeContextValue>` - Override specific theme tokens
+- `className?: string` - Class name to apply theme-specific styles  
+- `children: React.ReactNode` - Children to render with the theme context
+
+### Features
+
+- **Lightweight**: Minimal overhead compared to full FluentProvider
+- **Theme Merging**: Automatically merges with parent theme context
+- **Performance Optimized**: Uses React.memo for efficient re-renders
+- **Type Safe**: Full TypeScript support
+
 ## Peer Dependencies
 
 This package requires the following peer dependencies:
@@ -102,6 +175,7 @@ This package requires the following peer dependencies:
 - `react` >= 16.14.0 < 19.0.0
 - `react-dom` >= 16.14.0 < 19.0.0
 - `@fluentui/react-icons` >= 2.0.0
+- `@fluentui/react-shared-contexts` >= 9.0.0
 
 ## Dependencies
 

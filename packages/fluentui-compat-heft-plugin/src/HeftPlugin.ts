@@ -9,6 +9,7 @@ import { IFluentStyleExtractorConfiguration } from './interfaces';
 
 /**
  * Configuration schema for the style extractor
+ * @beta
  */
 export interface IFluentStyleExtractorPluginConfiguration {
   /**
@@ -24,6 +25,7 @@ export interface IFluentStyleExtractorPluginConfiguration {
 
 /**
  * Utility class for FluentUI style extraction that can be integrated with various build systems
+ * @beta
  */
 export class FluentStyleExtractorUtility {
   /**

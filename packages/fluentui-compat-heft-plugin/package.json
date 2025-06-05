@@ -2,12 +2,14 @@
   "name": "@cascadiacollections/fluentui-compat-heft-plugin",
   "version": "1.0.0",
   "description": "Heft plugin for extracting FluentUI merge-styles at build time",
+  "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run api-extract",
     "test": "jest",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "api-extract": "api-extractor run --local --verbose"
   },
   "repository": {
     "type": "git",
@@ -37,6 +39,7 @@
     "postcss": "^8.4.47"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.44.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
     "@types/babel__traverse": "^7.20.6",
@@ -50,6 +53,7 @@
     "typescript": "~5.6.3"
   },
   "files": [
-    "dist"
+    "dist",
+    "temp/fluentui-compat-heft-plugin.api.md"
   ]
 }

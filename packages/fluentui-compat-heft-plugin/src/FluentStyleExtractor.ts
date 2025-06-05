@@ -22,6 +22,7 @@ import { IFluentStyleExtractorConfiguration, IExtractionResult, IStyleExtraction
 
 /**
  * Options for the FluentStyleExtractor
+ * @beta
  */
 export interface IFluentStyleExtractorOptions extends IFluentStyleExtractorConfiguration {
   buildFolderPath: string;
@@ -32,6 +33,7 @@ export interface IFluentStyleExtractorOptions extends IFluentStyleExtractorConfi
 /**
  * Main class for extracting FluentUI styles at build time
  * Integrates with Heft's build pipeline
+ * @beta
  */
 export class FluentStyleExtractor {
   private readonly _options: IFluentStyleExtractorOptions;

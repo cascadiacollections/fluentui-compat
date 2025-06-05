@@ -4,6 +4,7 @@
 
 /**
  * Error information for extraction failures
+ * @beta
  */
 export interface IStyleExtractionError {
   file: string;
@@ -13,6 +14,7 @@ export interface IStyleExtractionError {
 
 /**
  * Warning information for extraction issues
+ * @beta
  */
 export interface IStyleExtractionWarning {
   file: string;
@@ -21,6 +23,7 @@ export interface IStyleExtractionWarning {
 
 /**
  * Metrics collected during style extraction
+ * @beta
  */
 export interface IStyleExtractionMetrics {
   filesProcessed: number;
@@ -33,6 +36,7 @@ export interface IStyleExtractionMetrics {
 
 /**
  * Configuration for the FluentUI Style Extractor
+ * @beta
  */
 export interface IFluentStyleExtractorConfiguration {
   /**
@@ -78,6 +82,7 @@ export interface IFluentStyleExtractorConfiguration {
 
 /**
  * Result of processing a single file
+ * @beta
  */
 export interface IFileExtractionResult {
   filePath: string;
@@ -92,6 +97,7 @@ export interface IFileExtractionResult {
 
 /**
  * Analysis report for the extraction process
+ * @beta
  */
 export interface IAnalysisReport {
   summary: {
@@ -124,6 +130,7 @@ export interface IAnalysisReport {
 
 /**
  * Result of the entire extraction process
+ * @beta
  */
 export interface IExtractionResult {
   success: boolean;

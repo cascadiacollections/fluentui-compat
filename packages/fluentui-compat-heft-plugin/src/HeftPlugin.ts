@@ -132,6 +132,18 @@ export class FluentStyleExtractorUtility {
         'spacingVerticalL': '12px',
         'spacingVerticalXL': '16px',
       },
+      vendorExtraction: {
+        enabled: false, // Disabled by default - opt-in feature
+        packages: [
+          // Example configurations for common FluentUI packages
+          // Users can override these in their configuration
+        ],
+        globalSettings: {
+          separateVendorCSS: false,
+          vendorClassPrefix: 'fui-vendor',
+          strictVersionChecking: false,
+        },
+      },
     };
   }
 }

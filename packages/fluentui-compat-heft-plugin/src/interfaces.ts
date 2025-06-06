@@ -22,6 +22,20 @@ export interface IStyleExtractionWarning {
 }
 
 /**
+ * Information about a processed vendor package
+ * @beta
+ */
+export interface IVendorPackageInfo {
+  packageName: string;
+  version: string;
+  versionRange: string;
+  compatible: boolean;
+  filesProcessed: number;
+  stylesExtracted: number;
+  warnings: string[];
+}
+
+/**
  * Metrics collected during style extraction
  * @beta
  */
@@ -32,6 +46,79 @@ export interface IStyleExtractionMetrics {
   errors: IStyleExtractionError[];
   warnings: IStyleExtractionWarning[];
   extractionTime: number;
+  vendorPackages?: IVendorPackageInfo[];
+}
+
+/**
+ * Configuration for vendor package extraction
+ * @beta
+ */
+export interface IVendorPackageConfig {
+  /**
+   * Name of the package to extract from (e.g., '@fluentui/react-button')
+   */
+  packageName: string;
+  
+  /**
+   * Semver range for compatible versions (e.g., '^9.0.0')
+   */
+  versionRange: string;
+  
+  /**
+   * File patterns to include within the package
+   */
+  include?: string[];
+  
+  /**
+   * File patterns to exclude within the package
+   */
+  exclude?: string[];
+  
+  /**
+   * Whether to show warnings for version mismatches
+   */
+  warnOnVersionMismatch?: boolean;
+  
+  /**
+   * Whether to continue extraction even if version doesn't match
+   */
+  allowVersionMismatch?: boolean;
+}
+
+/**
+ * Configuration for vendor package optimization
+ * @beta
+ */
+export interface IVendorExtractionConfig {
+  /**
+   * Whether to enable vendor package extraction
+   */
+  enabled: boolean;
+  
+  /**
+   * List of vendor packages to extract from
+   */
+  packages: IVendorPackageConfig[];
+  
+  /**
+   * Global settings for vendor extraction
+   */
+  globalSettings?: {
+    /**
+     * Whether to create separate CSS files for vendor packages
+     */
+    separateVendorCSS?: boolean;
+    
+    /**
+     * Prefix for vendor CSS classes
+     */
+    vendorClassPrefix?: string;
+    
+    /**
+     * Whether to fail build on version mismatches
+     */
+    strictVersionChecking?: boolean;
+  };
 }
 
 /**
@@ -78,6 +165,11 @@ export interface IFluentStyleExtractorConfiguration {
    * Theme tokens to include as CSS custom properties
    */
   themeTokens?: Record<string, string>;
+  
+  /**
+   * Vendor package extraction configuration
+   */
+  vendorExtraction?: IVendorExtractionConfig;
 }
 
 /**
@@ -108,10 +200,15 @@ export interface IAnalysisReport {
     errors: number;
     warnings: number;
     extractionTime: number;
+    vendorPackagesProcessed?: number;
   };
   performance: {
     bundleReduction: number; // estimated percentage
     avgExtractionTimePerFile: number;
+    vendorOptimization?: {
+      packagesProcessed: number;
+      estimatedSavings: number; // in KB
+    };
   };
   optimizations: Array<{
     type: string;
@@ -121,10 +218,19 @@ export interface IAnalysisReport {
     path: string;
     classes: number;
     cssSize: number;
+    isVendor?: boolean;
+    packageName?: string;
   }>;
   errors: Array<{
     path: string;
     error: string;
+  }>;
+  vendorPackages?: Array<{
+    name: string;
+    version: string;
+    compatible: boolean;
+    filesProcessed: number;
+    optimizations: number;
   }>;
 }
 

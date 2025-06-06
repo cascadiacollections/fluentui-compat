@@ -9,6 +9,7 @@ import {
 } from '@rushstack/node-core-library';
 import { Terminal } from '@rushstack/terminal';
 import * as path from 'path';
+import * as semver from 'semver';
 
 import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
@@ -19,7 +20,15 @@ import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
 import { mergeStyles, Stylesheet } from '@fluentui/merge-styles';
 
-import { IFluentStyleExtractorConfiguration, IExtractionResult, IStyleExtractionMetrics, IFileExtractionResult, IAnalysisReport } from './interfaces';
+import { 
+  IFluentStyleExtractorConfiguration, 
+  IExtractionResult, 
+  IStyleExtractionMetrics, 
+  IFileExtractionResult, 
+  IAnalysisReport,
+  IVendorPackageInfo,
+  IVendorPackageConfig
+} from './interfaces';
 
 /**
  * Options for the FluentStyleExtractor
@@ -117,7 +126,7 @@ export class FluentStyleExtractor {
   }
 
   /**
-   * Find all style files matching the configured patterns
+   * Find all style files matching the configured patterns (including vendor packages if configured)
    */
   private async _findStyleFiles(): Promise<string[]> {
     const { include, exclude } = this._options;
@@ -141,6 +150,12 @@ export class FluentStyleExtractor {
       if (await FileSystem.existsAsync(this._options.projectFolderPath)) {
         await this._collectFilesRecursively(this._options.projectFolderPath, allFiles);
       }
+    }
+
+    // Collect vendor package files if configured
+    if (this._options.vendorExtraction?.enabled) {
+      const vendorFiles = await this._findVendorStyleFiles();
+      allFiles.push(...vendorFiles);
     }
 
     this._terminal.writeVerboseLine(`Found ${allFiles.length} total files before filtering`);
@@ -1698,5 +1713,207 @@ export class FluentStyleExtractor {
     }
     
     return { classes: [], hasChanges: false };
+  }
+
+  /**
+   * Find and collect style files from vendor packages
+   */
+  private async _findVendorStyleFiles(): Promise<string[]> {
+    const vendorFiles: string[] = [];
+    const vendorConfig = this._options.vendorExtraction;
+    
+    if (!vendorConfig || !vendorConfig.enabled || !vendorConfig.packages.length) {
+      return vendorFiles;
+    }
+
+    this._terminal.writeVerboseLine(`Starting vendor package scanning for ${vendorConfig.packages.length} packages...`);
+
+    for (const packageConfig of vendorConfig.packages) {
+      try {
+        const packageFiles = await this._processVendorPackage(packageConfig);
+        vendorFiles.push(...packageFiles);
+      } catch (error) {
+        this._terminal.writeWarningLine(`Failed to process vendor package ${packageConfig.packageName}: ${error}`);
+        this._metrics.warnings.push({
+          file: packageConfig.packageName,
+          message: `Vendor package processing failed: ${error}`
+        });
+      }
+    }
+
+    this._terminal.writeVerboseLine(`Found ${vendorFiles.length} vendor style files`);
+    return vendorFiles;
+  }
+
+  /**
+   * Process a single vendor package
+   */
+  private async _processVendorPackage(packageConfig: IVendorPackageConfig): Promise<string[]> {
+    const { packageName, versionRange, include = [], exclude = [] } = packageConfig;
+    
+    this._terminal.writeVerboseLine(`Processing vendor package: ${packageName}`);
+
+    // Find package path in node_modules
+    const packagePath = await this._findPackagePath(packageName);
+    if (!packagePath) {
+      throw new Error(`Package ${packageName} not found in node_modules`);
+    }
+
+    // Check version compatibility
+    const packageVersion = await this._getPackageVersion(packagePath);
+    const isCompatible = semver.satisfies(packageVersion, versionRange);
+    
+    const versionMessage = `Version mismatch for ${packageName}: found ${packageVersion}, expected ${versionRange}`;
+    
+    if (!isCompatible) {
+      if (packageConfig.warnOnVersionMismatch !== false) {
+        this._terminal.writeWarningLine(versionMessage);
+        this._metrics.warnings.push({
+          file: packageName,
+          message: versionMessage
+        });
+      }
+
+      if (!packageConfig.allowVersionMismatch) {
+        throw new Error(versionMessage);
+      }
+    }
+
+    // Find style files in the package
+    const packageFiles: string[] = [];
+    const defaultInclude = [
+      '**/*.styles.ts',
+      '**/*.styles.tsx',
+      '**/*.styles.js',
+      '**/*.styles.jsx',
+      '**/styles.ts',
+      '**/styles.tsx',
+      '**/getStyles.ts',
+      '**/getStyles.tsx'
+    ];
+
+    const includePatterns = include.length > 0 ? include : defaultInclude;
+    const excludePatterns = [
+      '**/*.test.*',
+      '**/*.spec.*',
+      '**/test/**',
+      '**/tests/**',
+      '**/stories/**',
+      '**/*.stories.*',
+      ...exclude
+    ];
+
+    await this._collectVendorFilesRecursively(packagePath, packageFiles, includePatterns, excludePatterns, packageName);
+
+    // Update vendor package metrics
+    if (!this._metrics.vendorPackages) {
+      this._metrics.vendorPackages = [];
+    }
+
+    this._metrics.vendorPackages.push({
+      packageName,
+      version: packageVersion,
+      versionRange,
+      compatible: isCompatible,
+      filesProcessed: packageFiles.length,
+      stylesExtracted: 0, // Will be updated during extraction
+      warnings: isCompatible ? [] : [versionMessage]
+    });
+
+    this._terminal.writeVerboseLine(`Found ${packageFiles.length} style files in ${packageName}`);
+    return packageFiles;
+  }
+
+  /**
+   * Find the path to a package in node_modules
+   */
+  private async _findPackagePath(packageName: string): Promise<string | undefined> {
+    const nodeModulesPath = path.resolve(this._options.projectFolderPath, 'node_modules');
+    const packagePath = path.resolve(nodeModulesPath, packageName);
+    
+    if (await FileSystem.existsAsync(packagePath)) {
+      return packagePath;
+    }
+
+    // Try to find in parent directories (for monorepos)
+    let currentDir = this._options.projectFolderPath;
+    const root = path.parse(currentDir).root;
+    
+    while (currentDir !== root) {
+      const parentNodeModules = path.resolve(currentDir, '..', 'node_modules', packageName);
+      if (await FileSystem.existsAsync(parentNodeModules)) {
+        return parentNodeModules;
+      }
+      currentDir = path.dirname(currentDir);
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Get the version of a package from its package.json
+   */
+  private async _getPackageVersion(packagePath: string): Promise<string> {
+    const packageJsonPath = path.resolve(packagePath, 'package.json');
+    
+    if (!(await FileSystem.existsAsync(packageJsonPath))) {
+      throw new Error(`package.json not found in ${packagePath}`);
+    }
+
+    const packageJsonContent = await FileSystem.readFileAsync(packageJsonPath);
+    const packageJson = JSON.parse(packageJsonContent);
+    
+    if (!packageJson.version) {
+      throw new Error(`Version not found in package.json for ${packagePath}`);
+    }
+
+    return packageJson.version;
+  }
+
+  /**
+   * Recursively collect files from a vendor package directory
+   */
+  private async _collectVendorFilesRecursively(
+    dirPath: string,
+    files: string[],
+    includePatterns: string[],
+    excludePatterns: string[],
+    packageName: string
+  ): Promise<void> {
+    if (!(await FileSystem.existsAsync(dirPath))) {
+      return;
+    }
+
+    const items = await FileSystem.readFolderItemsAsync(dirPath);
+    
+    for (const item of items) {
+      const fullPath = path.resolve(dirPath, item.name);
+      
+      if (item.isDirectory()) {
+        // Skip certain directories
+        if (['node_modules', '.git', 'coverage', 'build', 'dist', 'lib'].includes(item.name)) {
+          continue;
+        }
+        
+        await this._collectVendorFilesRecursively(fullPath, files, includePatterns, excludePatterns, packageName);
+      } else if (item.isFile()) {
+        const relativePath = path.relative(dirPath, fullPath);
+        
+        // Check include patterns
+        const included = includePatterns.some(pattern => this._matchesGlob(relativePath, pattern));
+        if (!included) {
+          continue;
+        }
+
+        // Check exclude patterns
+        const excluded = excludePatterns.some(pattern => this._matchesGlob(relativePath, pattern));
+        if (excluded) {
+          continue;
+        }
+
+        files.push(fullPath);
+        this._terminal.writeVerboseLine(`Found vendor style file: ${packageName}/${relativePath}`);
+      }
+    }
   }
 }

@@ -119,7 +119,13 @@ importers:
       postcss:
         specifier: ^8.4.47
         version: 8.5.4
+      semver:
+        specifier: ^7.6.3
+        version: 7.7.2
     devDependencies:
+      '@fluentui/react-button':
+        specifier: 9.3.87
+        version: 9.3.87(@types/react-dom@19.1.5)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
       '@microsoft/api-extractor':
         specifier: ^7.44.0
         version: 7.52.8(@types/node@22.15.29)
@@ -138,6 +144,9 @@ importers:
       '@types/node':
         specifier: ^22.15.29
         version: 22.15.29
+      '@types/semver':
+        specifier: ^7.5.8
+        version: 7.7.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.33.1
         version: 8.33.1(@typescript-eslint/parser@8.33.1)(eslint@8.57.1)(typescript@5.6.3)
@@ -662,7 +671,7 @@ packages:
       react-dom: '>=16.14.0 <19.0.0'
     dependencies:
       '@fluentui/react-avatar': 9.7.7(@types/react-dom@19.1.5)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
-      '@fluentui/react-button': 9.4.7(@types/react-dom@19.1.5)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
+      '@fluentui/react-button': 9.3.87(@types/react-dom@19.1.5)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
       '@fluentui/react-icons': 2.0.301(react@18.3.1)
       '@fluentui/react-jsx-runtime': 9.0.54(@types/react@18.3.23)(react@18.3.1)
       '@fluentui/react-tabster': 9.24.7(@types/react-dom@19.1.5)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
@@ -760,6 +769,30 @@ packages:
       '@fluentui/react-icons': 2.0.301(react@18.3.1)
       '@fluentui/react-jsx-runtime': 9.0.54(@types/react@18.3.23)(react@18.3.1)
       '@fluentui/react-link': 9.4.7(@types/react-dom@19.1.5)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
+      '@fluentui/react-shared-contexts': 9.23.1(@types/react@18.3.23)(react@18.3.1)
+      '@fluentui/react-tabster': 9.24.7(@types/react-dom@19.1.5)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
+      '@fluentui/react-theme': 9.1.24
+      '@fluentui/react-utilities': 9.19.0(@types/react@18.3.23)(react@18.3.1)
+      '@griffel/react': 1.5.30(react@18.3.1)
+      '@swc/helpers': 0.5.17
+      '@types/react': 18.3.23
+      '@types/react-dom': 19.1.5(@types/react@18.3.23)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    dev: true
+
+  /@fluentui/react-button@9.3.87(@types/react-dom@19.1.5)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-Di8RWjIswa1jriYfed6FH90fqmTwBkaILWxzJzChaBbUAOtxEYn3K57F+9PS9s05z7PhlDuVnfd2RV0dIrYHtg==}
+    peerDependencies:
+      '@types/react': '>=16.14.0 <19.0.0'
+      '@types/react-dom': '>=16.9.0 <19.0.0'
+      react: '>=16.14.0 <19.0.0'
+      react-dom: '>=16.14.0 <19.0.0'
+    dependencies:
+      '@fluentui/keyboard-keys': 9.0.8
+      '@fluentui/react-aria': 9.14.7(@types/react-dom@19.1.5)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
+      '@fluentui/react-icons': 2.0.301(react@18.3.1)
+      '@fluentui/react-jsx-runtime': 9.0.54(@types/react@18.3.23)(react@18.3.1)
       '@fluentui/react-shared-contexts': 9.23.1(@types/react@18.3.23)(react@18.3.1)
       '@fluentui/react-tabster': 9.24.7(@types/react-dom@19.1.5)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
       '@fluentui/react-theme': 9.1.24
@@ -2947,6 +2980,10 @@ packages:
     dependencies:
       '@types/prop-types': 15.7.14
       csstype: 3.1.3
+
+  /@types/semver@7.7.0:
+    resolution: {integrity: sha512-k107IF4+Xr7UHjwDc7Cfd6PRQfbdkiRabXGRjo07b4WyPahFBZCZ1sE+BNxYIJPPg73UkfOsVOLwqVc/6ETrIA==}
+    dev: true
 
   /@types/stack-utils@2.0.3:
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
@@ -7273,7 +7310,6 @@ packages:
     resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
     engines: {node: '>=10'}
     hasBin: true
-    dev: true
 
   /serialize-javascript@6.0.2:
     resolution: {integrity: sha512-Saa1xPByTTq2gdeFZYLLo+RFE35NHZkAbqZeWNd3BpzppeVisAqpDjcp8dyf6uIvEqJRd46jemmyA4iFIeVk8g==}

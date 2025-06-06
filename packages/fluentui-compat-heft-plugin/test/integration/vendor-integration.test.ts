@@ -1,6 +1,6 @@
 /**
  * Vendor Integration test for FluentStyleExtractor
- * Tests end-to-end vendor package style extraction functionality
+ * Tests end-to-end vendor package style extraction functionality with real FluentUI packages
  */
 
 import { FluentStyleExtractor } from '../../src/FluentStyleExtractor';

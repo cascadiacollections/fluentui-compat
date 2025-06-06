@@ -41,6 +41,7 @@
     "semver": "^7.6.3"
   },
   "devDependencies": {
+    "@fluentui/react-button": "9.3.87",
     "@microsoft/api-extractor": "^7.44.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",

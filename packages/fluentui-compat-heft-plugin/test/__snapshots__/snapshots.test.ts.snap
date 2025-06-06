@@ -42,7 +42,7 @@ exports[`FluentStyleExtractor Snapshot Tests should match snapshot for basic but
   "metadata": {
     "classPrefix": "fui",
     "filesProcessed": 1,
-    "stylesExtracted": 3,
+    "stylesExtracted": 16,
   },
   "output": {
     "css": "/* FluentUI Extracted Styles */
@@ -56,16 +56,29 @@ exports[`FluentStyleExtractor Snapshot Tests should match snapshot for basic but
 }
 
 /* src/Button.styles.ts */
-.fui-Button-000001-base { /* extracted styles */ }",
+.css-0{class-name:ms-Button;border:1px solid ;padding-top:8px;padding-right:16px;padding-bottom:8px;padding-left:16px;border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;font-family:Segoe UI;font-size:14px;}.css-1{class-name:ms-Button;border:1px solid ;padding-top:8px;padding-right:16px;padding-bottom:8px;padding-left:16px;border-radius:2px;cursor:not-allowed;display:inline-flex;align-items:center;font-family:Segoe UI;font-size:14px;opacity:0.5;}",
     "extractedClasses": [
-      "fui-Button-000001-base",
-      "fui-Button-000001-actionable",
-      "fui-Button-000001-compact",
+      "css-0",
+      "css-0",
+      "css-0",
+      "css-0",
+      "css-1",
+      "css-1",
+      "css-1",
+      "css-1",
+      "css-0",
+      "css-0",
+      "css-0",
+      "css-0",
+      "css-1",
+      "css-1",
+      "css-1",
+      "css-1",
     ],
     "success": true,
     "transformedCode": "export const getStyles = props => {
   return {
-    root: ["fui-Button-000001-base", props.className]
+    root: ["css-0", props.className]
   };
 };",
   },
@@ -204,7 +217,7 @@ exports[`FluentStyleExtractor Snapshot Tests should match snapshot for complex C
     "hasDataAttributes": true,
     "hasPseudoElements": true,
     "hasVariantMapping": true,
-    "stylesExtracted": 3,
+    "stylesExtracted": 48,
   },
   "output": {
     "css": "/* FluentUI Extracted Styles */
@@ -218,16 +231,61 @@ exports[`FluentStyleExtractor Snapshot Tests should match snapshot for complex C
 }
 
 /* src/ComplexButton.styles.ts */
-.fui-ComplexButton-000001-base { /* extracted styles */ }",
+.css-0{class-name:ms-ComplexButton;display:inline-flex;align-items:center;justify-content:center;min-height:32px;font-family:Segoe UI;font-weight:400;text-decoration:none;text-align:center;cursor:pointer;user-select:none;border-radius:2px;transition:all 0.1s ease;position:relative;overflow:hidden;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;}.css-1{font-size:16px;line-height:1px;}.css-2{font-size:inherit;font-weight:inherit;line-height:1.2px;margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px;}",
     "extractedClasses": [
-      "fui-ComplexButton-000001-base",
-      "fui-ComplexButton-000001-actionable",
-      "fui-ComplexButton-000001-compact",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
     ],
     "success": true,
     "transformedCode": "export const getStyles = props => {
   return {
-    root: ["fui-ComplexButton-000001-base", props.className]
+    root: ["css-0", props.className]
   };
 };",
   },
@@ -313,7 +371,7 @@ exports[`FluentStyleExtractor Snapshot Tests should match snapshot for complex c
     "filesProcessed": 1,
     "hasConditionalStyles": true,
     "hasNestedSelectors": true,
-    "stylesExtracted": 3,
+    "stylesExtracted": 48,
   },
   "output": {
     "css": "/* FluentUI Extracted Styles */
@@ -327,16 +385,61 @@ exports[`FluentStyleExtractor Snapshot Tests should match snapshot for complex c
 }
 
 /* src/ComplexCard.styles.ts */
-.fui-ComplexCard-000001-base { /* extracted styles */ }",
+.css-0{class-name:ms-Card;background-color:#ffffff;border:1px solid #f3f2f1;border-radius:2px;padding-top:16px;padding-right:16px;padding-bottom:16px;padding-left:16px;position:relative;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;}.css-1{padding-top:0;padding-right:0;padding-bottom:8px;padding-left:0;font-size:14px;font-weight:600;border-bottom:1px solid #e1dfdd;}.css-2{padding-top:8px;padding-right:0;padding-bottom:8px;padding-left:0;line-height:1.4;}.css-3{class-name:ms-Card;background-color:#ffffff;border:1px solid #f3f2f1;border-radius:2px;padding-top:16px;padding-right:16px;padding-bottom:16px;padding-left:16px;position:relative;user-select:none;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;}.css-4{class-name:ms-Card;background-color:#ffffff;border:1px solid #f3f2f1;border-radius:2px;padding-top:8px;padding-right:8px;padding-bottom:8px;padding-left:8px;position:relative;user-select:none;display:flex;height:64px;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;}.css-5{class-name:ms-Card;background-color:#ffffff;border:1px solid #f3f2f1;border-radius:2px;padding-top:8px;padding-right:8px;padding-bottom:8px;padding-left:8px;position:relative;user-select:none;cursor:pointer;display:flex;height:64px;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;}",
     "extractedClasses": [
-      "fui-ComplexCard-000001-base",
-      "fui-ComplexCard-000001-actionable",
-      "fui-ComplexCard-000001-compact",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-3",
+      "css-1",
+      "css-2",
+      "css-4",
+      "css-1",
+      "css-2",
+      "css-5",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-3",
+      "css-1",
+      "css-2",
+      "css-4",
+      "css-1",
+      "css-2",
+      "css-5",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-3",
+      "css-1",
+      "css-2",
+      "css-4",
+      "css-1",
+      "css-2",
+      "css-5",
+      "css-1",
+      "css-2",
+      "css-0",
+      "css-1",
+      "css-2",
+      "css-3",
+      "css-1",
+      "css-2",
+      "css-4",
+      "css-1",
+      "css-2",
+      "css-5",
+      "css-1",
+      "css-2",
     ],
     "success": true,
     "transformedCode": "export const getStyles = props => {
   return {
-    root: ["fui-ComplexCard-000001-base", props.className]
+    root: ["css-0", props.className]
   };
 };",
   },
@@ -416,7 +519,7 @@ export const getStyles = (props) => {
     "hasAdvancedSelectors": true,
     "hasGlobalClassNames": true,
     "hasThemeUsage": true,
-    "stylesExtracted": 3,
+    "stylesExtracted": 16,
   },
   "output": {
     "css": "/* FluentUI Extracted Styles */
@@ -430,11 +533,24 @@ export const getStyles = (props) => {
 }
 
 /* src/DocumentCard.styles.ts */
-.fui-DocumentCard-000001-base { /* extracted styles */ }",
+.css-0{-webkit-font-smoothing:antialiased;background-color:#ffffff;border:1px solid #f3f2f1;max-width:320px;min-width:206px;user-select:none;position:relative;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;}.css-1{-webkit-font-smoothing:antialiased;background-color:#ffffff;border:1px solid #f3f2f1;max-width:320px;min-width:206px;user-select:none;position:relative;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;}",
     "extractedClasses": [
-      "fui-DocumentCard-000001-base",
-      "fui-DocumentCard-000001-actionable",
-      "fui-DocumentCard-000001-compact",
+      "css-0",
+      "css-1",
+      "css-0",
+      "css-1",
+      "css-0",
+      "css-1",
+      "css-0",
+      "css-1",
+      "css-0",
+      "css-1",
+      "css-0",
+      "css-1",
+      "css-0",
+      "css-1",
+      "css-0",
+      "css-1",
     ],
     "success": true,
     "transformedCode": "import { getGlobalClassNames } from '../../Styling';
@@ -444,7 +560,7 @@ const GlobalClassNames = {
 };
 export const getStyles = props => {
   return {
-    root: ["fui-DocumentCard-000001-base", props.className]
+    root: ["css-0", props.className]
   };
 };",
   },
@@ -487,7 +603,7 @@ exports[`FluentStyleExtractor Snapshot Tests should match snapshot for multiple 
     "classPrefix": "fui",
     "filesProcessed": 2,
     "hasThemeTokens": true,
-    "stylesExtracted": 6,
+    "stylesExtracted": 48,
     "themeTokens": {
       "borderRadiusSmall": "2px",
       "colorBrandBackground": "#0078d4",
@@ -507,35 +623,76 @@ exports[`FluentStyleExtractor Snapshot Tests should match snapshot for multiple 
 }
 
 /* src/Button.styles.ts */
-.fui-Button-000001-base { /* extracted styles */ }
-
+.css-0{padding-top:8px;padding-right:16px;padding-bottom:8px;padding-left:16px;border-radius:var(--borderRadiusSmall);font-size:var(--fontSizeBase300);}
 
 /* src/Card.styles.ts */
-.fui-Card-000002-base { /* extracted styles */ }",
+.css-0{background-color:var(--colorNeutralBackground1);border:1px solid #f3f2f1;border-radius:var(--borderRadiusSmall);}.css-1{font-size:var(--fontSizeBase300);font-weight:600;}",
     "success": true,
     "transformedFiles": [
       {
         "classes": [
-          "fui-Button-000001-base",
-          "fui-Button-000001-actionable",
-          "fui-Button-000001-compact",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
+          "css-0",
         ],
         "code": "export const getStyles = props => {
   return {
-    root: ["fui-Button-000001-base", props.className]
+    root: ["css-0", props.className]
   };
 };",
         "name": "Button.styles.ts",
       },
       {
         "classes": [
-          "fui-Card-000002-base",
-          "fui-Card-000002-actionable",
-          "fui-Card-000002-compact",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
+          "css-0",
+          "css-1",
         ],
         "code": "export const getStyles = props => {
   return {
-    root: ["fui-Card-000002-base", props.className]
+    root: ["css-0", props.className]
   };
 };",
         "name": "Card.styles.ts",

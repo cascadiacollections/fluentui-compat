@@ -274,6 +274,7 @@ export class FluentStyleExtractor {
 
   /**
    * Extract styles from source code using AST transformation and merge-styles execution
+   * Generates all possible CSS variants by evaluating getStyles with different prop combinations
    */
   private async _extractStylesFromCode(sourceCode: string, filePath: string): Promise<{
     code: string;
@@ -302,8 +303,9 @@ export class FluentStyleExtractor {
 
     // Create a fresh stylesheet instance for this extraction
     const stylesheet = Stylesheet.getInstance();
-    const initialRuleCount = stylesheet.getRules() ? stylesheet.getRules().split('}').length - 1 : 0;
-    console.log(`>>> Initial stylesheet rule count: ${initialRuleCount}`);
+    // Clear any existing styles to start fresh
+    stylesheet.reset();
+    console.log(`>>> Stylesheet reset for fresh extraction`);
 
     this._terminal.writeVerboseLine(`Starting AST traversal...`);
 
@@ -493,16 +495,19 @@ export class FluentStyleExtractor {
   }
 
   // Helper methods for style extraction (simplified implementations)
-  private _isGetStylesFunction(node: t.VariableDeclarator): boolean {
+  private _isGetStylesFunction = (node: t.VariableDeclarator): boolean => {
     console.log(`>>> Checking VariableDeclarator: ${node.id?.type === 'Identifier' ? node.id.name : 'unknown'}`);
     console.log(`>>>   - id.type: ${node.id?.type}`);
     console.log(`>>>   - id.name: ${node.id?.type === 'Identifier' ? node.id.name : 'n/a'}`);
     console.log(`>>>   - init.type: ${node.init?.type}`);
     
-    this._terminal.writeVerboseLine(`Checking VariableDeclarator: ${node.id?.type === 'Identifier' ? node.id.name : 'unknown'}`);
-    this._terminal.writeVerboseLine(`  - id.type: ${node.id?.type}`);
-    this._terminal.writeVerboseLine(`  - id.name: ${node.id?.type === 'Identifier' ? node.id.name : 'n/a'}`);
-    this._terminal.writeVerboseLine(`  - init.type: ${node.init?.type}`);
+    // Check if we have a terminal instance before using it
+    if (this && this._terminal && typeof this._terminal.writeVerboseLine === 'function') {
+      this._terminal.writeVerboseLine(`Checking VariableDeclarator: ${node.id?.type === 'Identifier' ? node.id.name : 'unknown'}`);
+      this._terminal.writeVerboseLine(`  - id.type: ${node.id?.type}`);
+      this._terminal.writeVerboseLine(`  - id.name: ${node.id?.type === 'Identifier' ? node.id.name : 'n/a'}`);
+      this._terminal.writeVerboseLine(`  - init.type: ${node.init?.type}`);
+    }
     
     const result = (
       node.id?.type === 'Identifier' &&
@@ -512,7 +517,9 @@ export class FluentStyleExtractor {
     );
     
     console.log(`>>>   - isGetStyles: ${result}`);
-    this._terminal.writeVerboseLine(`  - isGetStyles: ${result}`);
+    if (this && this._terminal && typeof this._terminal.writeVerboseLine === 'function') {
+      this._terminal.writeVerboseLine(`  - isGetStyles: ${result}`);
+    }
     return result;
   }
 
@@ -526,64 +533,75 @@ export class FluentStyleExtractor {
     themeTokens: Set<unknown>;
   } | null {
     try {
-      // Get the current CSS to compare against later
-      const initialCSS = stylesheet.getRules() || '';
-      const initialRuleCount = initialCSS.split('}').length - 1;
-      
-      console.log(`>>> Initial CSS for function extraction: ${initialCSS.length} chars, ${initialRuleCount} rules`);
-      
+      console.log(`>>> Starting _extractStylesFromFunction for: ${fileStyleId}`);
       this._terminal.writeVerboseLine(`Processing function node type: ${functionNode.type}`);
       
-      // Extract style objects from the function AST
-      const styleObjects = this._extractStyleObjectsFromAST(functionNode);
+      // Create evaluation context with theme tokens and sample props
+      const evaluationContext = this._createEvaluationContext();
       
-      console.log(`>>> Found ${styleObjects.length} style objects`);
-      this._terminal.writeVerboseLine(`Found ${styleObjects.length} style objects`);
+      // Generate all possible prop combinations for boolean conditions
+      const propVariants = this._generatePropVariants(functionNode);
+      console.log(`>>> Generated ${propVariants.length} prop variants`);
+      this._terminal.writeVerboseLine(`Generated ${propVariants.length} prop variants`);
       
-      if (styleObjects.length === 0) {
-        console.log(`>>> No style objects found, returning null`);
-        this._terminal.writeVerboseLine('No style objects found, returning null');
-        return null;
-      }
-
       const cssClasses: Record<string, string> = {};
       const styles: unknown[] = [];
       const themeTokens = new Set<unknown>();
-
-      // Process each style object through merge-styles
-      styleObjects.forEach((styleObj, index) => {
+      
+      // Evaluate getStyles function with each prop variant
+      for (const [variantIndex, props] of propVariants.entries()) {
+        console.log(`>>> Evaluating variant ${variantIndex}: ${JSON.stringify(props)}`);
+        this._terminal.writeVerboseLine(`Evaluating variant ${variantIndex}: ${JSON.stringify(props)}`);
+        
         try {
-          console.log(`>>> Processing style object ${index}: ${styleObj.key}`);
-          console.log(`>>> Style object content: ${JSON.stringify(styleObj.styles).substring(0, 200)}`);
+          // Execute the getStyles function with the current props
+          const styleResult = this._executeGetStylesFunction(functionNode, props, evaluationContext);
           
-          this._terminal.writeVerboseLine(`Processing style object ${index}: ${styleObj.key}`);
-          this._terminal.writeVerboseLine(`Style object content: ${JSON.stringify(styleObj.styles, null, 2)}`);
-          
-          // Execute merge-styles on the extracted style object
-          const className = mergeStyles(styleObj.styles);
-          
-          console.log(`>>> Generated class name: ${className}`);
-          this._terminal.writeVerboseLine(`Generated class name: ${className}`);
-          
-          // Get the CSS that was just generated
-          const currentCSS = stylesheet.getRules() || '';
-          console.log(`>>> CSS after merge-styles: ${currentCSS.length} chars`);
-          
-          // Map the generated class name to our naming convention
-          const stableClassName = `${this._options.classPrefix}-${fileStyleId}-${styleObj.key || `style${index}`}`;
-          cssClasses[styleObj.key || `style${index}`] = className;
-          styles.push(styleObj.styles);
-
-          // Extract theme tokens if present
-          this._extractThemeTokensFromStyles(styleObj.styles, themeTokens);
+          if (styleResult) {
+            console.log(`>>> Got style result with ${Object.keys(styleResult).length} style keys`);
+            
+            // Process each style key (root, header, content, etc.)
+            Object.entries(styleResult).forEach(([styleKey, styleValue]) => {
+              if (styleValue) {
+                console.log(`>>> Processing style key: ${styleKey}`);
+                console.log(`>>> Style value type: ${Array.isArray(styleValue) ? 'array' : typeof styleValue}`);
+                
+                // Flatten and merge styles (handle arrays and conditional styles)
+                const flattenedStyles = this._flattenStyleValue(styleValue, props, evaluationContext);
+                
+                if (flattenedStyles && Object.keys(flattenedStyles).length > 0) {
+                  console.log(`>>> Flattened styles: ${JSON.stringify(flattenedStyles).substring(0, 200)}`);
+                  
+                  // Execute merge-styles on the flattened style object
+                  const className = mergeStyles(flattenedStyles);
+                  console.log(`>>> Generated class name: ${className} for ${styleKey}`);
+                  
+                  // Use a unique key that includes the variant
+                  const variantKey = propVariants.length > 1 ? `${styleKey}_variant${variantIndex}` : styleKey;
+                  if (!cssClasses[variantKey]) {
+                    cssClasses[variantKey] = className;
+                    styles.push(flattenedStyles);
+                    
+                    // Extract theme tokens
+                    this._extractThemeTokensFromStyles(flattenedStyles, themeTokens);
+                  }
+                }
+              }
+            });
+          }
         } catch (error) {
-          console.log(`>>> Error processing style object: ${error}`);
-          this._terminal.writeWarningLine(`Failed to process style object in ${fileStyleId}: ${error}`);
+          console.log(`>>> Error evaluating variant ${variantIndex}: ${error}`);
+          this._terminal.writeWarningLine(`Failed to evaluate variant ${variantIndex}: ${error}`);
         }
-      });
+      }
 
-      this._terminal.writeVerboseLine(`Final CSS classes: ${JSON.stringify(cssClasses, null, 2)}`);
       console.log(`>>> Final CSS classes: ${JSON.stringify(cssClasses, null, 2)}`);
+      this._terminal.writeVerboseLine(`Final CSS classes: ${JSON.stringify(cssClasses, null, 2)}`);
+
+      if (Object.keys(cssClasses).length === 0) {
+        console.log(`>>> No CSS classes generated, returning null`);
+        return null;
+      }
 
       return {
         cssClasses,
@@ -598,145 +616,496 @@ export class FluentStyleExtractor {
   }
 
   /**
-   * Extract style objects from AST nodes
+   * Create evaluation context with theme tokens and default values
    */
-  private _extractStyleObjectsFromAST(functionNode: t.Node): Array<{
-    key: string;
-    styles: any;
-  }> {
-    const styleObjects: Array<{ key: string; styles: any }> = [];
+  private _createEvaluationContext(): any {
+    const { themeTokens } = this._options;
+    
+    // Create a comprehensive theme object based on FluentUI patterns
+    const defaultTheme = {
+      palette: {
+        white: '#ffffff',
+        black: '#000000',
+        themePrimary: themeTokens?.colorBrandBackground || '#0078d4',
+        neutralPrimary: '#323130',
+        neutralSecondary: '#605e5c',
+        neutralTertiary: '#a19f9d',
+        neutralTertiaryAlt: '#c8c6c4',
+        neutralQuaternaryAlt: '#e1dfdd',
+        neutralLight: '#f3f2f1',
+        neutralLighter: '#faf9f8',
+        neutralDark: '#201f1e',
+        neutralPrimaryAlt: '#3b3a39',
+        neutralSecondaryAlt: '#8a8886',
+        neutralQuaternary: '#d2d0ce',
+        neutralLighterAlt: '#f8f7f6',
+      },
+      fonts: {
+        small: { fontSize: '12px', fontWeight: '400', fontFamily: 'Segoe UI' },
+        medium: { fontSize: themeTokens?.fontSizeBase300 || '14px', fontWeight: '400', fontFamily: 'Segoe UI' },
+        mediumPlus: { fontSize: '16px', fontWeight: '400', fontFamily: 'Segoe UI' },
+        large: { fontSize: '18px', fontWeight: '400', fontFamily: 'Segoe UI' },
+      },
+      effects: {
+        elevation4: '0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108)',
+        elevation8: '0 3.2px 7.2px 0 rgba(0, 0, 0, 0.132), 0 0.6px 1.8px 0 rgba(0, 0, 0, 0.108)',
+        roundedCorner2: themeTokens?.borderRadiusSmall || '2px',
+        roundedCorner4: '4px',
+      },
+      spacing: {
+        xs: '4px',
+        s1: '8px',
+        s2: '12px',
+        m: '16px',
+        l: '20px',
+        xl: '24px',
+      },
+    };
 
-    if (t.isArrowFunctionExpression(functionNode) || t.isFunctionExpression(functionNode) || t.isFunctionDeclaration(functionNode)) {
-      const body = functionNode.body;
+    // Add custom theme tokens
+    if (themeTokens) {
+      Object.entries(themeTokens).forEach(([key, value]) => {
+        // Try to map theme tokens to palette/fonts/effects
+        if (key.startsWith('color')) {
+          const colorKey = key.replace(/^color/, '').toLowerCase();
+          if (colorKey.includes('background')) {
+            defaultTheme.palette.themePrimary = value;
+          } else if (colorKey.includes('neutral')) {
+            defaultTheme.palette.neutralPrimary = value;
+          }
+        } else if (key.startsWith('fontSize')) {
+          const sizeKey = key.replace(/^fontSize/, '').toLowerCase();
+          if (sizeKey.includes('base')) {
+            defaultTheme.fonts.medium.fontSize = value;
+          }
+        }
+      });
+    }
+
+    return {
+      theme: defaultTheme,
+      palette: defaultTheme.palette, // Direct access to palette for easier evaluation
+      fonts: defaultTheme.fonts,     // Direct access to fonts for easier evaluation
+      effects: defaultTheme.effects, // Direct access to effects for easier evaluation
+      // Helper functions that might be used in getStyles
+      getGlobalClassNames: (classNames: any, theme: any) => classNames, // Simplified implementation
+    };
+  }
+
+  /**
+   * Generate different prop combinations to test all conditional branches
+   */
+  private _generatePropVariants(functionNode: t.Node): Array<Record<string, any>> {
+    // Analyze the function to identify boolean props and conditions
+    const booleanProps = this._extractBooleanPropsFromFunction(functionNode);
+    console.log(`>>> Found boolean props: ${JSON.stringify(booleanProps)}`);
+    
+    if (booleanProps.length === 0) {
+      // Return a single variant with basic props
+      return [{ className: undefined }];
+    }
+
+    // Generate all combinations of boolean props
+    const variants: Array<Record<string, any>> = [];
+    const numCombinations = Math.pow(2, booleanProps.length);
+    
+    for (let i = 0; i < numCombinations; i++) {
+      const props: Record<string, any> = { className: undefined };
       
-      if (t.isBlockStatement(body)) {
-        // Look for return statements in block
-        body.body.forEach(statement => {
-          if (t.isReturnStatement(statement) && statement.argument) {
-            this._extractStylesFromReturnStatement(statement.argument, styleObjects);
-          }
-        });
-      } else if (t.isObjectExpression(body)) {
-        // Direct object return in arrow function (like: () => ({ root: {...} }))
-        this._extractStylesFromObjectExpression(body, styleObjects);
-      } else if (t.isExpression(body)) {
-        // Handle other direct expression returns
-        if (t.isObjectExpression(body)) {
-          this._extractStylesFromObjectExpression(body, styleObjects);
-        }
+      booleanProps.forEach((prop, index) => {
+        props[prop] = Boolean(i & (1 << index));
+      });
+      
+      // Add some additional prop variants for non-boolean conditions
+      if (booleanProps.includes('variant')) {
+        const variantProps = { ...props };
+        delete variantProps.variant;
+        variantProps.variant = 'elevated';
+        variants.push(variantProps);
       }
+      
+      variants.push(props);
     }
 
-    return styleObjects;
+    // Limit to reasonable number of variants to avoid performance issues
+    return variants.slice(0, 16);
   }
 
   /**
-   * Extract styles from a return statement
+   * Extract boolean props from function AST by analyzing conditional expressions
    */
-  private _extractStylesFromReturnStatement(node: t.Expression, styleObjects: Array<{ key: string; styles: any }>): void {
-    if (t.isObjectExpression(node)) {
-      this._extractStylesFromObjectExpression(node, styleObjects);
-    }
-  }
-
-  /**
-   * Extract styles from an object expression
-   */
-  private _extractStylesFromObjectExpression(node: t.ObjectExpression, styleObjects: Array<{ key: string; styles: any }>): void {
-    node.properties.forEach(prop => {
-      if (t.isObjectProperty(prop) && t.isIdentifier(prop.key)) {
-        const key = prop.key.name;
-        
-        // Convert the AST node back to a style object
-        if (t.isExpression(prop.value)) {
-          const styles = this._astNodeToStyleObject(prop.value);
-          if (styles) {
-            styleObjects.push({ key, styles });
-          }
-        }
-      }
-    });
-  }
-
-  /**
-   * Convert AST node to style object for merge-styles
-   */
-  private _astNodeToStyleObject(node: t.Expression): any {
+  private _extractBooleanPropsFromFunction(functionNode: t.Node): string[] {
+    const booleanProps = new Set<string>();
+    
     try {
-      if (t.isObjectExpression(node)) {
-        const styles: any = {};
-        
-        node.properties.forEach(prop => {
-          if (t.isObjectProperty(prop)) {
-            let key: string;
-            
-            if (t.isIdentifier(prop.key)) {
-              key = prop.key.name;
-            } else if (t.isStringLiteral(prop.key)) {
-              key = prop.key.value;
-            } else {
-              return; // Skip complex keys for now
+      // Traverse the function AST to find logical expressions and member accesses
+      const traverseVisitor = {
+        LogicalExpression: (path: any) => {
+          if (path.node.operator === '&&' && t.isIdentifier(path.node.left)) {
+            booleanProps.add(path.node.left.name);
+          } else if (path.node.operator === '&&' && t.isMemberExpression(path.node.left)) {
+            const memberName = this._getMemberExpressionName(path.node.left);
+            if (memberName) {
+              booleanProps.add(memberName);
             }
-
-            if (t.isExpression(prop.value)) {
-              const value = this._astNodeToValue(prop.value);
-              if (value !== undefined) {
-                styles[key] = value;
+          }
+        },
+        BinaryExpression: (path: any) => {
+          if (path.node.operator === '===' || path.node.operator === '==') {
+            if (t.isMemberExpression(path.node.left)) {
+              const memberName = this._getMemberExpressionName(path.node.left);
+              if (memberName && memberName !== 'variant') {
+                booleanProps.add(memberName);
               }
             }
           }
-        });
-
-        return styles;
-      } else if (t.isArrayExpression(node)) {
-        // Handle array of styles
-        return node.elements.map(element => {
-          if (element && t.isExpression(element)) {
-            return this._astNodeToStyleObject(element);
+        },
+        ConditionalExpression: (path: any) => {
+          if (t.isIdentifier(path.node.test)) {
+            booleanProps.add(path.node.test.name);
+          } else if (t.isMemberExpression(path.node.test)) {
+            const memberName = this._getMemberExpressionName(path.node.test);
+            if (memberName) {
+              booleanProps.add(memberName);
+            }
           }
-          return null;
-        }).filter(item => item !== null);
+        },
+      };
+
+      // Create a minimal AST with the function as the root
+      const program = t.program([t.expressionStatement(functionNode as any)]);
+      traverse(program, traverseVisitor);
+    } catch (error) {
+      console.log(`>>> Error extracting boolean props: ${error}`);
+      // Fallback to common boolean props if traversal fails
+      return ['actionable', 'compact', 'disabled', 'primary', 'selected', 'checked'];
+    }
+
+    return Array.from(booleanProps);
+  }
+
+  /**
+   * Get the name from a member expression (e.g., props.actionable -> actionable)
+   */
+  private _getMemberExpressionName(node: t.MemberExpression): string | null {
+    if (t.isIdentifier(node.object) && node.object.name === 'props' && t.isIdentifier(node.property)) {
+      return node.property.name;
+    }
+    return null;
+  }
+
+  /**
+   * Execute getStyles function with given props and context
+   */
+  private _executeGetStylesFunction(functionNode: t.Node, props: Record<string, any>, context: any): any {
+    try {
+      // Create a complete props object
+      const fullProps = {
+        ...props,
+        theme: context.theme,
+        className: props.className,
+      };
+
+      console.log(`>>> Executing getStyles with props: ${JSON.stringify(fullProps, null, 2).substring(0, 300)}`);
+      
+      // Extract and evaluate the function body
+      if (t.isArrowFunctionExpression(functionNode) || t.isFunctionExpression(functionNode) || t.isFunctionDeclaration(functionNode)) {
+        const body = functionNode.body;
+        
+        if (t.isBlockStatement(body)) {
+          // Look for return statements
+          for (const statement of body.body) {
+            if (t.isReturnStatement(statement) && statement.argument) {
+              return this._evaluateStyleExpression(statement.argument, fullProps, context);
+            }
+          }
+        } else if (t.isExpression(body)) {
+          // Direct expression return (arrow function)
+          return this._evaluateStyleExpression(body, fullProps, context);
+        }
       }
       
       return null;
     } catch (error) {
-      this._terminal.writeWarningLine(`Failed to convert AST node to style object: ${error}`);
+      console.log(`>>> Error executing getStyles function: ${error}`);
       return null;
     }
   }
 
   /**
-   * Convert AST node to primitive value
+   * Evaluate a style expression with given props and context
    */
-  private _astNodeToValue(node: t.Expression): any {
+  private _evaluateStyleExpression(node: t.Expression, props: Record<string, any>, context: any): any {
+    if (t.isObjectExpression(node)) {
+      const result: Record<string, any> = {};
+      
+      node.properties.forEach(prop => {
+        if (t.isObjectProperty(prop) && t.isIdentifier(prop.key)) {
+          const key = prop.key.name;
+          
+          if (t.isExpression(prop.value)) {
+            const value = this._evaluateStyleValue(prop.value, props, context);
+            if (value !== undefined) {
+              result[key] = value;
+            }
+          }
+        }
+      });
+      
+      return result;
+    }
+    
+    return this._evaluateStyleValue(node, props, context);
+  }
+
+  /**
+   * Evaluate a style value expression (handles arrays, conditionals, objects)
+   */
+  private _evaluateStyleValue(node: t.Expression, props: Record<string, any>, context: any): any {
+    if (t.isArrayExpression(node)) {
+      // Handle array of styles with conditional logic
+      const result: any[] = [];
+      
+      node.elements.forEach(element => {
+        if (element && t.isExpression(element)) {
+          const value = this._evaluateStyleValue(element, props, context);
+          if (value !== undefined && value !== null && value !== false) {
+            result.push(value);
+          }
+        }
+      });
+      
+      return result;
+    } else if (t.isLogicalExpression(node)) {
+      // Handle boolean && style expressions
+      if (node.operator === '&&') {
+        const leftValue = this._evaluateExpression(node.left, props, context);
+        if (leftValue) {
+          return this._evaluateStyleValue(node.right, props, context);
+        }
+        return null;
+      }
+    } else if (t.isConditionalExpression(node)) {
+      // Handle ternary expressions
+      const testValue = this._evaluateExpression(node.test, props, context);
+      if (testValue) {
+        return this._evaluateStyleValue(node.consequent, props, context);
+      } else {
+        return this._evaluateStyleValue(node.alternate, props, context);
+      }
+    } else if (t.isObjectExpression(node)) {
+      // Handle object styles
+      const result: Record<string, any> = {};
+      
+      node.properties.forEach(prop => {
+        if (t.isObjectProperty(prop)) {
+          let key: string;
+          
+          if (t.isIdentifier(prop.key)) {
+            key = prop.key.name;
+          } else if (t.isStringLiteral(prop.key)) {
+            key = prop.key.value;
+          } else {
+            return;
+          }
+
+          if (t.isExpression(prop.value)) {
+            const value = this._evaluateExpression(prop.value, props, context);
+            if (value !== undefined) {
+              result[key] = value;
+            }
+          }
+        }
+      });
+      
+      return result;
+    } else {
+      // Handle primitive expressions
+      return this._evaluateExpression(node, props, context);
+    }
+  }
+
+  /**
+   * Evaluate a general expression (member access, template literals, etc.)
+   */
+  private _evaluateExpression(node: t.Expression, props: Record<string, any>, context: any): any {
     if (t.isStringLiteral(node)) {
       return node.value;
     } else if (t.isNumericLiteral(node)) {
       return node.value;
     } else if (t.isBooleanLiteral(node)) {
       return node.value;
-    } else if (t.isObjectExpression(node)) {
-      return this._astNodeToStyleObject(node);
-    } else if (t.isArrayExpression(node)) {
-      return node.elements.map(element => {
-        if (element && t.isExpression(element)) {
-          return this._astNodeToValue(element);
-        }
-        return null;
-      });
-    } else if (t.isTemplateLiteral(node)) {
-      // Handle template literals - simplified conversion
-      if (node.expressions.length === 0) {
-        return node.quasis[0]?.value.cooked || '';
+    } else if (t.isIdentifier(node)) {
+      // Look up identifier in props or context
+      if (props.hasOwnProperty(node.name)) {
+        return props[node.name];
+      } else if (context.hasOwnProperty(node.name)) {
+        return context[node.name];
       }
-      // For complex template literals, we'd need to evaluate the expressions
-      return node.quasis[0]?.value.cooked || '';
+      return undefined;
+    } else if (t.isMemberExpression(node)) {
+      // Handle member expressions like props.primary, theme.palette.white
+      return this._evaluateMemberExpression(node, props, context);
+    } else if (t.isTemplateLiteral(node)) {
+      // Handle template literals with interpolation
+      return this._evaluateTemplateLiteral(node, props, context);
+    } else if (t.isBinaryExpression(node)) {
+      // Handle binary expressions like === comparisons
+      const left = t.isExpression(node.left) ? this._evaluateExpression(node.left, props, context) : undefined;
+      const right = t.isExpression(node.right) ? this._evaluateExpression(node.right, props, context) : undefined;
+      
+      switch (node.operator) {
+        case '===': return left === right;
+        case '==': return left == right;
+        case '!==': return left !== right;
+        case '!=': return left != right;
+        default: return undefined;
+      }
+    } else if (t.isLogicalExpression(node)) {
+      // Handle logical expressions
+      const left = this._evaluateExpression(node.left, props, context);
+      
+      if (node.operator === '&&') {
+        return left ? this._evaluateExpression(node.right, props, context) : left;
+      } else if (node.operator === '||') {
+        return left || this._evaluateExpression(node.right, props, context);
+      }
     }
     
-    // For other complex expressions, return a placeholder
-    // In a full implementation, this would handle member expressions,
-    // function calls, conditionals, etc.
     return undefined;
+  }
+
+  /**
+   * Evaluate member expressions (e.g., props.theme.palette.white)
+   */
+  private _evaluateMemberExpression(node: t.MemberExpression, props: Record<string, any>, context: any): any {
+    try {
+      let current: any = undefined;
+      
+      // Start with the object
+      if (t.isIdentifier(node.object)) {
+        const objName = node.object.name;
+        if (objName === 'props') {
+          current = props;
+        } else if (objName === 'theme') {
+          current = context.theme;
+        } else if (objName === 'palette') {
+          current = context.palette;
+        } else if (objName === 'fonts') {
+          current = context.fonts;
+        } else if (objName === 'effects') {
+          current = context.effects;
+        } else if (props.hasOwnProperty(objName)) {
+          current = props[objName];
+        } else if (context.hasOwnProperty(objName)) {
+          current = context[objName];
+        }
+      } else if (t.isMemberExpression(node.object)) {
+        current = this._evaluateMemberExpression(node.object, props, context);
+      }
+      
+      if (current === undefined || current === null) {
+        return undefined;
+      }
+      
+      // Access the property
+      let propertyName: string;
+      if (t.isIdentifier(node.property)) {
+        propertyName = node.property.name;
+      } else if (t.isStringLiteral(node.property)) {
+        propertyName = node.property.value;
+      } else {
+        return undefined;
+      }
+      
+      const result = current[propertyName];
+      console.log(`>>> Member expression ${this._memberExpressionToString(node)} = ${result}`);
+      return result;
+    } catch (error) {
+      console.log(`>>> Error evaluating member expression: ${error}`);
+      return undefined;
+    }
+  }
+  
+  /**
+   * Convert member expression to string for debugging
+   */
+  private _memberExpressionToString(node: t.MemberExpression): string {
+    try {
+      let objectStr: string;
+      if (t.isIdentifier(node.object)) {
+        objectStr = node.object.name;
+      } else if (t.isMemberExpression(node.object)) {
+        objectStr = this._memberExpressionToString(node.object);
+      } else {
+        objectStr = '[complex]';
+      }
+      
+      let propertyStr: string;
+      if (t.isIdentifier(node.property)) {
+        propertyStr = node.property.name;
+      } else if (t.isStringLiteral(node.property)) {
+        propertyStr = node.property.value;
+      } else {
+        propertyStr = '[complex]';
+      }
+      
+      return `${objectStr}.${propertyStr}`;
+    } catch {
+      return '[error]';
+    }
+  }
+
+  /**
+   * Evaluate template literals with interpolation
+   */
+  private _evaluateTemplateLiteral(node: t.TemplateLiteral, props: Record<string, any>, context: any): string {
+    let result = '';
+    
+    for (let i = 0; i < node.quasis.length; i++) {
+      result += node.quasis[i].value.cooked || '';
+      
+      if (i < node.expressions.length) {
+        const expression = node.expressions[i];
+        if (t.isExpression(expression)) {
+          const expressionValue = this._evaluateExpression(expression, props, context);
+          result += expressionValue !== undefined ? String(expressionValue) : '';
+        }
+      }
+    }
+    
+    return result;
+  }
+
+  /**
+   * Flatten style value (handle arrays and merge objects)
+   */
+  private _flattenStyleValue(styleValue: any, props: Record<string, any>, context: any): any {
+    if (Array.isArray(styleValue)) {
+      // Merge array elements into a single style object
+      const result: Record<string, any> = {};
+      
+      styleValue.forEach(item => {
+        if (item && typeof item === 'object') {
+          Object.assign(result, item);
+        } else if (typeof item === 'string') {
+          // Handle className strings - merge-styles will handle these
+          if (!result.className) {
+            result.className = item;
+          } else {
+            result.className += ' ' + item;
+          }
+        }
+      });
+      
+      return result;
+    } else if (styleValue && typeof styleValue === 'object') {
+      return styleValue;
+    } else if (typeof styleValue === 'string') {
+      return { className: styleValue };
+    }
+    
+    return null;
   }
 
   /**
@@ -755,7 +1124,16 @@ export class FluentStyleExtractor {
   }
 
   private _createPrecompiledFunction(extractedData: { cssClasses: Record<string, string> }): t.ArrowFunctionExpression {
-    // Simplified implementation - would generate actual pre-compiled function
+    // Create a mapping from the generated variant classes back to a simplified structure
+    const cssClasses = extractedData.cssClasses;
+    console.log(`>>> Creating precompiled function with classes: ${JSON.stringify(cssClasses)}`);
+    
+    // Find the root class (could be root, root_variant0, etc.)
+    const rootClassKey = Object.keys(cssClasses).find(key => key.startsWith('root')) || 'root';
+    const rootClassName = cssClasses[rootClassKey] || 'css-0';
+    
+    console.log(`>>> Using root class: ${rootClassKey} -> ${rootClassName}`);
+    
     return t.arrowFunctionExpression(
       [t.identifier('props')],
       t.blockStatement([
@@ -764,8 +1142,8 @@ export class FluentStyleExtractor {
             t.objectProperty(
               t.identifier('root'),
               t.arrayExpression([
-                t.stringLiteral(extractedData.cssClasses.base),
-                t.identifier('props.className')
+                t.stringLiteral(rootClassName),
+                t.memberExpression(t.identifier('props'), t.identifier('className'))
               ])
             )
           ])

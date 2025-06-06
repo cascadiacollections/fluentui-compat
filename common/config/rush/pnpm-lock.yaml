@@ -101,6 +101,9 @@ importers:
       '@babel/types':
         specifier: ^7.25.6
         version: 7.27.3
+      '@fluentui/merge-styles':
+        specifier: ^8.6.14
+        version: 8.6.14
       '@rushstack/node-core-library':
         specifier: ^5.9.0
         version: 5.13.1(@types/node@22.15.29)
@@ -117,6 +120,9 @@ importers:
         specifier: ^8.4.47
         version: 8.5.4
     devDependencies:
+      '@microsoft/api-extractor':
+        specifier: ^7.44.0
+        version: 7.52.8(@types/node@22.15.29)
       '@types/babel__core':
         specifier: ^7.20.5
         version: 7.20.5

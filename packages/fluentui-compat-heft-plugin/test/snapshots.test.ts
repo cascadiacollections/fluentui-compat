@@ -21,13 +21,13 @@ describe('FluentStyleExtractor Snapshot Tests', () => {
       writeError: jest.fn(),
       writeWarning: jest.fn(),
       writeVerbose: jest.fn(),
-      writeLine: jest.fn(),
-      writeErrorLine: jest.fn(),
-      writeWarningLine: jest.fn(),
-      writeVerboseLine: jest.fn(),
+      writeLine: console.log,
+      writeErrorLine: console.error,
+      writeWarningLine: console.warn,
+      writeVerboseLine: console.log,
       eolCharacter: '\n',
       supportsColor: false,
-      verboseEnabled: false,
+      verboseEnabled: true,
       debugEnabled: false
     };
     

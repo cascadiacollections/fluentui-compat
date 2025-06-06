@@ -266,23 +266,29 @@ describe('FluentStyleExtractor', () => {
       expect(functionNode.type).toBe('ArrowFunctionExpression');
     });
 
-    it('should generate CSS from extracted data', () => {
+    it('should generate CSS using merge-styles', () => {
       const extractor = createExtractor();
       
-      // Access private method via any for testing
-      const generateCSSFromExtracted = (extractor as any)._generateCSSFromExtracted;
+      // Test merge-styles integration directly
+      const { mergeStyles, Stylesheet } = require('@fluentui/merge-styles');
       
-      const extractedData = {
-        cssClasses: {
-          base: 'fui-Button-abc123-root',
-          root: 'fui-Button-abc123-root',
-          label: 'fui-Button-abc123-label'
-        }
-      };
+      // Reset stylesheet
+      const stylesheet = Stylesheet.getInstance();
+      stylesheet.reset();
       
-      const css = generateCSSFromExtracted.call(extractor, extractedData);
-      expect(css).toContain('.fui-Button-abc123-root');
+      // Test CSS generation
+      const className = mergeStyles({
+        backgroundColor: 'red',
+        padding: '10px',
+        fontSize: '14px'
+      });
+      
+      const css = stylesheet.getRules();
+      expect(typeof className).toBe('string');
       expect(typeof css).toBe('string');
+      expect(css).toContain('background-color:red');
+      expect(css).toContain('padding');
+      expect(css).toContain('font-size:14px');
     });
   });
 

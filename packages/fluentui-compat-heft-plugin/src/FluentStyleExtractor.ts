@@ -166,14 +166,23 @@ export class FluentStyleExtractor {
       
       this._terminal.writeVerboseLine(`Checking file: ${relativePath}`);
       
-      // Check include patterns
+      // Special handling for vendor files
+      const isVendorFile = relativePath.includes('node_modules');
+      if (isVendorFile) {
+        // Vendor files are already filtered by their own include/exclude patterns
+        // during vendor collection, so we don't need to filter them again here
+        this._terminal.writeVerboseLine(`File ${relativePath} is vendor file - including`);
+        return true;
+      }
+      
+      // Check include patterns for non-vendor files
       const included = include.some(pattern => this._matchesGlob(relativePath, pattern));
       if (!included) {
         this._terminal.writeVerboseLine(`File ${relativePath} not included by patterns`);
         return false;
       }
 
-      // Check exclude patterns
+      // Check exclude patterns for non-vendor files
       const excluded = exclude.some(pattern => this._matchesGlob(relativePath, pattern));
       if (excluded) {
         this._terminal.writeVerboseLine(`File ${relativePath} excluded by patterns`);
@@ -231,14 +240,26 @@ export class FluentStyleExtractor {
    * Simple glob pattern matching
    */
   private _matchesGlob(filePath: string, pattern: string): boolean {
+    // Simple glob matching for common patterns
+    const normalizedPath = filePath.replace(/\\/g, '/');
+    
+    // Handle the common case of src/**/*.styles.ts
+    if (pattern === 'src/**/*.styles.ts') {
+      return /^src\/.*\.styles\.ts$/.test(normalizedPath);
+    }
+    
+    if (pattern === 'src/**/*.styles.tsx') {
+      return /^src\/.*\.styles\.tsx$/.test(normalizedPath);
+    }
+    
     // Convert glob pattern to regex (simplified)
-    const regexPattern = pattern
+    let regexPattern = pattern
       .replace(/\*\*/g, '.*')
       .replace(/\*/g, '[^/]*')
       .replace(/\?/g, '[^/]');
     
     const regex = new RegExp(`^${regexPattern}$`);
-    return regex.test(filePath.replace(/\\/g, '/'));
+    return regex.test(normalizedPath);
   }
 
   /**
@@ -257,6 +278,16 @@ export class FluentStyleExtractor {
         this._metrics.filesProcessed++;
         this._metrics.stylesExtracted += result.extractedClasses.length;
         this._metrics.cssGenerated += result.css.length;
+        
+        // Update vendor package metrics if this is a vendor file
+        if (relativePath.includes('node_modules') && this._metrics.vendorPackages) {
+          const vendorPackage = this._metrics.vendorPackages.find(pkg => 
+            relativePath.includes(`node_modules/${pkg.packageName}`)
+          );
+          if (vendorPackage) {
+            vendorPackage.stylesExtracted += result.extractedClasses.length;
+          }
+        }
       }
 
       return {
@@ -1878,10 +1909,16 @@ export class FluentStyleExtractor {
     files: string[],
     includePatterns: string[],
     excludePatterns: string[],
-    packageName: string
+    packageName: string,
+    packageBasePath?: string
   ): Promise<void> {
     if (!(await FileSystem.existsAsync(dirPath))) {
       return;
+    }
+
+    // Set packageBasePath on first call
+    if (!packageBasePath) {
+      packageBasePath = dirPath;
     }
 
     const items = await FileSystem.readFolderItemsAsync(dirPath);
@@ -1895,18 +1932,23 @@ export class FluentStyleExtractor {
           continue;
         }
         
-        await this._collectVendorFilesRecursively(fullPath, files, includePatterns, excludePatterns, packageName);
+        await this._collectVendorFilesRecursively(fullPath, files, includePatterns, excludePatterns, packageName, packageBasePath);
       } else if (item.isFile()) {
-        const relativePath = path.relative(dirPath, fullPath);
+        // Calculate relative path from package base path, not current directory
+        const relativePath = path.relative(packageBasePath, fullPath);
         
         // Check include patterns
-        const included = includePatterns.some(pattern => this._matchesGlob(relativePath, pattern));
+        const included = includePatterns.some(pattern => {
+          return this._matchesGlob(relativePath, pattern);
+        });
         if (!included) {
           continue;
         }
 
         // Check exclude patterns
-        const excluded = excludePatterns.some(pattern => this._matchesGlob(relativePath, pattern));
+        const excluded = excludePatterns.some(pattern => {
+          return this._matchesGlob(relativePath, pattern);
+        });
         if (excluded) {
           continue;
         }

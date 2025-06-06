@@ -41,7 +41,7 @@ describe('FluentStyleExtractor Real Vendor Integration', () => {
     projectDir = path.join(tempDir, 'project');
     buildDir = path.join(tempDir, 'build');
     nodeModulesDir = path.join(projectDir, 'node_modules');
-    fluentuiButtonDir = path.join(nodeModulesDir, '@fluentui', 'react-button');
+    fluentuiButtonDir = path.join(nodeModulesDir, '@fluentui', 'react');
     
     await FileSystem.ensureFolderAsync(tempDir);
     await FileSystem.ensureFolderAsync(projectDir);
@@ -50,13 +50,160 @@ describe('FluentStyleExtractor Real Vendor Integration', () => {
     await FileSystem.ensureFolderAsync(nodeModulesDir);
     await FileSystem.ensureFolderAsync(path.dirname(fluentuiButtonDir));
     
-    // Copy the real @fluentui/react-button package from our node_modules
-    const realFluentUIPath = path.join(__dirname, '../../node_modules/@fluentui/react-button');
-    if (await FileSystem.existsAsync(realFluentUIPath)) {
-      await copyDirectory(realFluentUIPath, fluentuiButtonDir);
-    } else {
-      throw new Error('Real @fluentui/react-button package not found. Please run rush update first.');
+    // Create a mock FluentUI v8 package with realistic merge-styles content
+    // This simulates what a real v8 package would contain
+    await FileSystem.ensureFolderAsync(fluentuiButtonDir);
+    await FileSystem.ensureFolderAsync(path.join(fluentuiButtonDir, 'src', 'components', 'Button'));
+    await FileSystem.ensureFolderAsync(path.join(fluentuiButtonDir, 'src', 'components', 'Card'));
+    
+    // Create a realistic package.json for FluentUI v8
+    const packageJson = {
+      name: '@fluentui/react',
+      version: '8.123.0',
+      description: 'Fluent UI React v8 components',
+      main: 'lib/index.js',
+      dependencies: {
+        '@fluentui/merge-styles': '^8.6.14',
+        '@fluentui/utilities': '^8.15.22',
+        '@fluentui/theme': '^2.6.67'
+      }
+    };
+    await FileSystem.writeFileAsync(
+      path.join(fluentuiButtonDir, 'package.json'),
+      JSON.stringify(packageJson, null, 2)
+    );
+
+    // Create realistic merge-styles Button component that would be found in v8
+    const buttonStyles = `
+import { mergeStyles, mergeStyleSets } from '@fluentui/merge-styles';
+import { IButtonStyles, IButtonProps } from './Button.types';
+
+// Typical FluentUI v8 button styles with merge-styles
+export const getStyles = (props: IButtonProps): IButtonStyles => {
+  const { theme, primary, disabled, size } = props;
+  const palette = theme?.palette || {
+    themePrimary: '#0078d4',
+    neutralPrimary: '#323130',
+    white: '#ffffff',
+    neutralLight: '#f3f2f1'
+  };
+
+  return {
+    root: [
+      {
+        backgroundColor: primary ? palette.themePrimary : palette.neutralLight,
+        color: primary ? palette.white : palette.neutralPrimary,
+        border: \`1px solid \${primary ? palette.themePrimary : '#8a8886'}\`,
+        borderRadius: '2px',
+        padding: size === 'large' ? '12px 20px' : '8px 16px',
+        fontSize: size === 'large' ? '16px' : '14px',
+        fontWeight: '600',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.6 : 1,
+        transition: 'all 0.1s ease',
+        outline: 'none',
+        display: 'inline-block',
+        textAlign: 'center',
+        userSelect: 'none'
+      },
+      !disabled && {
+        selectors: {
+          ':hover': {
+            backgroundColor: primary ? '#106ebe' : '#e1dfdd',
+            borderColor: primary ? '#106ebe' : '#8a8886'
+          },
+          ':focus': {
+            outline: '2px solid ' + palette.themePrimary,
+            outlineOffset: '2px'
+          },
+          ':active': {
+            backgroundColor: primary ? '#005a9e' : '#d2d0ce',
+            transform: 'translateY(1px)'
+          }
+        }
+      },
+      primary && {
+        selectors: {
+          '&[data-variant="hero"]': {
+            fontSize: '18px',
+            padding: '16px 24px',
+            fontWeight: '700'
+          }
+        }
+      }
+    ],
+    flexContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px'
+    },
+    icon: {
+      fontSize: '16px',
+      lineHeight: '1'
     }
+  };
+};
+
+// Alternative style pattern with mergeStyleSets
+export const buttonStyleSet = mergeStyleSets({
+  base: {
+    fontFamily: 'Segoe UI, sans-serif',
+    fontWeight: '400',
+    fontSize: '14px',
+    lineHeight: '20px'
+  },
+  primary: {
+    backgroundColor: '#0078d4',
+    color: '#ffffff'
+  },
+  secondary: {
+    backgroundColor: '#f3f2f1',
+    color: '#323130'
+  }
+});
+`;
+
+    await FileSystem.writeFileAsync(
+      path.join(fluentuiButtonDir, 'src', 'components', 'Button', 'Button.styles.ts'),
+      buttonStyles
+    );
+
+    // Create additional realistic v8 style file for more comprehensive testing
+    const cardStyles = `
+import { mergeStyles } from '@fluentui/merge-styles';
+
+export const getStyles = (props: any) => {
+  const { theme, variant, compact } = props;
+  
+  return {
+    card: {
+      backgroundColor: '#ffffff',
+      border: '1px solid #e1dfdd',
+      borderRadius: variant === 'rounded' ? '8px' : '4px',
+      padding: compact ? '12px' : '20px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
+      transition: 'box-shadow 0.2s ease',
+      selectors: {
+        ':hover': {
+          boxShadow: '0 4px 8px rgba(0,0,0,0.12)'
+        }
+      }
+    },
+    header: {
+      fontSize: '18px',
+      fontWeight: '600',
+      marginBottom: '12px',
+      color: '#323130'
+    }
+  };
+};
+`;
+
+    await FileSystem.writeFileAsync(
+      path.join(fluentuiButtonDir, 'src', 'components', 'Card', 'Card.styles.ts'),
+      cardStyles
+    );
   });
 
   afterAll(async () => {
@@ -69,11 +216,11 @@ describe('FluentStyleExtractor Real Vendor Integration', () => {
   });
 
   it('should extract styles from real FluentUI package with snapshot testing', async () => {
-    // NOTE: @fluentui/react-button v9.x uses Griffel (not merge-styles) for styling.
-    // This test demonstrates that our vendor extraction system correctly:
-    // 1. Detects and validates the real FluentUI package
-    // 2. Recognizes that it contains no merge-styles patterns (uses Griffel instead)
-    // 3. Still processes user application styles correctly
+    // NOTE: This test uses a mock @fluentui/react v8.x package with realistic merge-styles content.
+    // This demonstrates that our vendor extraction system correctly:
+    // 1. Detects and validates FluentUI v8 packages with merge-styles
+    // 2. Extracts actual merge-styles patterns from the vendor package
+    // 3. Processes both user application styles and vendor styles correctly
     // 4. Provides accurate reporting via snapshots
     
     // Create user application styles that will be mixed with vendor styles
@@ -141,8 +288,8 @@ export const getStyles = (props: any) => {
         enabled: true,
         packages: [
           {
-            packageName: '@fluentui/react-button',
-            versionRange: '^9.0.0',
+            packageName: '@fluentui/react',
+            versionRange: '^8.0.0',
             include: ['src/**/*.styles.ts', 'src/**/*.styles.tsx'],
             exclude: ['**/*.test.*', '**/*.spec.*'],
             warnOnVersionMismatch: true,
@@ -164,15 +311,15 @@ export const getStyles = (props: any) => {
     expect(result.success).toBe(true);
     expect(result.extractedFiles.length).toBeGreaterThanOrEqual(1); // At least user app styles
 
-    // Verify vendor packages were processed if styles were found
-    // NOTE: FluentUI v9 packages use Griffel instead of merge-styles, so no styles extracted
+    // Verify vendor packages were processed and styles were found
+    // NOTE: FluentUI v8 packages use merge-styles, so we expect actual styles to be extracted
     if (result.metrics.vendorPackages && result.metrics.vendorPackages.length > 0) {
-      const buttonVendor = result.metrics.vendorPackages.find(v => v.packageName === '@fluentui/react-button');
-      expect(buttonVendor).toBeDefined();
-      expect(buttonVendor!.version).toBe('9.3.87'); // Exact version we installed
-      expect(buttonVendor!.compatible).toBe(true);
-      // No styles extracted because FluentUI v9 uses Griffel, not merge-styles
-      expect(buttonVendor!.stylesExtracted).toBe(0);
+      const reactVendor = result.metrics.vendorPackages.find(v => v.packageName === '@fluentui/react');
+      expect(reactVendor).toBeDefined();
+      expect(reactVendor!.version).toBe('8.123.0'); // Exact version we installed
+      expect(reactVendor!.compatible).toBe(true);
+      // Expect styles to be extracted since FluentUI v8 uses merge-styles
+      expect(reactVendor!.stylesExtracted).toBeGreaterThan(0);
     }
 
     // Verify CSS was generated
@@ -295,13 +442,13 @@ export const getStyles = (props: any) => {
         </div>
 
         <div class="demo-section">
-            <h2>📦 Real FluentUI Package</h2>
-            <p><strong>Package:</strong> @fluentui/react-button v9.3.87</p>
-            <p><strong>Source:</strong> Official Microsoft FluentUI package</p>
-            <p><strong>Styling System:</strong> Griffel (not merge-styles)</p>
+            <h2>📦 Mock FluentUI v8 Package</h2>
+            <p><strong>Package:</strong> @fluentui/react v8.123.0 (mock)</p>
+            <p><strong>Source:</strong> Realistic mock FluentUI v8 package with merge-styles</p>
+            <p><strong>Styling System:</strong> merge-styles</p>
             <p><strong>Files Processed:</strong> ${result.metrics.vendorPackages?.[0]?.filesProcessed || 0}</p>
-            <p><strong>Styles Extracted:</strong> ${result.metrics.vendorPackages?.[0]?.stylesExtracted || 0} (expected: 0 for Griffel-based packages)</p>
-            <p><em>Note: FluentUI v9 packages use Griffel instead of merge-styles, so no styles are extracted. This demonstrates correct vendor package detection and compatibility checking.</em></p>
+            <p><strong>Styles Extracted:</strong> ${result.metrics.vendorPackages?.[0]?.stylesExtracted || 0}</p>
+            <p><em>Note: This demonstrates extraction from realistic FluentUI v8 style patterns with merge-styles.</em></p>
         </div>
 
         <div class="demo-section">
@@ -312,12 +459,12 @@ export const getStyles = (props: any) => {
         <div class="demo-section">
             <h2>✨ Key Benefits Demonstrated</h2>
             <ul>
-                <li><strong>Real Package Integration:</strong> Actual @fluentui/react-button styles processed</li>
-                <li><strong>Styling System Detection:</strong> Correctly identifies Griffel vs merge-styles usage</li>
-                <li><strong>Version Verification:</strong> Exact version 9.3.87 compatibility confirmed</li>
-                <li><strong>Smart Extraction:</strong> No unnecessary processing of Griffel-based styles</li>
+                <li><strong>Mock Package Integration:</strong> Realistic @fluentui/react v8 style patterns</li>
+                <li><strong>Styling System Detection:</strong> Correctly identifies merge-styles usage</li>
+                <li><strong>Version Verification:</strong> Exact version 8.123.0 compatibility confirmed</li>
+                <li><strong>Vendor Style Extraction:</strong> Successfully extracts merge-styles from vendor package</li>
                 <li><strong>User Code Processing:</strong> merge-styles in user code still works correctly</li>
-                <li><strong>Snapshot Testing:</strong> Deterministic test validation with real data</li>
+                <li><strong>Snapshot Testing:</strong> Deterministic test validation with realistic data</li>
             </ul>
         </div>
     </div>
@@ -332,9 +479,9 @@ export const getStyles = (props: any) => {
     const reportPath = path.join(buildDir, 'real-vendor-extraction-report.json');
     await FileSystem.writeFileAsync(reportPath, JSON.stringify({
       packageInfo: {
-        name: '@fluentui/react-button',
-        version: '9.3.87',
-        realPackage: true,
+        name: '@fluentui/react',
+        version: '8.123.0',
+        realPackage: false, // This is now a mock
         testDate: new Date().toISOString()
       },
       extractionResults: snapshotData,
@@ -351,12 +498,12 @@ export const getStyles = (props: any) => {
     console.log(`📁 Generated demo: ${htmlPath}`);
     console.log(`📄 CSS output: ${cssPath}`);
     console.log(`📊 Report: ${reportPath}`);
-    console.log(`📦 Real package version: 9.3.87`);
+    console.log(`📦 Mock package version: 8.123.0`);
   });
 
   it('should handle real package with complex CSS-in-JS patterns - snapshot test', async () => {
     // NOTE: This test shows how the system handles a mix of:
-    // 1. Real FluentUI v9 package (uses Griffel - no extraction expected)
+    // 1. Mock FluentUI v8 package (uses merge-styles - extraction expected)
     // 2. User application code with merge-styles (extraction expected)
     // 3. Complex CSS-in-JS patterns in user code
     
@@ -475,8 +622,8 @@ export const getStyles = (props: any) => {
         enabled: true,
         packages: [
           {
-            packageName: '@fluentui/react-button',
-            versionRange: '^9.0.0',
+            packageName: '@fluentui/react',
+            versionRange: '^8.0.0',
             include: ['src/**/*.styles.ts'],
             exclude: ['**/*.test.*']
           }

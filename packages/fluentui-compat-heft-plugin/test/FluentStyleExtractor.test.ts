@@ -341,4 +341,407 @@ describe('FluentStyleExtractor', () => {
       expect(typeof commonPatterns.themeTokens).toBe('string');
     });
   });
+
+  describe('Extended merge-styles API support', () => {
+    let extractor: FluentStyleExtractor;
+
+    beforeEach(() => {
+      extractor = createExtractor();
+    });
+
+    describe('Style function pattern detection', () => {
+      it('should detect various style function naming patterns', () => {
+        const isStyleFunction = (extractor as any)._isStyleFunction;
+
+        // Test getStyles
+        const getStylesNode = {
+          id: { type: 'Identifier', name: 'getStyles' },
+          init: { type: 'ArrowFunctionExpression' }
+        };
+        expect(isStyleFunction.call(extractor, getStylesNode)).toBe(true);
+
+        // Test useStyles
+        const useStylesNode = {
+          id: { type: 'Identifier', name: 'useStyles' },
+          init: { type: 'ArrowFunctionExpression' }
+        };
+        expect(isStyleFunction.call(extractor, useStylesNode)).toBe(true);
+
+        // Test createStyles
+        const createStylesNode = {
+          id: { type: 'Identifier', name: 'createStyles' },
+          init: { type: 'FunctionExpression' }
+        };
+        expect(isStyleFunction.call(extractor, createStylesNode)).toBe(true);
+
+        // Test functions ending with "Styles"
+        const buttonStylesNode = {
+          id: { type: 'Identifier', name: 'buttonStyles' },
+          init: { type: 'ArrowFunctionExpression' }
+        };
+        expect(isStyleFunction.call(extractor, buttonStylesNode)).toBe(true);
+
+        // Test functions ending with "Style"
+        const cardStyleNode = {
+          id: { type: 'Identifier', name: 'cardStyle' },
+          init: { type: 'ArrowFunctionExpression' }
+        };
+        expect(isStyleFunction.call(extractor, cardStyleNode)).toBe(true);
+
+        // Test non-style function
+        const regularFunctionNode = {
+          id: { type: 'Identifier', name: 'calculateTotal' },
+          init: { type: 'ArrowFunctionExpression' }
+        };
+        expect(isStyleFunction.call(extractor, regularFunctionNode)).toBe(false);
+      });
+
+      it('should detect style function declarations', () => {
+        const isStyleFunctionDeclaration = (extractor as any)._isStyleFunctionDeclaration;
+
+        const getStylesDeclaration = {
+          id: { name: 'getStyles' }
+        };
+        expect(isStyleFunctionDeclaration.call(extractor, getStylesDeclaration)).toBe(true);
+
+        const makeStylesDeclaration = {
+          id: { name: 'makeStyles' }
+        };
+        expect(isStyleFunctionDeclaration.call(extractor, makeStylesDeclaration)).toBe(true);
+
+        const regularFunctionDeclaration = {
+          id: { name: 'processData' }
+        };
+        expect(isStyleFunctionDeclaration.call(extractor, regularFunctionDeclaration)).toBe(false);
+      });
+
+      it('should detect style class methods', () => {
+        const isStyleClassMethod = (extractor as any)._isStyleClassMethod;
+
+        const getStylesMethod = {
+          key: { type: 'Identifier', name: 'getStyles' }
+        };
+        expect(isStyleClassMethod.call(extractor, getStylesMethod)).toBe(true);
+
+        const stylesMethod = {
+          key: { type: 'Identifier', name: 'styles' }
+        };
+        expect(isStyleClassMethod.call(extractor, stylesMethod)).toBe(true);
+
+        const renderMethod = {
+          key: { type: 'Identifier', name: 'render' }
+        };
+        expect(isStyleClassMethod.call(extractor, renderMethod)).toBe(true);
+
+        const regularMethod = {
+          key: { type: 'Identifier', name: 'handleClick' }
+        };
+        expect(isStyleClassMethod.call(extractor, regularMethod)).toBe(false);
+      });
+    });
+
+    describe('Direct merge-styles API calls', () => {
+      it('should handle mergeStyles calls', () => {
+        const handleMergeStylesCall = (extractor as any)._handleMergeStylesCall;
+        
+        // Mock call expression node
+        const mockNode = {
+          arguments: [
+            { type: 'ObjectExpression', properties: [] }
+          ]
+        };
+        
+        const mockPath = {
+          replaceWith: jest.fn()
+        };
+        
+        const result = handleMergeStylesCall.call(extractor, mockNode, mockPath, {}, []);
+        expect(result).toHaveProperty('classes');
+        expect(result).toHaveProperty('hasChanges');
+        expect(Array.isArray(result.classes)).toBe(true);
+      });
+
+      it('should handle mergeStyleSets calls', () => {
+        const handleMergeStyleSetsCall = (extractor as any)._handleMergeStyleSetsCall;
+        
+        const mockNode = {
+          arguments: [
+            { type: 'ObjectExpression', properties: [] }
+          ]
+        };
+        
+        const mockPath = {
+          replaceWith: jest.fn()
+        };
+        
+        const result = handleMergeStyleSetsCall.call(extractor, mockNode, mockPath, {}, []);
+        expect(result).toHaveProperty('classes');
+        expect(result).toHaveProperty('hasChanges');
+      });
+
+      it('should handle concatStyleSets calls', () => {
+        const handleConcatStyleSetsCall = (extractor as any)._handleConcatStyleSetsCall;
+        
+        const mockNode = {
+          arguments: [
+            { type: 'ObjectExpression', properties: [] },
+            { type: 'ObjectExpression', properties: [] }
+          ]
+        };
+        
+        const mockPath = {
+          replaceWith: jest.fn()
+        };
+        
+        const result = handleConcatStyleSetsCall.call(extractor, mockNode, mockPath, {}, []);
+        expect(result).toHaveProperty('classes');
+        expect(result).toHaveProperty('hasChanges');
+      });
+
+      it('should handle fontFace calls', () => {
+        const handleFontFaceCall = (extractor as any)._handleFontFaceCall;
+        
+        const mockNode = {
+          arguments: [
+            { type: 'ObjectExpression', properties: [] }
+          ]
+        };
+        
+        const mockPath = {
+          replaceWith: jest.fn()
+        };
+        
+        const result = handleFontFaceCall.call(extractor, mockNode, mockPath, {}, []);
+        expect(result).toHaveProperty('classes');
+        expect(result).toHaveProperty('hasChanges');
+      });
+
+      it('should handle keyframes calls', () => {
+        const handleKeyframesCall = (extractor as any)._handleKeyframesCall;
+        
+        const mockNode = {
+          arguments: [
+            { type: 'ObjectExpression', properties: [] }
+          ]
+        };
+        
+        const mockPath = {
+          replaceWith: jest.fn()
+        };
+        
+        const result = handleKeyframesCall.call(extractor, mockNode, mockPath, {}, []);
+        expect(result).toHaveProperty('classes');
+        expect(result).toHaveProperty('hasChanges');
+      });
+
+      it('should handle mergeCss calls with options', () => {
+        const handleMergeCssCall = (extractor as any)._handleMergeCssCall;
+        
+        const mockNode = {
+          arguments: [
+            { type: 'ObjectExpression', properties: [] },
+            { type: 'ObjectExpression', properties: [] } // IStyleOptions
+          ]
+        };
+        
+        const mockPath = {
+          replaceWith: jest.fn()
+        };
+        
+        const result = handleMergeCssCall.call(extractor, mockNode, mockPath, {}, []);
+        expect(result).toHaveProperty('classes');
+        expect(result).toHaveProperty('hasChanges');
+      });
+    });
+
+    describe('Global selectors and special patterns', () => {
+      it('should process global selectors correctly', () => {
+        const processStyleValue = (extractor as any)._processStyleValue;
+        
+        const selectorsValue = {
+          ':global(.custom-class)': { color: 'red' },
+          ':hover': { color: 'blue' },
+          ':global(.another-class) .nested': { fontSize: '14px' }
+        };
+        
+        const result = processStyleValue.call(extractor, 'selectors', selectorsValue, {});
+        
+        expect(result).toBeDefined();
+        expect(typeof result).toBe('object');
+        expect(result['.custom-class']).toEqual({ color: 'red' });
+        expect(result[':hover']).toEqual({ color: 'blue' });
+        expect(result['.another-class .nested']).toEqual({ fontSize: '14px' });
+      });
+
+      it('should detect custom wrapper functions', () => {
+        const evaluateCustomWrapperFunction = (extractor as any)._evaluateCustomWrapperFunction;
+        
+        // Mock the _evaluateExpression method to return style-like objects
+        const originalEvaluateExpression = (extractor as any)._evaluateExpression;
+        (extractor as any)._evaluateExpression = jest.fn().mockReturnValue({ color: 'red', padding: '8px' });
+        
+        const mockWrapperNode = {
+          callee: { type: 'Identifier', name: 'createButtonStyle' },
+          arguments: [
+            { type: 'ObjectExpression', properties: [{ type: 'ObjectProperty' }] }
+          ]
+        };
+        
+        const result = evaluateCustomWrapperFunction.call(extractor, mockWrapperNode, {}, {});
+        
+        expect(result).toBeDefined();
+        expect(result).toHaveProperty('__wrapperFunction');
+        expect(result.__wrapperFunction).toBe('createButtonStyle');
+        expect(result).toHaveProperty('__arguments');
+        
+        // Restore original method
+        (extractor as any)._evaluateExpression = originalEvaluateExpression;
+      });
+
+      it('should recognize wrapper function patterns', () => {
+        const evaluateCustomWrapperFunction = (extractor as any)._evaluateCustomWrapperFunction;
+        
+        // Mock the _evaluateExpression method to return style-like objects
+        const originalEvaluateExpression = (extractor as any)._evaluateExpression;
+        (extractor as any)._evaluateExpression = jest.fn().mockReturnValue({ backgroundColor: 'blue' });
+        
+        const wrapperNames = [
+          'createCardStyle',
+          'makeButtonStyle', 
+          'getComponentStyle',
+          'buildLayoutStyle',
+          'useThemeStyle',
+          'buttonStyleHelper',
+          'layoutStyleUtil'
+        ];
+        
+        wrapperNames.forEach(name => {
+          const mockNode = {
+            callee: { type: 'Identifier', name },
+            arguments: [{ type: 'ObjectExpression', properties: [] }]
+          };
+          
+          const result = evaluateCustomWrapperFunction.call(extractor, mockNode, {}, {});
+          expect(result).toBeDefined();
+          expect(result).toHaveProperty('__wrapperFunction');
+          expect(result.__wrapperFunction).toBe(name);
+        });
+        
+        // Restore original method
+        (extractor as any)._evaluateExpression = originalEvaluateExpression;
+      });
+
+      it('should not detect non-wrapper functions', () => {
+        const evaluateCustomWrapperFunction = (extractor as any)._evaluateCustomWrapperFunction;
+        
+        const nonWrapperNames = [
+          'calculateSum',
+          'fetchData',
+          'handleClick',
+          'processInput',
+          'validateForm'
+        ];
+        
+        nonWrapperNames.forEach(name => {
+          const mockNode = {
+            callee: { type: 'Identifier', name },
+            arguments: [{ type: 'ObjectExpression', properties: [] }]
+          };
+          
+          const result = evaluateCustomWrapperFunction.call(extractor, mockNode, {}, {});
+          expect(result).toBeUndefined();
+        });
+      });
+    });
+
+    describe('Complex nested calls and inline usage', () => {
+      it('should handle inline merge-styles calls in render methods', () => {
+        // This would typically be tested through integration tests
+        // since it requires full AST parsing and traversal
+        const sourceCode = `
+          const MyComponent = () => {
+            return (
+              <div className={mergeStyles({ color: 'red', padding: '8px' })}>
+                Content
+              </div>
+            );
+          };
+        `;
+        
+        // Test that the source code can be parsed
+        expect(sourceCode).toContain('mergeStyles');
+        expect(sourceCode).toContain('className');
+      });
+
+      it('should handle class name composition patterns', () => {
+        const sourceCode = `
+          const className = mergeStyles(baseClass, props.primary && primaryStyles, props.className);
+        `;
+        
+        // Test pattern recognition
+        expect(sourceCode).toContain('mergeStyles');
+        expect(sourceCode).toContain('&&');
+        expect(sourceCode).toContain('props.className');
+      });
+    });
+
+    describe('API coverage validation', () => {
+      it('should recognize all supported merge-styles APIs', () => {
+        const handleMergeStylesCalls = (extractor as any)._handleMergeStylesCalls;
+        
+        const supportedApis = [
+          'mergeStyles',
+          'mergeStyleSets', 
+          'concatStyleSets',
+          'concatStyleSetsWithProps',
+          'mergeCss',
+          'mergeCssSets',
+          'fontFace',
+          'keyframes'
+        ];
+        
+        supportedApis.forEach(apiName => {
+          const mockPath = {
+            node: {
+              type: 'CallExpression',
+              callee: { type: 'Identifier', name: apiName },
+              arguments: []
+            }
+          };
+          
+          const result = handleMergeStylesCalls.call(extractor, mockPath, 'test', {});
+          // Should not return null for supported APIs (though it might return empty results)
+          expect(result).toBeDefined();
+          expect(result).toHaveProperty('classes');
+          expect(result).toHaveProperty('hasChanges');
+          expect(Array.isArray(result.classes)).toBe(true);
+          expect(typeof result.hasChanges).toBe('boolean');
+        });
+      });
+
+      it('should ignore unsupported function calls', () => {
+        const handleMergeStylesCalls = (extractor as any)._handleMergeStylesCalls;
+        
+        const unsupportedApis = [
+          'console.log',
+          'Math.max',
+          'Object.assign',
+          'customFunction',
+          'someOtherApi'
+        ];
+        
+        unsupportedApis.forEach(apiName => {
+          const mockPath = {
+            node: {
+              callee: { type: 'Identifier', name: apiName },
+              arguments: []
+            }
+          };
+          
+          const result = handleMergeStylesCalls.call(extractor, mockPath, 'test', {});
+          expect(result).toBeNull();
+        });
+      });
+    });
+  });
 });

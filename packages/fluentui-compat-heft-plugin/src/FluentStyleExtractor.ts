@@ -309,14 +309,16 @@ export class FluentStyleExtractor {
 
     this._terminal.writeVerboseLine(`Starting AST traversal...`);
 
-    // Transform getStyles functions
+    // Transform all merge-styles API usage patterns
     traverse(ast, {
       VariableDeclarator: (path) => {
         console.log(`>>> Found VariableDeclarator: ${path.node.id?.type === 'Identifier' ? path.node.id.name : 'unknown'}`);
         this._terminal.writeVerboseLine(`Found VariableDeclarator in traversal`);
-        if (this._isGetStylesFunction(path.node)) {
-          console.log(`>>> Processing getStyles function (VariableDeclarator)`);
-          this._terminal.writeVerboseLine(`Processing getStyles function (VariableDeclarator)`);
+        
+        // Handle getStyles and other style functions
+        if (this._isStyleFunction(path.node)) {
+          console.log(`>>> Processing style function (VariableDeclarator)`);
+          this._terminal.writeVerboseLine(`Processing style function (VariableDeclarator)`);
           const extractedData = this._extractStylesFromFunction(path.node.init!, fileStyleId, stylesheet);
           if (extractedData) {
             console.log(`>>> Successfully extracted data, creating precompiled function`);
@@ -325,8 +327,8 @@ export class FluentStyleExtractor {
             extractedClasses.push(...(Object.values(extractedData.cssClasses) as string[]));
             hasChanges = true;
           } else {
-            console.log(`>>> No data extracted from getStyles function`);
-            this._terminal.writeVerboseLine(`No data extracted from getStyles function`);
+            console.log(`>>> No data extracted from style function`);
+            this._terminal.writeVerboseLine(`No data extracted from style function`);
           }
         }
       },
@@ -334,9 +336,11 @@ export class FluentStyleExtractor {
       FunctionDeclaration: (path) => {
         console.log(`>>> Found FunctionDeclaration: ${path.node.id?.name}`);
         this._terminal.writeVerboseLine(`Found FunctionDeclaration: ${path.node.id?.name}`);
-        if (path.node.id?.name === 'getStyles') {
-          console.log(`>>> Processing getStyles function (FunctionDeclaration)`);
-          this._terminal.writeVerboseLine(`Processing getStyles function (FunctionDeclaration)`);
+        
+        // Handle getStyles and other style functions
+        if (this._isStyleFunctionDeclaration(path.node)) {
+          console.log(`>>> Processing style function (FunctionDeclaration)`);
+          this._terminal.writeVerboseLine(`Processing style function (FunctionDeclaration)`);
           const extractedData = this._extractStylesFromFunction(path.node, fileStyleId, stylesheet);
           if (extractedData) {
             console.log(`>>> Successfully extracted data, creating precompiled function`);
@@ -344,14 +348,36 @@ export class FluentStyleExtractor {
             const newFunction = this._createPrecompiledFunction(extractedData);
             path.replaceWith(
               t.variableDeclaration('const', [
-                t.variableDeclarator(t.identifier('getStyles'), newFunction),
+                t.variableDeclarator(t.identifier(path.node.id?.name || 'getStyles'), newFunction),
               ])
             );
             extractedClasses.push(...(Object.values(extractedData.cssClasses) as string[]));
             hasChanges = true;
           } else {
-            console.log(`>>> No data extracted from getStyles function`);
-            this._terminal.writeVerboseLine(`No data extracted from getStyles function`);
+            console.log(`>>> No data extracted from style function`);
+            this._terminal.writeVerboseLine(`No data extracted from style function`);
+          }
+        }
+      },
+
+      // Handle direct merge-styles API calls
+      CallExpression: (path) => {
+        const result = this._handleMergeStylesCalls(path, fileStyleId, stylesheet);
+        if (result) {
+          extractedClasses.push(...result.classes);
+          hasChanges = hasChanges || result.hasChanges;
+        }
+      },
+
+      // Handle class method declarations that contain styles
+      ClassMethod: (path) => {
+        if (this._isStyleClassMethod(path.node)) {
+          console.log(`>>> Processing style class method: ${path.node.key.type === 'Identifier' ? path.node.key.name : 'unknown'}`);
+          const extractedData = this._extractStylesFromFunction(path.node, fileStyleId, stylesheet);
+          if (extractedData) {
+            console.log(`>>> Successfully extracted data from class method`);
+            extractedClasses.push(...(Object.values(extractedData.cssClasses) as string[]));
+            hasChanges = true;
           }
         }
       },
@@ -521,6 +547,167 @@ export class FluentStyleExtractor {
       this._terminal.writeVerboseLine(`  - isGetStyles: ${result}`);
     }
     return result;
+  }
+
+  /**
+   * Enhanced function to detect various style function patterns
+   * Handles getStyles, useStyles, createStyles, etc.
+   */
+  private _isStyleFunction = (node: t.VariableDeclarator): boolean => {
+    if (node.id?.type !== 'Identifier') return false;
+    if (!(node.init?.type === 'ArrowFunctionExpression' || node.init?.type === 'FunctionExpression')) return false;
+
+    const functionName = node.id.name;
+    
+    // Check for common style function naming patterns
+    const stylePatterns = [
+      'getStyles',
+      'useStyles', 
+      'createStyles',
+      'makeStyles',
+      'buildStyles',
+      /.*Styles$/,  // Any function ending with "Styles"
+      /.*Style$/,   // Any function ending with "Style"
+    ];
+
+    return stylePatterns.some(pattern => {
+      if (typeof pattern === 'string') {
+        return functionName === pattern;
+      } else {
+        return pattern.test(functionName);
+      }
+    });
+  }
+
+  /**
+   * Check if a function declaration is a style function
+   */
+  private _isStyleFunctionDeclaration = (node: t.FunctionDeclaration): boolean => {
+    if (!node.id?.name) return false;
+
+    const functionName = node.id.name;
+    
+    // Check for common style function naming patterns
+    const stylePatterns = [
+      'getStyles',
+      'useStyles', 
+      'createStyles',
+      'makeStyles',
+      'buildStyles',
+      /.*Styles$/,  // Any function ending with "Styles"
+      /.*Style$/,   // Any function ending with "Style"
+    ];
+
+    return stylePatterns.some(pattern => {
+      if (typeof pattern === 'string') {
+        return functionName === pattern;
+      } else {
+        return pattern.test(functionName);
+      }
+    });
+  }
+
+  /**
+   * Check if a class method contains style definitions
+   */
+  private _isStyleClassMethod = (node: t.ClassMethod): boolean => {
+    if (node.key.type !== 'Identifier') return false;
+
+    const methodName = node.key.name;
+    
+    // Check for common style method naming patterns
+    const stylePatterns = [
+      'getStyles',
+      'useStyles', 
+      'createStyles',
+      'styles',
+      'render', // Sometimes styles are in render methods
+      /.*Styles$/,
+      /.*Style$/,
+    ];
+
+    return stylePatterns.some(pattern => {
+      if (typeof pattern === 'string') {
+        return methodName === pattern;
+      } else {
+        return pattern.test(methodName);
+      }
+    });
+  }
+
+  /**
+   * Handle various merge-styles API calls
+   * Supports: mergeStyles, mergeStyleSets, concatStyleSets, fontFace, keyframes, etc.
+   */
+  private _handleMergeStylesCalls = (path: any, fileStyleId: string, stylesheet: any): { classes: string[], hasChanges: boolean } | null => {
+    const node = path.node;
+    
+    if (!t.isCallExpression(node)) return null;
+
+    // Get the function name being called
+    let functionName: string | null = null;
+    
+    if (t.isIdentifier(node.callee)) {
+      functionName = node.callee.name;
+    } else if (t.isMemberExpression(node.callee) && t.isIdentifier(node.callee.property)) {
+      functionName = node.callee.property.name;
+    }
+
+    if (!functionName) return null;
+
+    console.log(`>>> Found function call: ${functionName}`);
+    this._terminal.writeVerboseLine(`Found function call: ${functionName}`);
+
+    const mergeStylesApis = [
+      'mergeStyles',
+      'mergeStyleSets', 
+      'concatStyleSets',
+      'concatStyleSetsWithProps',
+      'mergeCss',
+      'mergeCssSets',
+      'fontFace',
+      'keyframes',
+    ];
+
+    if (!mergeStylesApis.includes(functionName)) return null;
+
+    console.log(`>>> Processing merge-styles API call: ${functionName}`);
+    this._terminal.writeVerboseLine(`Processing merge-styles API call: ${functionName}`);
+
+    try {
+      const extractedClasses: string[] = [];
+      
+      // Handle different API patterns
+      switch (functionName) {
+        case 'mergeStyles':
+          return this._handleMergeStylesCall(node, path, stylesheet, extractedClasses);
+        
+        case 'mergeStyleSets':
+          return this._handleMergeStyleSetsCall(node, path, stylesheet, extractedClasses);
+        
+        case 'concatStyleSets':
+        case 'concatStyleSetsWithProps':
+          return this._handleConcatStyleSetsCall(node, path, stylesheet, extractedClasses);
+        
+        case 'fontFace':
+          return this._handleFontFaceCall(node, path, stylesheet, extractedClasses);
+        
+        case 'keyframes':
+          return this._handleKeyframesCall(node, path, stylesheet, extractedClasses);
+        
+        case 'mergeCss':
+        case 'mergeCssSets':
+          return this._handleMergeCssCall(node, path, stylesheet, extractedClasses);
+        
+        default:
+          console.log(`>>> Unsupported merge-styles API: ${functionName}`);
+          return null;
+      }
+    } catch (error) {
+      console.log(`>>> Error processing ${functionName} call: ${error}`);
+      this._terminal.writeWarningLine(`Error processing ${functionName} call: ${error}`);
+      return null;
+    }
   }
 
   private _extractStylesFromFunction(
@@ -785,7 +972,7 @@ export class FluentStyleExtractor {
   }
 
   /**
-   * Get the name from a member expression (e.g., props.actionable -> actionable)
+   * Get the name from a member expression (e.g., props.actionable -\> actionable)
    */
   private _getMemberExpressionName(node: t.MemberExpression): string | null {
     if (t.isIdentifier(node.object) && node.object.name === 'props' && t.isIdentifier(node.property)) {
@@ -894,7 +1081,7 @@ export class FluentStyleExtractor {
         return this._evaluateStyleValue(node.alternate, props, context);
       }
     } else if (t.isObjectExpression(node)) {
-      // Handle object styles
+      // Handle object styles with special processing for selectors
       const result: Record<string, any> = {};
       
       node.properties.forEach(prop => {
@@ -912,17 +1099,103 @@ export class FluentStyleExtractor {
           if (t.isExpression(prop.value)) {
             const value = this._evaluateExpression(prop.value, props, context);
             if (value !== undefined) {
-              result[key] = value;
+              // Handle special selector patterns
+              result[key] = this._processStyleValue(key, value, context);
             }
           }
         }
       });
       
       return result;
+    } else if (t.isCallExpression(node)) {
+      // Handle function calls that might be custom wrapper functions
+      return this._evaluateCustomWrapperFunction(node, props, context);
     } else {
       // Handle primitive expressions
       return this._evaluateExpression(node, props, context);
     }
+  }
+
+  /**
+   * Process style values to handle special patterns like :global() selectors
+   */
+  private _processStyleValue(key: string, value: any, context: any): any {
+    // Handle selectors object specially
+    if (key === 'selectors' && typeof value === 'object' && value !== null) {
+      const processedSelectors: Record<string, any> = {};
+      
+      Object.entries(value).forEach(([selector, selectorValue]) => {
+        // Handle :global() selectors
+        if (selector.includes(':global(')) {
+          console.log(`>>> Processing global selector: ${selector}`);
+          // Extract the selector from :global() wrapper
+          const globalSelector = selector.replace(/:global\(([^)]+)\)/g, '$1');
+          processedSelectors[globalSelector] = selectorValue;
+        } else {
+          processedSelectors[selector] = selectorValue;
+        }
+      });
+      
+      return processedSelectors;
+    }
+    
+    return value;
+  }
+
+  /**
+   * Evaluate custom wrapper functions that might wrap merge-styles APIs
+   */
+  private _evaluateCustomWrapperFunction(node: t.CallExpression, props: Record<string, any>, context: any): any {
+    // Check if this is a call to a potential wrapper function
+    let functionName: string | null = null;
+    
+    if (t.isIdentifier(node.callee)) {
+      functionName = node.callee.name;
+    } else if (t.isMemberExpression(node.callee) && t.isIdentifier(node.callee.property)) {
+      functionName = node.callee.property.name;
+    }
+
+    if (!functionName) return undefined;
+
+    console.log(`>>> Evaluating potential wrapper function: ${functionName}`);
+
+    // Common wrapper function patterns
+    const wrapperPatterns = [
+      /^create.*Style/i,   // createButtonStyle, createCardStyle, etc.
+      /^make.*Style/i,     // makeButtonStyle, etc.
+      /^get.*Style/i,      // getButtonStyle, etc.
+      /^build.*Style/i,    // buildButtonStyle, etc.
+      /^use.*Style/i,      // useButtonStyle, etc.
+      /.*StyleHelper$/i,   // buttonStyleHelper, etc.
+      /.*StyleUtil$/i,     // buttonStyleUtil, etc.
+    ];
+
+    const isLikelyWrapper = wrapperPatterns.some(pattern => pattern.test(functionName!));
+
+    if (isLikelyWrapper) {
+      console.log(`>>> Detected wrapper function: ${functionName}`);
+      
+      // Try to evaluate the arguments and see if they look like style objects
+      const evaluatedArgs = node.arguments.map(arg => {
+        if (t.isExpression(arg)) {
+          return this._evaluateExpression(arg, props, context);
+        }
+        return undefined;
+      }).filter(arg => arg !== undefined);
+
+      // If the wrapper takes style-like arguments, return a placeholder
+      if (evaluatedArgs.some(arg => typeof arg === 'object' && arg !== null)) {
+        console.log(`>>> Wrapper function ${functionName} appears to process styles, creating placeholder`);
+        return {
+          __wrapperFunction: functionName,
+          __arguments: evaluatedArgs,
+          // Return a basic style object as fallback
+          display: 'block',
+        };
+      }
+    }
+
+    return undefined;
   }
 
   /**
@@ -1196,5 +1469,234 @@ export class FluentStyleExtractor {
     }
 
     return suggestions;
+  }
+
+  /**
+   * Handle direct mergeStyles() calls
+   */
+  private _handleMergeStylesCall(node: t.CallExpression, path: any, stylesheet: any, extractedClasses: string[]): { classes: string[], hasChanges: boolean } {
+    console.log(`>>> Handling mergeStyles call with ${node.arguments.length} arguments`);
+    
+    try {
+      // Evaluate the style arguments and call mergeStyles
+      const styleArgs: any[] = [];
+      
+      for (const arg of node.arguments) {
+        if (t.isExpression(arg)) {
+          const evaluatedStyle = this._evaluateStyleExpression(arg, {}, this._createEvaluationContext());
+          if (evaluatedStyle) {
+            styleArgs.push(evaluatedStyle);
+          }
+        }
+      }
+
+      if (styleArgs.length > 0) {
+        // Import mergeStyles dynamically to avoid conflicts
+        const { mergeStyles } = require('@fluentui/merge-styles');
+        const className = mergeStyles(...styleArgs);
+        console.log(`>>> Generated class from mergeStyles: ${className}`);
+        
+        extractedClasses.push(className);
+        
+        // Replace the call with the pre-generated class name
+        path.replaceWith(t.stringLiteral(className));
+        
+        return { classes: [className], hasChanges: true };
+      }
+    } catch (error) {
+      console.log(`>>> Error handling mergeStyles call: ${error}`);
+    }
+    
+    return { classes: [], hasChanges: false };
+  }
+
+  /**
+   * Handle mergeStyleSets() calls
+   */
+  private _handleMergeStyleSetsCall(node: t.CallExpression, path: any, stylesheet: any, extractedClasses: string[]): { classes: string[], hasChanges: boolean } {
+    console.log(`>>> Handling mergeStyleSets call`);
+    
+    try {
+      if (node.arguments.length > 0 && t.isExpression(node.arguments[0])) {
+        const styleSetExpression = node.arguments[0];
+        const evaluatedStyleSet = this._evaluateStyleExpression(styleSetExpression, {}, this._createEvaluationContext());
+        
+        if (evaluatedStyleSet && typeof evaluatedStyleSet === 'object') {
+          // Import mergeStyleSets dynamically
+          const { mergeStyleSets } = require('@fluentui/merge-styles');
+          const classNameMap = mergeStyleSets(evaluatedStyleSet);
+          console.log(`>>> Generated class map from mergeStyleSets: ${JSON.stringify(classNameMap)}`);
+          
+          extractedClasses.push(...Object.values(classNameMap).filter(v => typeof v === 'string') as string[]);
+          
+          // Replace the call with the pre-generated class name map
+          const objectProperties = Object.entries(classNameMap)
+            .filter(([key, value]) => typeof value === 'string') // Only include string values
+            .map(([key, value]) => 
+              t.objectProperty(t.identifier(key), t.stringLiteral(value as string))
+            );
+          
+          path.replaceWith(t.objectExpression(objectProperties));
+          
+          return { classes: Object.values(classNameMap).filter(v => typeof v === 'string') as string[], hasChanges: true };
+        }
+      }
+    } catch (error) {
+      console.log(`>>> Error handling mergeStyleSets call: ${error}`);
+    }
+    
+    return { classes: [], hasChanges: false };
+  }
+
+  /**
+   * Handle concatStyleSets() and concatStyleSetsWithProps() calls
+   */
+  private _handleConcatStyleSetsCall(node: t.CallExpression, path: any, stylesheet: any, extractedClasses: string[]): { classes: string[], hasChanges: boolean } {
+    console.log(`>>> Handling concatStyleSets call`);
+    
+    try {
+      const styleSetArgs: any[] = [];
+      
+      for (const arg of node.arguments) {
+        if (t.isExpression(arg)) {
+          const evaluatedStyleSet = this._evaluateStyleExpression(arg, {}, this._createEvaluationContext());
+          if (evaluatedStyleSet) {
+            styleSetArgs.push(evaluatedStyleSet);
+          }
+        }
+      }
+
+      if (styleSetArgs.length > 0) {
+        // Import concatStyleSets dynamically
+        const { concatStyleSets } = require('@fluentui/merge-styles');
+        const mergedStyleSet = concatStyleSets(...styleSetArgs);
+        console.log(`>>> Generated merged style set: ${JSON.stringify(mergedStyleSet)}`);
+        
+        if (typeof mergedStyleSet === 'object' && mergedStyleSet !== null) {
+          const classNames = Object.values(mergedStyleSet).filter(v => typeof v === 'string');
+          extractedClasses.push(...classNames);
+          
+          // Replace with the merged result
+          const objectProperties = Object.entries(mergedStyleSet).map(([key, value]) => 
+            t.objectProperty(t.identifier(key), 
+              typeof value === 'string' ? t.stringLiteral(value) : t.stringLiteral(String(value))
+            )
+          );
+          
+          path.replaceWith(t.objectExpression(objectProperties));
+          
+          return { classes: classNames, hasChanges: true };
+        }
+      }
+    } catch (error) {
+      console.log(`>>> Error handling concatStyleSets call: ${error}`);
+    }
+    
+    return { classes: [], hasChanges: false };
+  }
+
+  /**
+   * Handle fontFace() calls
+   */
+  private _handleFontFaceCall(node: t.CallExpression, path: any, stylesheet: any, extractedClasses: string[]): { classes: string[], hasChanges: boolean } {
+    console.log(`>>> Handling fontFace call`);
+    
+    try {
+      if (node.arguments.length > 0 && t.isExpression(node.arguments[0])) {
+        const fontDescriptor = this._evaluateStyleExpression(node.arguments[0], {}, this._createEvaluationContext());
+        
+        if (fontDescriptor && typeof fontDescriptor === 'object') {
+          // Import fontFace dynamically
+          const { fontFace } = require('@fluentui/merge-styles');
+          const fontFamilyName = fontFace(fontDescriptor);
+          console.log(`>>> Generated font family: ${fontFamilyName}`);
+          
+          // Replace with the generated font family name
+          path.replaceWith(t.stringLiteral(fontFamilyName));
+          
+          return { classes: [], hasChanges: true }; // Font faces don't generate classes but do generate CSS
+        }
+      }
+    } catch (error) {
+      console.log(`>>> Error handling fontFace call: ${error}`);
+    }
+    
+    return { classes: [], hasChanges: false };
+  }
+
+  /**
+   * Handle keyframes() calls
+   */
+  private _handleKeyframesCall(node: t.CallExpression, path: any, stylesheet: any, extractedClasses: string[]): { classes: string[], hasChanges: boolean } {
+    console.log(`>>> Handling keyframes call`);
+    
+    try {
+      if (node.arguments.length > 0 && t.isExpression(node.arguments[0])) {
+        const keyframeDefinition = this._evaluateStyleExpression(node.arguments[0], {}, this._createEvaluationContext());
+        
+        if (keyframeDefinition && typeof keyframeDefinition === 'object') {
+          // Import keyframes dynamically
+          const { keyframes } = require('@fluentui/merge-styles');
+          const animationName = keyframes(keyframeDefinition);
+          console.log(`>>> Generated animation name: ${animationName}`);
+          
+          // Replace with the generated animation name
+          path.replaceWith(t.stringLiteral(animationName));
+          
+          return { classes: [], hasChanges: true }; // Keyframes don't generate classes but do generate CSS
+        }
+      }
+    } catch (error) {
+      console.log(`>>> Error handling keyframes call: ${error}`);
+    }
+    
+    return { classes: [], hasChanges: false };
+  }
+
+  /**
+   * Handle mergeCss() and mergeCssSets() calls with IStyleOptions
+   */
+  private _handleMergeCssCall(node: t.CallExpression, path: any, stylesheet: any, extractedClasses: string[]): { classes: string[], hasChanges: boolean } {
+    console.log(`>>> Handling mergeCss call`);
+    
+    try {
+      const styleArgs: any[] = [];
+      let options: any = {};
+      
+      // Parse arguments - last one might be IStyleOptions
+      for (let i = 0; i < node.arguments.length; i++) {
+        const arg = node.arguments[i];
+        if (t.isExpression(arg)) {
+          const evaluated = this._evaluateStyleExpression(arg, {}, this._createEvaluationContext());
+          
+          // Check if this looks like IStyleOptions (last argument with specific properties)
+          if (i === node.arguments.length - 1 && 
+              typeof evaluated === 'object' && 
+              evaluated !== null &&
+              ('rtl' in evaluated || 'shadowDOMContainer' in evaluated || 'supportsCSSCustomProperties' in evaluated)) {
+            options = evaluated;
+          } else {
+            styleArgs.push(evaluated);
+          }
+        }
+      }
+
+      if (styleArgs.length > 0) {
+        // Import mergeCss dynamically
+        const { mergeCss } = require('@fluentui/merge-styles');
+        const result = mergeCss(...styleArgs, options);
+        console.log(`>>> Generated CSS from mergeCss: ${result}`);
+        
+        if (typeof result === 'string') {
+          extractedClasses.push(result);
+          path.replaceWith(t.stringLiteral(result));
+          return { classes: [result], hasChanges: true };
+        }
+      }
+    } catch (error) {
+      console.log(`>>> Error handling mergeCss call: ${error}`);
+    }
+    
+    return { classes: [], hasChanges: false };
   }
 }

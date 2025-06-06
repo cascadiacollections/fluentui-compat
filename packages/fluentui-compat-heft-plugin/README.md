@@ -1,15 +1,43 @@
 # FluentUI Heft Style Extractor Plugin
 
-A Heft plugin that extracts FluentUI merge-styles from runtime TSX, TS, JS, JSX code and generates static CSS files at build time for improved performance.
+A comprehensive Heft plugin that extracts FluentUI merge-styles from runtime TSX, TS, JS, JSX code and generates static CSS files at build time for improved performance.
 
 ## Features
 
 - **Build-time style extraction**: Converts runtime merge-styles to static CSS
+- **Comprehensive API coverage**: Supports all major merge-styles APIs
 - **Heft integration**: Seamlessly integrates with the RushStack build pipeline
 - **Performance optimization**: Reduces JavaScript bundle size and runtime overhead
 - **TypeScript support**: Full TypeScript definitions included
 - **Configurable**: Customizable extraction patterns and output options
 - **PostCSS processing**: Includes autoprefixer and minification support
+
+## Supported merge-styles APIs
+
+### Core APIs
+- **`getStyles()` functions**: Traditional style function pattern
+- **`mergeStyles()`**: Direct style merging calls
+- **`mergeStyleSets()`**: Style set creation and merging
+- **`concatStyleSets()`** and **`concatStyleSetsWithProps()`**: Style composition utilities
+- **`mergeCss()`** and **`mergeCssSets()`**: CSS merging with IStyleOptions support
+
+### Advanced APIs
+- **`fontFace()`**: Font registration and @font-face rules
+- **`keyframes()`**: Animation keyframes and @keyframes rules
+- **Global selectors**: `:global()` wrapped selectors for global CSS rules
+- **RTL and accessibility options**: Support for right-to-left layouts and accessibility features
+
+### Function Patterns
+- **Multiple naming patterns**: `getStyles`, `useStyles`, `createStyles`, `makeStyles`, `buildStyles`
+- **Pattern matching**: Any function ending with "Style" or "Styles"
+- **Class methods**: Style methods within classes
+- **Custom wrapper functions**: Detection of custom style utility functions
+
+### Usage Patterns
+- **Inline calls**: Direct `mergeStyles()` calls in component render methods
+- **Class name composition**: Combining existing class names with merge-styles results
+- **Conditional styles**: Complex boolean logic and ternary expressions
+- **Theme integration**: Theme token usage and interpolation
 
 ## Installation
 
@@ -68,11 +96,178 @@ Create a configuration file at `config/fluentui-style-extractor.json`:
 The plugin:
 
 1. **Scans** your source code for `.styles.ts/.tsx/.js/.jsx` files
-2. **Parses** the code using Babel to find `getStyles` functions
-3. **Extracts** style definitions from merge-styles calls
+2. **Parses** the code using Babel to find style-related functions and API calls
+3. **Extracts** style definitions from all supported merge-styles APIs
 4. **Generates** static CSS with scoped class names
 5. **Transforms** the original code to use pre-compiled class names
 6. **Outputs** optimized CSS files and analysis reports
+
+## API Pattern Examples
+
+### Traditional getStyles Functions
+```typescript
+// Input: Traditional pattern
+export const getStyles = (props) => ({
+  root: {
+    backgroundColor: props.primary ? '#0078d4' : '#f3f2f1',
+    padding: '8px 16px',
+    borderRadius: '2px'
+  }
+});
+
+// Output: Pre-compiled CSS classes
+export const getStyles = (props) => ({
+  root: ['css-0', props.className]
+});
+```
+
+### Direct mergeStyleSets Usage
+```typescript
+// Input: Direct API call
+import { mergeStyleSets } from '@fluentui/merge-styles';
+
+export const buttonClasses = mergeStyleSets({
+  root: { padding: '8px 16px' },
+  icon: { fontSize: '16px' },
+  label: { fontWeight: '600' }
+});
+
+// Output: Pre-compiled class map
+export const buttonClasses = {
+  root: 'css-1',
+  icon: 'css-2', 
+  label: 'css-3'
+};
+```
+
+### Style Composition with concatStyleSets
+```typescript
+// Input: Style composition
+import { concatStyleSets } from '@fluentui/merge-styles';
+
+const baseStyles = { root: { margin: 0 } };
+const themeStyles = { root: { backgroundColor: '#fff' } };
+
+export const combinedStyles = concatStyleSets(baseStyles, themeStyles);
+
+// Output: Merged result
+export const combinedStyles = {
+  root: 'css-4'
+};
+```
+
+### Font Registration with fontFace
+```typescript
+// Input: Font registration
+import { fontFace } from '@fluentui/merge-styles';
+
+export const customFont = fontFace({
+  fontFamily: 'CustomFont',
+  src: "url('custom.woff2') format('woff2')"
+});
+
+// Output: Generated font family name
+export const customFont = 'CustomFont-abc123';
+```
+
+### Animation with keyframes
+```typescript
+// Input: Animation definition
+import { keyframes } from '@fluentui/merge-styles';
+
+export const fadeIn = keyframes({
+  '0%': { opacity: 0 },
+  '100%': { opacity: 1 }
+});
+
+// Output: Generated animation name
+export const fadeIn = 'fadeIn-def456';
+```
+
+### Inline merge-styles Calls
+```typescript
+// Input: Inline usage in components
+import { mergeStyles } from '@fluentui/merge-styles';
+
+export const Button = ({ primary }) => (
+  <button className={mergeStyles({
+    backgroundColor: primary ? '#0078d4' : '#f3f2f1',
+    color: primary ? '#fff' : '#000'
+  })}>
+    Click me
+  </button>
+);
+
+// Output: Pre-compiled class
+export const Button = ({ primary }) => (
+  <button className="css-5">
+    Click me
+  </button>
+);
+```
+
+### Global Selectors
+```typescript
+// Input: Global CSS patterns
+export const getGlobalStyles = () => ({
+  root: {
+    position: 'relative',
+    selectors: {
+      ':global(.custom-theme)': {
+        backgroundColor: '#f8f7f6'
+      },
+      ':global(.dark-theme) &': {
+        color: '#ffffff'
+      }
+    }
+  }
+});
+
+// Output: Processed selectors (global wrappers removed)
+// CSS Generated:
+// .css-6 { position: relative; }
+// .custom-theme { background-color: #f8f7f6; }
+// .dark-theme .css-6 { color: #ffffff; }
+```
+
+### Alternative Function Naming Patterns
+```typescript
+// All of these patterns are supported:
+export const useButtonStyles = (props) => ({ /* styles */ });
+export const createCardStyles = (theme) => ({ /* styles */ });
+export const makeLayoutStyles = () => ({ /* styles */ });
+export const buildFormStyles = (props) => ({ /* styles */ });
+export const customComponentStyles = () => ({ /* styles */ });
+
+// Class methods are also supported:
+class StyleProvider {
+  getComponentStyles(props) {
+    return { root: { display: 'block' } };
+  }
+}
+```
+
+### Custom Wrapper Functions
+```typescript
+// Input: Custom style utilities
+const createComponentStyle = (base, theme) => ({
+  ...base,
+  ...theme,
+  position: 'relative'
+});
+
+export const getCardStyles = (props) => ({
+  root: createComponentStyle(
+    { backgroundColor: '#fff' },
+    { border: `1px solid ${props.theme.palette.neutralLight}` }
+  )
+});
+
+// Output: Wrapper functions are detected and processed
+export const getCardStyles = (props) => ({
+  root: ['css-7', props.className]
+});
+```
 
 ## Configuration Options
 

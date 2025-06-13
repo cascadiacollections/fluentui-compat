@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useConst } from './useConst';
 
 /** Updater callbacks returned by `useBoolean`. */
 export interface IUseBooleanCallbacks {
@@ -14,9 +13,9 @@ export interface IUseBooleanCallbacks {
 /**
  * Hook to store a boolean value and generate callbacks for setting the value to true, false, or toggling it.
  * 
- * This hook is optimized for performance:
+ * This hook is optimized for performance using idiomatic React patterns:
  * - The identity of the callbacks will always stay the same across renders
- * - Uses a single internal ref to store all callbacks, minimizing memory allocations  
+ * - Uses `useMemo` with empty dependencies for stable callback object  
  * - Avoids unnecessary function closures and object recreations
  * - Provides stable referential identity for the callbacks object
  *
@@ -87,21 +86,21 @@ export interface IUseBooleanCallbacks {
  * ```
  * 
  * @see {@link https://react.dev/reference/react/useState | React.useState} for basic state management
- * @see {@link useConst} for creating stable references
+ * @see {@link https://react.dev/reference/react/useMemo | React.useMemo} for memoization
  * 
  * @public
  */
 export function useBoolean(initialState: boolean): [boolean, IUseBooleanCallbacks] {
   const [value, setValue] = React.useState(initialState);
 
-  // Create all callbacks in a single useConst call to minimize memory usage
-  // and ensure stable identity for the entire callbacks object
-  const callbacks = useConst<IUseBooleanCallbacks>(() => ({
+  // Create all callbacks in a single useMemo call with empty dependencies
+  // This provides stable identity for the entire callbacks object using idiomatic React
+  const callbacks = React.useMemo<IUseBooleanCallbacks>(() => ({
     setTrue: () => setValue(true),
     setFalse: () => setValue(false),
     // Use functional update to avoid stale closure issues
     toggle: () => setValue(currentValue => !currentValue)
-  }));
+  }), []); // Empty dependencies ensure callbacks never change
 
   return [value, callbacks];
 }

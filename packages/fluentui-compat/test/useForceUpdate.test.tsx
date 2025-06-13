@@ -191,8 +191,9 @@ describe('useForceUpdate', () => {
       forceUpdate();
     });
     
-    // Should have triggered a re-render
-    expect(renderCount).toBeGreaterThan(0);
+    // In StrictMode, React double-invokes components during development
+    // Initial render: 2 invocations, forceUpdate: 2 more invocations = 4 total
+    expect(renderCount).toBe(4);
   });
 
   test('should not cause memory leaks with frequent usage', () => {

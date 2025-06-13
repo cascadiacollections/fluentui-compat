@@ -64,9 +64,9 @@ interface ForceUpdateMetrics {
  * 
  * // ✅ Better - use appropriate React patterns
  * function GoodExample() {
- *   const [data, setData] = useState(null);
+ *   const [data, setData] = React.useState(null);
  *   
- *   useEffect(() => {
+ *   React.useEffect(() => {
  *     // Update state instead of forcing renders
  *     fetchData().then(setData);
  *   }, []);

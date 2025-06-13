@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { useSetTimeout } from '../src/useSetTimeout';
 
 // Mock global setTimeout and clearTimeout to track calls and control timing

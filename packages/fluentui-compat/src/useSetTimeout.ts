@@ -68,7 +68,7 @@ export const useSetTimeout = (): UseSetTimeoutReturnType => {
     return () => {
       // Clear all active timeouts on unmount
       currentTimeoutIds.forEach(id => {
-        clearTimeout(id);
+        window.clearTimeout(id);
       });
       currentTimeoutIds.clear();
     };
@@ -77,7 +77,7 @@ export const useSetTimeout = (): UseSetTimeoutReturnType => {
   // Memoize the return object to prevent recreation on every render
   return React.useMemo(() => ({
     setTimeout: (callback: () => void, duration: number): number => {
-      const id = setTimeout(() => {
+      const id = window.setTimeout(() => {
         // Auto-cleanup: remove from tracking when timeout executes
         timeoutIds.current.delete(id);
         callback();
@@ -90,7 +90,7 @@ export const useSetTimeout = (): UseSetTimeoutReturnType => {
     clearTimeout: (id: number): void => {
       if (timeoutIds.current.has(id)) {
         timeoutIds.current.delete(id);
-        clearTimeout(id);
+        window.clearTimeout(id);
       }
     },
   }), []);

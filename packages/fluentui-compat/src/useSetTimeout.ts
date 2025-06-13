@@ -1,9 +1,19 @@
 import * as React from 'react';
 
+/** The timeout ID type that works across different environments */
+export type TimeoutId = ReturnType<typeof setTimeout>;
+
 export type UseSetTimeoutReturnType = {
-  setTimeout: (callback: () => void, duration: number) => number;
-  clearTimeout: (id: number) => void;
+  setTimeout: (callback: () => void, duration: number) => TimeoutId;
+  clearTimeout: (id: TimeoutId) => void;
 };
+
+// Development-time constants for performance monitoring
+const DEV_MAX_ACTIVE_TIMEOUTS = 50;
+const DEV_LONG_TIMEOUT_THRESHOLD = 60000; // 1 minute
+
+/** Check if we're in development mode (evaluated at runtime) */
+const isDevelopment = () => process.env.NODE_ENV !== 'production';
 
 /**
  * Hook to provide performance optimized timeout management with automatic cleanup.
@@ -60,7 +70,7 @@ export type UseSetTimeoutReturnType = {
  */
 export const useSetTimeout = (): UseSetTimeoutReturnType => {
   // Use Set for O(1) operations instead of Record
-  const timeoutIds = React.useRef<Set<number>>(new Set());
+  const timeoutIds = React.useRef<Set<TimeoutId>>(new Set());
   
   // Cleanup function
   React.useEffect(() => {
@@ -68,7 +78,7 @@ export const useSetTimeout = (): UseSetTimeoutReturnType => {
     return () => {
       // Clear all active timeouts on unmount
       currentTimeoutIds.forEach(id => {
-        window.clearTimeout(id);
+        clearTimeout(id);
       });
       currentTimeoutIds.clear();
     };
@@ -76,21 +86,49 @@ export const useSetTimeout = (): UseSetTimeoutReturnType => {
 
   // Memoize the return object to prevent recreation on every render
   return React.useMemo(() => ({
-    setTimeout: (callback: () => void, duration: number): number => {
-      const id = window.setTimeout(() => {
+    setTimeout: (callback: () => void, duration: number): TimeoutId => {
+      // Development-time diagnostics
+      if (isDevelopment()) {
+        // Warn about very long timeouts that might indicate mistakes
+        if (duration > DEV_LONG_TIMEOUT_THRESHOLD) {
+          console.warn(
+            `useSetTimeout: Setting a very long timeout (${duration}ms). ` +
+            'Consider if this is intentional or if you meant a shorter duration.'
+          );
+        }
+        
+        // Warn about excessive number of active timeouts
+        if (timeoutIds.current.size >= DEV_MAX_ACTIVE_TIMEOUTS) {
+          console.warn(
+            `useSetTimeout: Component has ${timeoutIds.current.size} active timeouts. ` +
+            'This might indicate a memory leak or performance issue. ' +
+            'Consider clearing unused timeouts or reviewing your timeout usage patterns.'
+          );
+        }
+        
+        // Warn about negative durations
+        if (duration < 0) {
+          console.warn(
+            `useSetTimeout: Negative timeout duration (${duration}ms) will be treated as 0. ` +
+            'This might not be the intended behavior.'
+          );
+        }
+      }
+      
+      const id = setTimeout(() => {
         // Auto-cleanup: remove from tracking when timeout executes
         timeoutIds.current.delete(id);
         callback();
-      }, duration) as unknown as number;
+      }, duration);
       
       timeoutIds.current.add(id);
       return id;
     },
     
-    clearTimeout: (id: number): void => {
+    clearTimeout: (id: TimeoutId): void => {
       if (timeoutIds.current.has(id)) {
         timeoutIds.current.delete(id);
-        window.clearTimeout(id);
+        clearTimeout(id);
       }
     },
   }), []);

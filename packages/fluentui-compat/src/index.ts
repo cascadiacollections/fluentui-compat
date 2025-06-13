@@ -5,4 +5,4 @@ export { useBoolean } from './useBoolean';
 export type { IUseBooleanCallbacks } from './useBoolean';
 export { useConst } from './useConst';
 export { useSetTimeout } from './useSetTimeout';
-export type { UseSetTimeoutReturnType } from './useSetTimeout';
+export type { UseSetTimeoutReturnType, TimeoutId } from './useSetTimeout';

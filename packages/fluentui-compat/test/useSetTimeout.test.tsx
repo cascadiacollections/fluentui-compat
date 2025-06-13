@@ -1,30 +1,30 @@
 import React from 'react';
 import { renderHook } from '@testing-library/react';
-import { useSetTimeout } from '../src/useSetTimeout';
+import { useSetTimeout, type TimeoutId } from '../src/useSetTimeout';
 
 // Mock global setTimeout and clearTimeout to track calls and control timing
 const originalSetTimeout = global.setTimeout;
 const originalClearTimeout = global.clearTimeout;
 
 let mockTimeoutId = 1;
-const mockSetTimeoutCallbacks = new Map<number, () => void>();
-const mockSetTimeoutCalls: Array<{ callback: () => void; duration: number; id: number }> = [];
-const mockClearTimeoutCalls: number[] = [];
+const mockSetTimeoutCallbacks = new Map<TimeoutId, () => void>();
+const mockSetTimeoutCalls: Array<{ callback: () => void; duration: number; id: TimeoutId }> = [];
+const mockClearTimeoutCalls: TimeoutId[] = [];
 
-const mockSetTimeout = jest.fn((callback: () => void, duration: number) => {
-  const id = mockTimeoutId++;
+const mockSetTimeout = jest.fn((callback: () => void, duration: number): TimeoutId => {
+  const id = mockTimeoutId++ as unknown as TimeoutId;
   mockSetTimeoutCallbacks.set(id, callback);
   mockSetTimeoutCalls.push({ callback, duration, id });
   return id;
 });
 
-const mockClearTimeout = jest.fn((id: number) => {
+const mockClearTimeout = jest.fn((id: TimeoutId) => {
   mockSetTimeoutCallbacks.delete(id);
   mockClearTimeoutCalls.push(id);
 });
 
 // Helper to execute a timeout callback
-const executeTimeout = (id: number) => {
+const executeTimeout = (id: TimeoutId) => {
   const callback = mockSetTimeoutCallbacks.get(id);
   if (callback) {
     mockSetTimeoutCallbacks.delete(id);
@@ -82,7 +82,7 @@ describe('useSetTimeout', () => {
     expect(mockSetTimeout).toHaveBeenCalledTimes(1);
     expect(mockSetTimeoutCalls[0].duration).toBe(1000);
     expect(typeof timeoutId).toBe('number');
-    expect(timeoutId).toBe(1); // First mocked ID
+    expect(timeoutId).toBe(1 as unknown as TimeoutId); // First mocked ID
   });
 
   test('should return different timeout IDs for multiple calls', () => {
@@ -337,7 +337,7 @@ describe('useSetTimeout', () => {
   test('should handle large numbers of timeouts', () => {
     const { result, unmount } = renderHook(() => useSetTimeout());
     
-    const timeoutIds: number[] = [];
+    const timeoutIds: TimeoutId[] = [];
     const callbacks: jest.Mock[] = [];
     
     // Create 100 timeouts
@@ -369,5 +369,127 @@ describe('useSetTimeout', () => {
     // The exact count depends on which were executed vs manually cleared vs cleared on unmount
     // but the important thing is that all were handled appropriately
     expect(mockClearTimeoutCalls.length).toBeGreaterThan(0);
+  });
+
+  // Development-time diagnostic tests
+  describe('development diagnostics', () => {
+    const originalEnv = process.env.NODE_ENV;
+    const originalConsoleWarn = console.warn;
+    let mockConsoleWarn: jest.Mock;
+
+    beforeEach(() => {
+      process.env.NODE_ENV = 'development';
+      mockConsoleWarn = jest.fn();
+      console.warn = mockConsoleWarn;
+    });
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalEnv;
+      console.warn = originalConsoleWarn;
+    });
+
+    test('should warn about very long timeouts in development', () => {
+      const { result } = renderHook(() => useSetTimeout());
+      
+      result.current.setTimeout(() => {}, 65000); // > 60 second threshold
+      
+      expect(mockConsoleWarn).toHaveBeenCalledWith(
+        expect.stringContaining('useSetTimeout: Setting a very long timeout (65000ms)')
+      );
+    });
+
+    test('should warn about negative timeout durations', () => {
+      const { result } = renderHook(() => useSetTimeout());
+      
+      result.current.setTimeout(() => {}, -1000);
+      
+      expect(mockConsoleWarn).toHaveBeenCalledWith(
+        expect.stringContaining('useSetTimeout: Negative timeout duration (-1000ms)')
+      );
+    });
+
+    test('should warn about excessive number of active timeouts', () => {
+      const { result } = renderHook(() => useSetTimeout());
+      
+      // Create more than the threshold (50)
+      for (let i = 0; i < 51; i++) {
+        result.current.setTimeout(() => {}, 1000);
+      }
+      
+      expect(mockConsoleWarn).toHaveBeenCalledWith(
+        expect.stringContaining('useSetTimeout: Component has 50 active timeouts')
+      );
+    });
+
+    test('should not warn in production mode', () => {
+      process.env.NODE_ENV = 'production';
+      
+      const { result } = renderHook(() => useSetTimeout());
+      
+      result.current.setTimeout(() => {}, 65000); // Long timeout
+      result.current.setTimeout(() => {}, -1000);  // Negative timeout
+      
+      expect(mockConsoleWarn).not.toHaveBeenCalled();
+    });
+  });
+
+  // Edge case tests
+  describe('edge cases', () => {
+    test('should handle extremely large timeout values', () => {
+      const { result } = renderHook(() => useSetTimeout());
+      const callback = jest.fn();
+      
+      const timeoutId = result.current.setTimeout(callback, Number.MAX_SAFE_INTEGER);
+      
+      expect(mockSetTimeout).toHaveBeenCalledWith(expect.any(Function), Number.MAX_SAFE_INTEGER);
+      expect(typeof timeoutId).toBe('number');
+    });
+
+    test('should handle callback that throws an error', () => {
+      const { result } = renderHook(() => useSetTimeout());
+      const errorCallback = jest.fn(() => {
+        throw new Error('Test error');
+      });
+      
+      const timeoutId = result.current.setTimeout(errorCallback, 100);
+      
+      // Execute the timeout - should not break the hook
+      expect(() => executeTimeout(timeoutId)).toThrow('Test error');
+      expect(errorCallback).toHaveBeenCalledTimes(1);
+    });
+
+    test('should handle unmount during timeout execution', () => {
+      const { result, unmount } = renderHook(() => useSetTimeout());
+      const callback = jest.fn();
+      
+      const timeoutId = result.current.setTimeout(callback, 100);
+      
+      // Start executing timeout but unmount before completion
+      unmount();
+      
+      // The timeout should still be in the mock system but hook should be cleaned up
+      expect(mockClearTimeout).toHaveBeenCalledWith(timeoutId);
+    });
+
+    test('should handle multiple rapid setTimeout calls', () => {
+      const { result } = renderHook(() => useSetTimeout());
+      const callbacks: jest.Mock[] = [];
+      const timeoutIds: TimeoutId[] = [];
+      
+      // Rapidly create many timeouts
+      for (let i = 0; i < 10; i++) {
+        const callback = jest.fn();
+        callbacks.push(callback);
+        const id = result.current.setTimeout(callback, 10 + i);
+        timeoutIds.push(id);
+      }
+      
+      expect(mockSetTimeout).toHaveBeenCalledTimes(10);
+      expect(timeoutIds.length).toBe(10);
+      
+      // All IDs should be unique
+      const uniqueIds = new Set(timeoutIds);
+      expect(uniqueIds.size).toBe(10);
+    });
   });
 });

@@ -246,4 +246,222 @@ describe('useForceUpdate', () => {
     
     expect(renderCount).toBe(4);
   });
+
+  describe('development features', () => {
+    const originalEnv = process.env.NODE_ENV;
+    
+    beforeEach(() => {
+      // Mock console.warn to test development warnings
+      jest.spyOn(console, 'warn').mockImplementation(() => {});
+      // Set development environment
+      process.env.NODE_ENV = 'development';
+    });
+    
+    afterEach(() => {
+      // Restore original environment
+      process.env.NODE_ENV = originalEnv;
+      jest.restoreAllMocks();
+    });
+
+    test('should provide debug value in development', () => {
+      const { result } = renderHook(() => useForceUpdate());
+      
+      // Trigger a force update to increment the call count
+      act(() => {
+        result.current();
+      });
+      
+      // We can't directly test useDebugValue, but we can ensure the hook works
+      expect(typeof result.current).toBe('function');
+    });
+
+    test('should warn about rapid successive calls', () => {
+      const { result } = renderHook(() => useForceUpdate());
+      
+      // Simulate rapid calls by calling multiple times quickly
+      act(() => {
+        // Call 7 times rapidly (more than the threshold of 5)
+        for (let i = 0; i < 7; i++) {
+          result.current();
+        }
+      });
+      
+      // Should have warned about rapid calls
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('useForceUpdate: Detected excessive rapid calls'),
+        expect.any(Number)
+      );
+    });
+
+    test('should warn about high usage frequency', () => {
+      jest.useFakeTimers();
+      
+      const { result } = renderHook(() => useForceUpdate());
+      
+      // Simulate high frequency usage over time
+      for (let i = 0; i < 12; i++) {
+        act(() => {
+          result.current();
+        });
+        
+        // Advance time by 100ms between calls
+        act(() => {
+          jest.advanceTimersByTime(100);
+        });
+      }
+      
+      // Advance time to trigger the frequency check (after 1 second)
+      act(() => {
+        jest.advanceTimersByTime(1000);
+        result.current(); // One more call to trigger the check
+      });
+      
+      // Should have warned about high frequency usage
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('useForceUpdate: High usage frequency detected'),
+        expect.any(Number)
+      );
+      
+      jest.useRealTimers();
+    });
+
+    test('should warn about short-lived components with many updates', () => {
+      const { result, unmount } = renderHook(() => useForceUpdate());
+      
+      // Call force update multiple times quickly
+      act(() => {
+        for (let i = 0; i < 5; i++) {
+          result.current();
+        }
+      });
+      
+      // Unmount immediately (simulating short component lifetime)
+      unmount();
+      
+      // Should have warned about quick unmount with many updates
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('useForceUpdate: Component unmounted quickly after'),
+        expect.any(Number)
+      );
+    });
+
+    test('should create performance marks when available', () => {
+      // Mock performance.mark
+      const mockMark = jest.fn();
+      Object.defineProperty(global, 'performance', {
+        writable: true,
+        value: { mark: mockMark }
+      });
+      
+      const { result } = renderHook(() => useForceUpdate());
+      
+      act(() => {
+        result.current();
+      });
+      
+      // Should have created a performance mark
+      expect(mockMark).toHaveBeenCalledWith('useForceUpdate:call');
+      
+      // Clean up
+      delete (global as any).performance;
+    });
+
+    test('should not create performance marks when performance is unavailable', () => {
+      // Ensure performance is undefined
+      const originalPerformance = global.performance;
+      delete (global as any).performance;
+      
+      const { result } = renderHook(() => useForceUpdate());
+      
+      // Should not throw when performance is unavailable
+      expect(() => {
+        act(() => {
+          result.current();
+        });
+      }).not.toThrow();
+      
+      // Restore performance
+      (global as any).performance = originalPerformance;
+    });
+
+    test('should reset rapid call counter after normal intervals', () => {
+      jest.useFakeTimers();
+      
+      const { result } = renderHook(() => useForceUpdate());
+      
+      // Make some rapid calls (but not enough to trigger warning)
+      act(() => {
+        result.current();
+        result.current();
+        result.current();
+      });
+      
+      // Wait for more than 16ms (one frame)
+      act(() => {
+        jest.advanceTimersByTime(20);
+      });
+      
+      // Make another set of rapid calls
+      act(() => {
+        for (let i = 0; i < 7; i++) {
+          result.current();
+        }
+      });
+      
+      // Should still warn because rapid call counter was reset and then exceeded again
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('useForceUpdate: Detected excessive rapid calls'),
+        expect.any(Number)
+      );
+      
+      jest.useRealTimers();
+    });
+  });
+
+  describe('production behavior', () => {
+    const originalEnv = process.env.NODE_ENV;
+    
+    beforeEach(() => {
+      // Set production environment
+      process.env.NODE_ENV = 'production';
+      jest.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+    
+    afterEach(() => {
+      // Restore original environment
+      process.env.NODE_ENV = originalEnv;
+      jest.restoreAllMocks();
+    });
+
+    test('should not show warnings in production', () => {
+      const { result } = renderHook(() => useForceUpdate());
+      
+      // Make many rapid calls that would trigger warnings in development
+      act(() => {
+        for (let i = 0; i < 10; i++) {
+          result.current();
+        }
+      });
+      
+      // Should not have any warnings in production
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test('should still function correctly in production', () => {
+      let renderCount = 0;
+      
+      const { result } = renderHook(() => {
+        renderCount++;
+        return useForceUpdate();
+      });
+      
+      expect(renderCount).toBe(1);
+      
+      act(() => {
+        result.current();
+      });
+      
+      expect(renderCount).toBe(2);
+    });
+  });
 });

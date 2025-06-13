@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Add optimized useBoolean hook with stable callback identities and comprehensive documentation",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "copilot@github.com"
+}

@@ -33,7 +33,7 @@ interface IMemoizeNode {
 export function resetMemoizations(): void {
   _resetCounter++;
   // Also clear the primitive cache periodically to prevent memory leaks
-  if (_primitiveCache.size > 1000) {
+  if (_primitiveCache.size > primitiveCacheThreshold) {
     _primitiveCache.clear();
   }
 }

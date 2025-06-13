@@ -1,5 +1,5 @@
 import React from 'react';
-import { useBoolean } from '../src/useBoolean';
+import { useBoolean } from '../../src/useBoolean';
 
 /**
  * Example component demonstrating the optimized useBoolean hook

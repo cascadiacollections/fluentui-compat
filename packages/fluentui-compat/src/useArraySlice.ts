@@ -1,14 +1,14 @@
 import * as React from 'react';
 
-// React 18+ progressive support - conditionally use newer APIs
-const useId = (React as any).useId || (() => Math.random().toString(36).substr(2, 9));
-const useDeferredValue = (React as any).useDeferredValue || ((value: any) => value);
+// React 18+ progressive support - conditionally use newer APIs with proper typing
+const useId: () => string = React.useId ?? (() => Math.random().toString(36).substr(2, 9));
+const useDeferredValue = React.useDeferredValue ?? (<T>(value: T): T => value);
 
 /**
  * Generates a collision-resistant hash from a string using a simple but effective algorithm.
  * This is used as a fallback when no user-provided ID function is available.
  */
-function generateHashId(input: string): string {
+const generateHashId = (input: string): string => {
   let hash = 0;
   for (let i = 0; i < input.length; i++) {
     const char = input.charCodeAt(i);
@@ -16,13 +16,13 @@ function generateHashId(input: string): string {
     hash = hash & hash; // Convert to 32-bit integer
   }
   return Math.abs(hash).toString(36);
-}
+};
 
 /**
  * Creates a collision-resistant ID for an item when no user-provided ID function is available.
  * Combines the original index with a content hash to minimize collisions while maintaining stability.
  */
-function createFallbackId<T>(item: T, originalIndex: number): string {
+const createFallbackId = <T>(item: T, originalIndex: number): string => {
   // Create a stable string representation of the item
   const itemStr = typeof item === 'object' && item !== null 
     ? JSON.stringify(item) 
@@ -33,90 +33,90 @@ function createFallbackId<T>(item: T, originalIndex: number): string {
   
   // Combine original index with content hash for collision resistance
   return `${originalIndex}_${contentHash}`;
-}
+};
 
 /** Configuration options for the useArraySlice hook */
 export interface UseArraySliceOptions<T> {
   /** Number of items per page (default: 10) */
-  pageSize?: number;
+  readonly pageSize?: number;
   /** Initial page number (0-based, default: 0) */
-  initialPage?: number;
+  readonly initialPage?: number;
   /** Initial visibility state for all items (default: true) */
-  initialVisible?: boolean;
+  readonly initialVisible?: boolean;
   /** Function to filter items based on search criteria */
-  searchFunction?: (item: T, searchTerm: string) => boolean;
+  readonly searchFunction?: (item: T, searchTerm: string) => boolean;
   /** Initial search term */
-  initialSearchTerm?: string;
+  readonly initialSearchTerm?: string;
   /** Function to extract or generate unique IDs for items. If not provided, collision-resistant IDs will be generated automatically. */
-  getItemId?: (item: T, index: number) => string | number;
+  readonly getItemId?: (item: T, index: number) => string | number;
 }
 
 /** Return type of useArraySlice hook */
 export interface UseArraySliceResult<T> {
   /** Current slice of items to render */
-  currentItems: T[];
+  readonly currentItems: readonly T[];
   /** Total number of items after filtering */
-  totalItems: number;
+  readonly totalItems: number;
   /** Current page number (0-based) */
-  currentPage: number;
+  readonly currentPage: number;
   /** Total number of pages */
-  totalPages: number;
+  readonly totalPages: number;
   /** Whether all items are currently visible */
-  allVisible: boolean;
+  readonly allVisible: boolean;
   /** Current search term */
-  searchTerm: string;
+  readonly searchTerm: string;
   /** Pagination controls */
-  pagination: {
+  readonly pagination: {
     /** Go to specific page */
-    goToPage: (page: number) => void;
+    readonly goToPage: (page: number) => void;
     /** Go to next page */
-    nextPage: () => void;
+    readonly nextPage: () => void;
     /** Go to previous page */
-    previousPage: () => void;
+    readonly previousPage: () => void;
     /** Go to first page */
-    firstPage: () => void;
+    readonly firstPage: () => void;
     /** Go to last page */
-    lastPage: () => void;
+    readonly lastPage: () => void;
     /** Check if next page is available */
-    hasNextPage: boolean;
+    readonly hasNextPage: boolean;
     /** Check if previous page is available */
-    hasPreviousPage: boolean;
+    readonly hasPreviousPage: boolean;
   };
   /** Visibility controls */
-  visibility: {
+  readonly visibility: {
     /** Show all items */
-    showAll: () => void;
+    readonly showAll: () => void;
     /** Hide all items */
-    hideAll: () => void;
+    readonly hideAll: () => void;
     /** Toggle visibility of all items */
-    toggleAll: () => void;
+    readonly toggleAll: () => void;
   };
   /** Search controls */
-  search: {
+  readonly search: {
     /** Set search term */
-    setSearchTerm: (term: string) => void;
+    readonly setSearchTerm: (term: string) => void;
     /** Clear search */
-    clearSearch: () => void;
+    readonly clearSearch: () => void;
   };
   /** Configuration controls */
-  controls: {
+  readonly controls: {
     /** Change page size */
-    setPageSize: (size: number) => void;
+    readonly setPageSize: (size: number) => void;
     /** Current page size */
-    pageSize: number;
+    readonly pageSize: number;
   };
   /** Get stable ID for an item in the current slice - useful for React keys */
-  getItemId: (item: T, sliceIndex: number) => string | number;
+  readonly getItemId: (item: T, sliceIndex: number) => string | number;
   /** React DevTools debug information (development builds only) */
-  _debug?: {
+  readonly _debug?: {
     /** Unique hook instance ID */
-    hookId: string;
+    readonly hookId: string;
     /** Original data array length */
-    dataLength: number;
+    readonly dataLength: number;
     /** Filtered data array length */
-    filteredLength: number;
+    readonly filteredLength: number;
     /** Hook version */
-    version: string;
+    readonly version: string;
   };
 }
 
@@ -229,7 +229,7 @@ export interface UseArraySliceResult<T> {
  * @public
  */
 export function useArraySlice<T>(
-  data: T[],
+  data: readonly T[],
   options: UseArraySliceOptions<T> = {}
 ): UseArraySliceResult<T> {
   const {
@@ -241,9 +241,15 @@ export function useArraySlice<T>(
     getItemId
   } = options;
 
+  // Development constants
+  const DEV_CONSTANTS = {
+    HOOK_VERSION: '1.0.0',
+    DISPLAY_NAME: 'useArraySlice'
+  } as const;
+
   // React DevTools integration - displayName for debugging
   if (process.env.NODE_ENV !== 'production') {
-    (useArraySlice as any).displayName = 'useArraySlice';
+    (useArraySlice as any).displayName = DEV_CONSTANTS.DISPLAY_NAME;
   }
 
   // Generate stable hook ID for React DevTools (React 18+ progressive support)
@@ -298,78 +304,86 @@ export function useArraySlice<T>(
   }, [filteredData, currentPage, pageSize, allVisible]);
 
   // Pagination controls - optimized with React 18+ patterns for concurrent rendering
-  const goToPage = React.useCallback((page: number) => {
-    const clampedPage = Math.max(0, Math.min(page, totalPages - 1));
-    setCurrentPage(clampedPage);
-  }, [totalPages]);
+  const pagination = React.useMemo(() => {
+    const goToPage = (page: number) => {
+      const clampedPage = Math.max(0, Math.min(page, totalPages - 1));
+      setCurrentPage(clampedPage);
+    };
 
-  const nextPage = React.useCallback(() => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(prev => prev + 1);
-    }
+    const nextPage = () => {
+      if (currentPage < totalPages - 1) {
+        setCurrentPage(prev => prev + 1);
+      }
+    };
+
+    const previousPage = () => {
+      if (currentPage > 0) {
+        setCurrentPage(prev => prev - 1);
+      }
+    };
+
+    const firstPage = () => setCurrentPage(0);
+    const lastPage = () => setCurrentPage(Math.max(0, totalPages - 1));
+
+    return {
+      goToPage,
+      nextPage,
+      previousPage,
+      firstPage,
+      lastPage,
+      hasNextPage: currentPage < totalPages - 1,
+      hasPreviousPage: currentPage > 0,
+    } as const satisfies UseArraySliceResult<T>['pagination'];
   }, [currentPage, totalPages]);
 
-  const previousPage = React.useCallback(() => {
-    if (currentPage > 0) {
-      setCurrentPage(prev => prev - 1);
-    }
-  }, [currentPage]);
-
-  const firstPage = React.useCallback(() => setCurrentPage(0), []);
-  const lastPage = React.useCallback(() => setCurrentPage(Math.max(0, totalPages - 1)), [totalPages]);
-
-  const pagination = React.useMemo(() => ({
-    goToPage,
-    nextPage,
-    previousPage,
-    firstPage,
-    lastPage,
-    hasNextPage: currentPage < totalPages - 1,
-    hasPreviousPage: currentPage > 0,
-  }), [goToPage, nextPage, previousPage, firstPage, lastPage, currentPage, totalPages]);
-
   // Visibility controls - optimized with React 18+ useCallback patterns
-  const showAll = React.useCallback(() => setAllVisible(true), []);
-  const hideAll = React.useCallback(() => setAllVisible(false), []);
-  const toggleAll = React.useCallback(() => setAllVisible(prev => !prev), []);
+  const visibility = React.useMemo(() => {
+    const showAll = () => setAllVisible(true);
+    const hideAll = () => setAllVisible(false);
+    const toggleAll = () => setAllVisible(prev => !prev);
 
-  const visibility = React.useMemo(() => ({
-    showAll,
-    hideAll,
-    toggleAll,
-  }), [showAll, hideAll, toggleAll]);
+    return {
+      showAll,
+      hideAll,
+      toggleAll,
+    } as const satisfies UseArraySliceResult<T>['visibility'];
+  }, []);
 
   // Search controls - optimized with React 18+ useCallback patterns  
-  const setSearchTermWithReset = React.useCallback((term: string) => {
-    setSearchTerm(term);
-    // Reset to first page when searching
-    setCurrentPage(0);
-  }, []);
+  const search = React.useMemo(() => {
+    const setSearchTermWithReset = (term: string) => {
+      setSearchTerm(term);
+      // Reset to first page when searching
+      setCurrentPage(0);
+    };
 
-  const clearSearch = React.useCallback(() => {
-    setSearchTerm('');
-    setCurrentPage(0);
-  }, []);
+    const clearSearch = () => {
+      setSearchTerm('');
+      setCurrentPage(0);
+    };
 
-  const search = React.useMemo(() => ({
-    setSearchTerm: setSearchTermWithReset,
-    clearSearch,
-  }), [setSearchTermWithReset, clearSearch]);
+    return {
+      setSearchTerm: setSearchTermWithReset,
+      clearSearch,
+    } as const satisfies UseArraySliceResult<T>['search'];
+  }, []);
 
   // Control functions - optimized with React 18+ useCallback patterns
-  const setPageSizeWithAdjustment = React.useCallback((size: number) => {
-    const newSize = Math.max(1, size);
-    setPageSize(newSize);
-    // Adjust current page to maintain position as much as possible
-    const currentItemIndex = currentPage * pageSize;
-    const newPage = Math.floor(currentItemIndex / newSize);
-    setCurrentPage(Math.max(0, Math.min(newPage, Math.ceil(totalItems / newSize) - 1)));
-  }, [currentPage, pageSize, totalItems]);
+  const controls = React.useMemo(() => {
+    const setPageSizeWithAdjustment = (size: number) => {
+      const newSize = Math.max(1, size);
+      setPageSize(newSize);
+      // Adjust current page to maintain position as much as possible
+      const currentItemIndex = currentPage * pageSize;
+      const newPage = Math.floor(currentItemIndex / newSize);
+      setCurrentPage(Math.max(0, Math.min(newPage, Math.ceil(totalItems / newSize) - 1)));
+    };
 
-  const controls = React.useMemo(() => ({
-    setPageSize: setPageSizeWithAdjustment,
-    pageSize,
-  }), [setPageSizeWithAdjustment, pageSize]);
+    return {
+      setPageSize: setPageSizeWithAdjustment,
+      pageSize,
+    } as const satisfies UseArraySliceResult<T>['controls'];
+  }, [currentPage, pageSize, totalItems]);
 
   // ID management function - provides stable IDs for items
   const getItemIdForResult = React.useCallback((item: T, sliceIndex: number) => {
@@ -384,7 +398,7 @@ export function useArraySlice<T>(
     }
   }, [getItemId, itemToOriginalIndex]);
 
-  const result = React.useMemo(() => ({
+  return React.useMemo(() => ({
     currentItems,
     totalItems,
     currentPage,
@@ -402,10 +416,10 @@ export function useArraySlice<T>(
         hookId,
         dataLength: data.length,
         filteredLength: filteredData.length,
-        version: '1.0.0'
-      }
+        version: DEV_CONSTANTS.HOOK_VERSION
+      } as const satisfies NonNullable<UseArraySliceResult<T>['_debug']>
     })
-  }), [
+  } as const satisfies UseArraySliceResult<T>), [
     currentItems,
     totalItems,
     currentPage,
@@ -421,6 +435,4 @@ export function useArraySlice<T>(
     data.length,
     filteredData.length
   ]);
-
-  return result;
 }

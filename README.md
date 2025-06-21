@@ -99,6 +99,7 @@ This monorepo contains two main packages:
 The core compatibility library containing optimized FluentUI components and utilities:
 
 - **bundleIcon**: Optimized higher-order component for creating compound icons
+- **useArraySlice**: React hook for slicing array collections with pagination, search, and visibility controls
 - **useAsync**: React hook that provides an Async instance with automatic cleanup
 - **useConst**: React hook for creating constant values that don't change between renders
 
@@ -197,6 +198,115 @@ function MyComponent() {
 - **Development Warnings**: Warns about potential race conditions in development mode
 - **React DevTools Integration**: Provides debugging information in development
 - **Performance Optimized**: Uses stable references to prevent unnecessary re-renders
+
+## useArraySlice
+
+A React hook for slicing array collections with comprehensive functionality for managing large lists of data. Provides pagination, search/filtering, and visibility controls with performance optimizations.
+
+### useArraySlice Usage
+
+```typescript
+import { useArraySlice } from "@cascadiacollections/fluentui-compat";
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+function UserList({ users }: { users: User[] }) {
+  const {
+    currentItems,
+    currentPage,
+    totalPages,
+    pagination,
+    search,
+    visibility
+  } = useArraySlice(users, {
+    pageSize: 5,
+    searchFunction: (user, term) => 
+      user.name.toLowerCase().includes(term.toLowerCase()) ||
+      user.email.toLowerCase().includes(term.toLowerCase())
+  });
+
+  return (
+    <div>
+      <input 
+        type="text" 
+        placeholder="Search users..."
+        onChange={(e) => search.setSearchTerm(e.target.value)}
+      />
+      <button onClick={visibility.toggleAll}>
+        Toggle Visibility
+      </button>
+      
+      {currentItems.map(user => (
+        <div key={user.id}>{user.name} - {user.email}</div>
+      ))}
+      
+      <div>
+        Page {currentPage + 1} of {totalPages}
+        <button 
+          onClick={pagination.previousPage} 
+          disabled={!pagination.hasPreviousPage}
+        >
+          Previous
+        </button>
+        <button 
+          onClick={pagination.nextPage} 
+          disabled={!pagination.hasNextPage}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+### useArraySlice Features
+
+- **Pagination**: Configurable page size with navigation controls (next/prev/first/last/goToPage)
+- **Search/Filtering**: Custom search function support with automatic pagination reset
+- **Visibility Toggle**: Show/hide all items functionality
+- **Dynamic Configuration**: Change page size with position maintenance
+- **Performance Optimized**: Stable callback identities using useMemo
+- **TypeScript Generic Support**: Full type safety for any array type
+- **Comprehensive Controls**: Complete API for managing list state
+
+### useArraySlice API
+
+#### Parameters
+
+- `data: T[]` - Array of items to slice and manage
+- `options?: UseArraySliceOptions<T>` - Configuration options
+
+#### Options
+
+```typescript
+interface UseArraySliceOptions<T> {
+  pageSize?: number;              // Items per page (default: 10)
+  initialPage?: number;           // Initial page (0-based, default: 0)
+  initialVisible?: boolean;       // Initial visibility (default: true)
+  searchFunction?: (item: T, searchTerm: string) => boolean;
+  initialSearchTerm?: string;     // Initial search term
+}
+```
+
+#### Returns
+
+The hook returns an object with:
+
+- `currentItems: T[]` - Current slice of items to render
+- `totalItems: number` - Total number of items after filtering
+- `currentPage: number` - Current page number (0-based)
+- `totalPages: number` - Total number of pages
+- `allVisible: boolean` - Whether all items are currently visible
+- `searchTerm: string` - Current search term
+- `pagination` - Navigation controls and state
+- `visibility` - Show/hide controls
+- `search` - Search term management
+- `controls` - Configuration controls (page size, etc.)
 
 ## Webpack Plugin Usage
 

@@ -1,5 +1,7 @@
 export { bundleIcon } from './bundleIcon';
 export type { BundledIconProps } from './bundleIcon';
+export { useArraySlice } from './useArraySlice';
+export type { UseArraySliceOptions, UseArraySliceResult } from './useArraySlice';
 export { useAsync } from './useAsync';
 export { useBoolean } from './useBoolean';
 export type { IUseBooleanCallbacks } from './useBoolean';

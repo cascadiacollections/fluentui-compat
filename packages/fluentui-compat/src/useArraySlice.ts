@@ -241,15 +241,9 @@ export function useArraySlice<T>(
     getItemId
   } = options;
 
-  // Development constants
-  const DEV_CONSTANTS = {
-    HOOK_VERSION: '1.0.0',
-    DISPLAY_NAME: 'useArraySlice'
-  } as const;
-
   // React DevTools integration - displayName for debugging
   if (process.env.NODE_ENV !== 'production') {
-    (useArraySlice as any).displayName = DEV_CONSTANTS.DISPLAY_NAME;
+    (useArraySlice as any).displayName = 'useArraySlice';
   }
 
   // Generate stable hook ID for React DevTools (React 18+ progressive support)
@@ -416,7 +410,7 @@ export function useArraySlice<T>(
         hookId,
         dataLength: data.length,
         filteredLength: filteredData.length,
-        version: DEV_CONSTANTS.HOOK_VERSION
+        version: '1.0.0'
       } as const satisfies NonNullable<UseArraySliceResult<T>['_debug']>
     })
   } as const satisfies UseArraySliceResult<T>), [

@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+// React 18+ progressive support - conditionally use newer APIs
+const useId = (React as any).useId || (() => Math.random().toString(36).substr(2, 9));
+const useDeferredValue = (React as any).useDeferredValue || ((value: any) => value);
+
 /** Configuration options for the useArraySlice hook */
 export interface UseArraySliceOptions<T> {
   /** Number of items per page (default: 10) */
@@ -68,6 +72,17 @@ export interface UseArraySliceResult<T> {
     /** Current page size */
     pageSize: number;
   };
+  /** React DevTools debug information (development builds only) */
+  _debug?: {
+    /** Unique hook instance ID */
+    hookId: string;
+    /** Original data array length */
+    dataLength: number;
+    /** Filtered data array length */
+    filteredLength: number;
+    /** Hook version */
+    version: string;
+  };
 }
 
 /**
@@ -79,6 +94,14 @@ export interface UseArraySliceResult<T> {
  * - Search/filtering with custom search functions
  * - Performance optimized with stable callback identities
  * - TypeScript generic support for type safety
+ * - React DevTools integration with debug information (development builds)
+ * - React 18+ API progressive support for enhanced concurrent rendering
+ * 
+ * **React 18+ Features:**
+ * - Uses `useId` for stable hook instance identification
+ * - Uses `useDeferredValue` for non-blocking search operations
+ * - Optimized `useCallback` patterns for better concurrent rendering
+ * - Development-only debug information visible in React DevTools
  * 
  * @param data - Array of items to slice and manage
  * @param options - Configuration options for pagination, search, and visibility
@@ -138,7 +161,7 @@ export interface UseArraySliceResult<T> {
  * 
  * @example
  * ```typescript
- * // Advanced usage with complex filtering
+ * // Advanced usage with complex filtering and React 18+ features
  * function ProductCatalog({ products }: { products: Product[] }) {
  *   const productSlice = useArraySlice(products, {
  *     pageSize: 12,
@@ -153,6 +176,11 @@ export interface UseArraySliceResult<T> {
  *       );
  *     }
  *   });
+ * 
+ *   // Debug information available in development builds
+ *   if (process.env.NODE_ENV !== 'production') {
+ *     console.log('useArraySlice debug:', productSlice._debug);
+ *   }
  * 
  *   return (
  *     <div>
@@ -195,30 +223,41 @@ export function useArraySlice<T>(
     initialSearchTerm = ''
   } = options;
 
+  // React DevTools integration - displayName for debugging
+  if (process.env.NODE_ENV !== 'production') {
+    (useArraySlice as any).displayName = 'useArraySlice';
+  }
+
+  // Generate stable hook ID for React DevTools (React 18+ progressive support)
+  const hookId = useId();
+
   // State management
   const [currentPage, setCurrentPage] = React.useState(initialPage);
   const [pageSize, setPageSize] = React.useState(initialPageSize);
   const [allVisible, setAllVisible] = React.useState(initialVisible);
   const [searchTerm, setSearchTerm] = React.useState(initialSearchTerm);
 
-  // Filter data based on search term
+  // React 18+ progressive enhancement: defer search term for better concurrent rendering
+  const deferredSearchTerm = useDeferredValue(searchTerm);
+
+  // Filter data based on search term (using deferred value for React 18+ concurrent rendering)
   const filteredData = React.useMemo(() => {
-    if (!searchTerm || !searchFunction) {
+    if (!deferredSearchTerm || !searchFunction) {
       return data;
     }
-    return data.filter(item => searchFunction(item, searchTerm));
-  }, [data, searchTerm, searchFunction]);
+    return data.filter(item => searchFunction(item, deferredSearchTerm));
+  }, [data, deferredSearchTerm, searchFunction]);
 
   // Calculate pagination values
   const totalItems = allVisible ? filteredData.length : 0;
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const totalPages = allVisible ? Math.max(1, Math.ceil(totalItems / pageSize)) : 1;
   
-  // Ensure current page is valid when data changes
+  // Ensure current page is valid when data changes (but only when visible)
   React.useEffect(() => {
-    if (currentPage >= totalPages && totalPages > 0) {
+    if (allVisible && currentPage >= totalPages && totalPages > 0) {
       setCurrentPage(Math.max(0, totalPages - 1));
     }
-  }, [currentPage, totalPages]);
+  }, [currentPage, totalPages, allVisible]);
 
   // Calculate current slice
   const currentItems = React.useMemo(() => {
@@ -231,62 +270,81 @@ export function useArraySlice<T>(
     return filteredData.slice(startIndex, endIndex);
   }, [filteredData, currentPage, pageSize, allVisible]);
 
-  // Pagination controls - memoized for stable identity
+  // Pagination controls - optimized with React 18+ patterns for concurrent rendering
+  const goToPage = React.useCallback((page: number) => {
+    const clampedPage = Math.max(0, Math.min(page, totalPages - 1));
+    setCurrentPage(clampedPage);
+  }, [totalPages]);
+
+  const nextPage = React.useCallback(() => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(prev => prev + 1);
+    }
+  }, [currentPage, totalPages]);
+
+  const previousPage = React.useCallback(() => {
+    if (currentPage > 0) {
+      setCurrentPage(prev => prev - 1);
+    }
+  }, [currentPage]);
+
+  const firstPage = React.useCallback(() => setCurrentPage(0), []);
+  const lastPage = React.useCallback(() => setCurrentPage(Math.max(0, totalPages - 1)), [totalPages]);
+
   const pagination = React.useMemo(() => ({
-    goToPage: (page: number) => {
-      const clampedPage = Math.max(0, Math.min(page, totalPages - 1));
-      setCurrentPage(clampedPage);
-    },
-    nextPage: () => {
-      if (currentPage < totalPages - 1) {
-        setCurrentPage(prev => prev + 1);
-      }
-    },
-    previousPage: () => {
-      if (currentPage > 0) {
-        setCurrentPage(prev => prev - 1);
-      }
-    },
-    firstPage: () => setCurrentPage(0),
-    lastPage: () => setCurrentPage(Math.max(0, totalPages - 1)),
+    goToPage,
+    nextPage,
+    previousPage,
+    firstPage,
+    lastPage,
     hasNextPage: currentPage < totalPages - 1,
     hasPreviousPage: currentPage > 0,
-  }), [currentPage, totalPages]);
+  }), [goToPage, nextPage, previousPage, firstPage, lastPage, currentPage, totalPages]);
 
-  // Visibility controls - memoized for stable identity
+  // Visibility controls - optimized with React 18+ useCallback patterns
+  const showAll = React.useCallback(() => setAllVisible(true), []);
+  const hideAll = React.useCallback(() => setAllVisible(false), []);
+  const toggleAll = React.useCallback(() => setAllVisible(prev => !prev), []);
+
   const visibility = React.useMemo(() => ({
-    showAll: () => setAllVisible(true),
-    hideAll: () => setAllVisible(false),
-    toggleAll: () => setAllVisible(prev => !prev),
-  }), []);
+    showAll,
+    hideAll,
+    toggleAll,
+  }), [showAll, hideAll, toggleAll]);
 
-  // Search controls - memoized for stable identity
+  // Search controls - optimized with React 18+ useCallback patterns  
+  const setSearchTermWithReset = React.useCallback((term: string) => {
+    setSearchTerm(term);
+    // Reset to first page when searching
+    setCurrentPage(0);
+  }, []);
+
+  const clearSearch = React.useCallback(() => {
+    setSearchTerm('');
+    setCurrentPage(0);
+  }, []);
+
   const search = React.useMemo(() => ({
-    setSearchTerm: (term: string) => {
-      setSearchTerm(term);
-      // Reset to first page when searching
-      setCurrentPage(0);
-    },
-    clearSearch: () => {
-      setSearchTerm('');
-      setCurrentPage(0);
-    },
-  }), []);
+    setSearchTerm: setSearchTermWithReset,
+    clearSearch,
+  }), [setSearchTermWithReset, clearSearch]);
 
-  // Control functions - memoized for stable identity
+  // Control functions - optimized with React 18+ useCallback patterns
+  const setPageSizeWithAdjustment = React.useCallback((size: number) => {
+    const newSize = Math.max(1, size);
+    setPageSize(newSize);
+    // Adjust current page to maintain position as much as possible
+    const currentItemIndex = currentPage * pageSize;
+    const newPage = Math.floor(currentItemIndex / newSize);
+    setCurrentPage(Math.max(0, Math.min(newPage, Math.ceil(totalItems / newSize) - 1)));
+  }, [currentPage, pageSize, totalItems]);
+
   const controls = React.useMemo(() => ({
-    setPageSize: (size: number) => {
-      const newSize = Math.max(1, size);
-      setPageSize(newSize);
-      // Adjust current page to maintain position as much as possible
-      const currentItemIndex = currentPage * pageSize;
-      const newPage = Math.floor(currentItemIndex / newSize);
-      setCurrentPage(Math.max(0, Math.min(newPage, Math.ceil(totalItems / newSize) - 1)));
-    },
+    setPageSize: setPageSizeWithAdjustment,
     pageSize,
-  }), [pageSize, currentPage, totalItems]);
+  }), [setPageSizeWithAdjustment, pageSize]);
 
-  return {
+  const result = React.useMemo(() => ({
     currentItems,
     totalItems,
     currentPage,
@@ -297,5 +355,30 @@ export function useArraySlice<T>(
     visibility,
     search,
     controls,
-  };
+    // React DevTools debug information (development only)
+    ...(process.env.NODE_ENV !== 'production' && {
+      _debug: {
+        hookId,
+        dataLength: data.length,
+        filteredLength: filteredData.length,
+        version: '1.0.0'
+      }
+    })
+  }), [
+    currentItems,
+    totalItems,
+    currentPage,
+    totalPages,
+    allVisible,
+    searchTerm,
+    pagination,
+    visibility,
+    search,
+    controls,
+    hookId,
+    data.length,
+    filteredData.length
+  ]);
+
+  return result;
 }

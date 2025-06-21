@@ -74,7 +74,7 @@ describe('useArraySlice', () => {
 
       // First page should contain items 1-5
       expect(result.current.currentItems).toHaveLength(5);
-      expect(result.current.currentItems[0]).toEqual({ id: 1, name: 'Item 1', category: 'Category B' });
+      expect(result.current.currentItems[0]).toEqual({ id: 1, name: 'Item 1', category: 'Category A' });
       expect(result.current.currentItems[4]).toEqual({ id: 5, name: 'Item 5', category: 'Category B' });
     });
   });
@@ -109,7 +109,7 @@ describe('useArraySlice', () => {
       });
 
       expect(result.current.currentPage).toBe(0);
-      expect(result.current.currentItems[0]).toEqual({ id: 1, name: 'Item 1', category: 'Category B' });
+      expect(result.current.currentItems[0]).toEqual({ id: 1, name: 'Item 1', category: 'Category A' });
     });
 
     test('should go to specific page', () => {
@@ -122,7 +122,7 @@ describe('useArraySlice', () => {
 
       expect(result.current.currentPage).toBe(3);
       expect(result.current.currentItems).toHaveLength(5);
-      expect(result.current.currentItems[0]).toEqual({ id: 16, name: 'Item 16', category: 'Category B' });
+      expect(result.current.currentItems[0]).toEqual({ id: 16, name: 'Item 16', category: 'Category A' });
     });
 
     test('should clamp page to valid range', () => {

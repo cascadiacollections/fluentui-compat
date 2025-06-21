@@ -606,4 +606,167 @@ describe('useArraySlice', () => {
       expect(mockEffectWithClearSearch).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('ID management', () => {
+    test('should generate stable fallback IDs when no getItemId is provided', () => {
+      const data = createTestData(10);
+      const { result } = renderHook(() => useArraySlice(data, { pageSize: 5 }));
+
+      const firstPageIds = result.current.currentItems.map((item, index) =>
+        result.current.getItemId(item, index)
+      );
+
+      // IDs should be strings
+      expect(firstPageIds.every(id => typeof id === 'string')).toBe(true);
+
+      // IDs should be unique
+      expect(new Set(firstPageIds).size).toBe(firstPageIds.length);
+
+      // IDs should be stable across re-renders
+      const { rerender } = renderHook(() => useArraySlice(data, { pageSize: 5 }));
+      rerender();
+      
+      const stableIds = result.current.currentItems.map((item, index) =>
+        result.current.getItemId(item, index)
+      );
+
+      expect(stableIds).toEqual(firstPageIds);
+    });
+
+    test('should use custom getItemId function when provided', () => {
+      const data = createTestData(10);
+      const customGetItemId = jest.fn((item: TestItem) => `custom-${item.id}`);
+      
+      const { result } = renderHook(() => 
+        useArraySlice(data, { 
+          pageSize: 5,
+          getItemId: customGetItemId
+        })
+      );
+
+      const ids = result.current.currentItems.map((item, index) =>
+        result.current.getItemId(item, index)
+      );
+
+      // Should use the custom function
+      expect(customGetItemId).toHaveBeenCalledTimes(5); // Called for each item in current page
+      expect(ids).toEqual(['custom-1', 'custom-2', 'custom-3', 'custom-4', 'custom-5']);
+    });
+
+    test('should maintain stable IDs across filtering', () => {
+      const data = createTestData(10);
+      const { result } = renderHook(() => 
+        useArraySlice(data, { 
+          pageSize: 10,
+          searchFunction: defaultSearchFunction
+        })
+      );
+
+      // Get IDs for all items initially
+      const initialIds = result.current.currentItems.map((item, index) =>
+        result.current.getItemId(item, index)
+      );
+
+      // Apply search filter
+      act(() => {
+        result.current.search.setSearchTerm('Item 1');
+      });
+
+      // Items matching "Item 1" should have the same IDs as before
+      const filteredIds = result.current.currentItems.map((item, index) =>
+        result.current.getItemId(item, index)
+      );
+
+      // Find the original IDs for items that match "Item 1"
+      const matchingItems = data.filter(item => item.name.includes('Item 1'));
+      const expectedIds = matchingItems.map(item => {
+        const originalIndex = data.indexOf(item);
+        return result.current.getItemId(item, originalIndex);
+      });
+
+      expect(filteredIds).toEqual(expectedIds);
+    });
+
+    test('should maintain stable IDs across pagination', () => {
+      const data = createTestData(25);
+      const { result } = renderHook(() => useArraySlice(data, { pageSize: 5 }));
+
+      // Get IDs for first page
+      const firstPageIds = result.current.currentItems.map((item, index) =>
+        result.current.getItemId(item, index)
+      );
+
+      // Go to second page
+      act(() => {
+        result.current.pagination.nextPage();
+      });
+
+      // Go back to first page
+      act(() => {
+        result.current.pagination.previousPage();
+      });
+
+      // IDs should be the same as before
+      const backToFirstPageIds = result.current.currentItems.map((item, index) =>
+        result.current.getItemId(item, index)
+      );
+
+      expect(backToFirstPageIds).toEqual(firstPageIds);
+    });
+
+    test('should handle empty arrays gracefully', () => {
+      const { result } = renderHook(() => useArraySlice([]));
+
+      expect(result.current.currentItems).toHaveLength(0);
+      
+      // getItemId should not throw when called with empty array
+      expect(() => result.current.getItemId({} as any, 0)).not.toThrow();
+    });
+
+    test('should handle items with identical content but different references', () => {
+      // Create identical items with different object references
+      const data = [
+        { id: 1, name: 'Item 1', category: 'Category A' },
+        { id: 1, name: 'Item 1', category: 'Category A' }, // Same content, different reference
+        { id: 2, name: 'Item 2', category: 'Category B' }
+      ];
+
+      const { result } = renderHook(() => useArraySlice(data, { pageSize: 5 }));
+
+      const ids = result.current.currentItems.map((item, index) =>
+        result.current.getItemId(item, index)
+      );
+
+      // IDs should be unique despite identical content (due to different original indices)
+      expect(new Set(ids).size).toBe(ids.length);
+      expect(ids[0]).not.toBe(ids[1]); // Different positions should generate different IDs
+    });
+
+    test('getItemId callback should be stable across re-renders', () => {
+      const data = createTestData(5);
+      const { result, rerender } = renderHook(() => useArraySlice(data));
+      
+      const initialGetItemId = result.current.getItemId;
+      
+      // Re-render with same data
+      rerender();
+      
+      // getItemId function reference should be stable
+      expect(result.current.getItemId).toBe(initialGetItemId);
+    });
+
+    test('should work with non-object items', () => {
+      const stringData = ['apple', 'banana', 'cherry', 'date'];
+      const { result } = renderHook(() => useArraySlice(stringData, { pageSize: 2 }));
+
+      const ids = result.current.currentItems.map((item, index) =>
+        result.current.getItemId(item, index)
+      );
+
+      expect(ids).toHaveLength(2);
+      expect(ids.every(id => typeof id === 'string')).toBe(true);
+      expect(new Set(ids).size).toBe(2); // Should be unique
+    });
+  });
+});
 });

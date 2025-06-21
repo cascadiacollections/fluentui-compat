@@ -60,7 +60,8 @@ export function UseArraySliceDemo() {
     pagination,
     visibility,
     search,
-    controls
+    controls,
+    getItemId
   } = useArraySlice(sampleData, {
     pageSize: 8,
     initialPage: 0,
@@ -70,7 +71,11 @@ export function UseArraySliceDemo() {
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
       <h1>useArraySlice Hook Demo</h1>
-      <p>This demo showcases a React hook for managing array slicing with pagination, search, and visibility controls.</p>
+      <p>
+        This demo showcases a React hook for managing array slicing with pagination, search, visibility controls, 
+        and <strong>ID management</strong>. The hook automatically generates collision-resistant IDs for React keys, 
+        or you can provide a custom ID function for your data items.
+      </p>
       
       {/* Controls Section */}
       <div style={{ 
@@ -261,9 +266,9 @@ export function UseArraySliceDemo() {
           gap: '15px',
           marginBottom: '20px'
         }}>
-          {currentItems.map((item) => (
+          {currentItems.map((item, index) => (
             <div
-              key={item.id}
+              key={getItemId(item, index)}
               style={{
                 border: '1px solid #ddd',
                 borderRadius: '8px',

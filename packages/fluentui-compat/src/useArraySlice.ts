@@ -4,6 +4,37 @@ import * as React from 'react';
 const useId = (React as any).useId || (() => Math.random().toString(36).substr(2, 9));
 const useDeferredValue = (React as any).useDeferredValue || ((value: any) => value);
 
+/**
+ * Generates a collision-resistant hash from a string using a simple but effective algorithm.
+ * This is used as a fallback when no user-provided ID function is available.
+ */
+function generateHashId(input: string): string {
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash).toString(36);
+}
+
+/**
+ * Creates a collision-resistant ID for an item when no user-provided ID function is available.
+ * Combines the original index with a content hash to minimize collisions while maintaining stability.
+ */
+function createFallbackId<T>(item: T, originalIndex: number): string {
+  // Create a stable string representation of the item
+  const itemStr = typeof item === 'object' && item !== null 
+    ? JSON.stringify(item) 
+    : String(item);
+  
+  // Generate a hash from the item content
+  const contentHash = generateHashId(itemStr);
+  
+  // Combine original index with content hash for collision resistance
+  return `${originalIndex}_${contentHash}`;
+}
+
 /** Configuration options for the useArraySlice hook */
 export interface UseArraySliceOptions<T> {
   /** Number of items per page (default: 10) */
@@ -16,6 +47,8 @@ export interface UseArraySliceOptions<T> {
   searchFunction?: (item: T, searchTerm: string) => boolean;
   /** Initial search term */
   initialSearchTerm?: string;
+  /** Function to extract or generate unique IDs for items. If not provided, collision-resistant IDs will be generated automatically. */
+  getItemId?: (item: T, index: number) => string | number;
 }
 
 /** Return type of useArraySlice hook */
@@ -72,6 +105,8 @@ export interface UseArraySliceResult<T> {
     /** Current page size */
     pageSize: number;
   };
+  /** Get stable ID for an item in the current slice - useful for React keys */
+  getItemId: (item: T, sliceIndex: number) => string | number;
   /** React DevTools debug information (development builds only) */
   _debug?: {
     /** Unique hook instance ID */
@@ -92,6 +127,7 @@ export interface UseArraySliceResult<T> {
  * - Pagination with configurable page size
  * - Global visibility toggle (show/hide all items)
  * - Search/filtering with custom search functions
+ * - **ID Management**: User-provided ID functions with collision-resistant fallbacks
  * - Performance optimized with stable callback identities
  * - TypeScript generic support for type safety
  * - React DevTools integration with debug information (development builds)
@@ -103,31 +139,29 @@ export interface UseArraySliceResult<T> {
  * - Optimized `useCallback` patterns for better concurrent rendering
  * - Development-only debug information visible in React DevTools
  * 
+ * **ID Management:**
+ * - Supports user-provided `getItemId` function for custom ID extraction/generation
+ * - Provides collision-resistant fallback IDs when no ID function is specified
+ * - Maintains stable IDs across filtering and pagination for React key consistency
+ * - IDs are based on original array positions combined with content hashing for collision resistance
+ * 
  * @param data - Array of items to slice and manage
  * @param options - Configuration options for pagination, search, and visibility
  * @returns Object containing current slice, pagination controls, and utility functions
  * 
  * @example
  * ```typescript
- * interface User {
- *   id: number;
- *   name: string;
- *   email: string;
- * }
- * 
+ * // Basic usage with automatic collision-resistant ID generation
  * function UserList({ users }: { users: User[] }) {
  *   const {
  *     currentItems,
- *     currentPage,
- *     totalPages,
+ *     getItemId,
  *     pagination,
- *     search,
- *     visibility
+ *     search
  *   } = useArraySlice(users, {
  *     pageSize: 5,
  *     searchFunction: (user, term) => 
- *       user.name.toLowerCase().includes(term.toLowerCase()) ||
- *       user.email.toLowerCase().includes(term.toLowerCase())
+ *       user.name.toLowerCase().includes(term.toLowerCase())
  *   });
  * 
  *   return (
@@ -137,16 +171,14 @@ export interface UseArraySliceResult<T> {
  *         placeholder="Search users..."
  *         onChange={(e) => search.setSearchTerm(e.target.value)}
  *       />
- *       <button onClick={visibility.toggleAll}>
- *         Toggle Visibility
- *       </button>
  *       
- *       {currentItems.map(user => (
- *         <div key={user.id}>{user.name} - {user.email}</div>
+ *       {currentItems.map((user, index) => (
+ *         <div key={getItemId(user, index)}>
+ *           {user.name} - {user.email}
+ *         </div>
  *       ))}
  *       
  *       <div>
- *         Page {currentPage + 1} of {totalPages}
  *         <button onClick={pagination.previousPage} disabled={!pagination.hasPreviousPage}>
  *           Previous
  *         </button>
@@ -161,45 +193,30 @@ export interface UseArraySliceResult<T> {
  * 
  * @example
  * ```typescript
- * // Advanced usage with complex filtering and React 18+ features
+ * // Advanced usage with custom ID function
  * function ProductCatalog({ products }: { products: Product[] }) {
  *   const productSlice = useArraySlice(products, {
  *     pageSize: 12,
- *     initialSearchTerm: '',
+ *     // Custom ID function using product's unique identifier
+ *     getItemId: (product) => `product-${product.sku}`,
  *     searchFunction: (product, term) => {
  *       const searchLower = term.toLowerCase();
  *       return (
  *         product.name.toLowerCase().includes(searchLower) ||
  *         product.description.toLowerCase().includes(searchLower) ||
- *         product.category.toLowerCase().includes(searchLower) ||
- *         product.tags.some(tag => tag.toLowerCase().includes(searchLower))
+ *         product.sku.toLowerCase().includes(searchLower)
  *       );
  *     }
  *   });
  * 
- *   // Debug information available in development builds
- *   if (process.env.NODE_ENV !== 'production') {
- *     console.log('useArraySlice debug:', productSlice._debug);
- *   }
- * 
  *   return (
  *     <div>
- *       <div className="filters">
- *         <input
- *           type="text"
- *           placeholder="Search products..."
- *           onChange={(e) => productSlice.search.setSearchTerm(e.target.value)}
- *         />
- *         <select onChange={(e) => productSlice.controls.setPageSize(Number(e.target.value))}>
- *           <option value={6}>6 per page</option>
- *           <option value={12}>12 per page</option>
- *           <option value={24}>24 per page</option>
- *         </select>
- *       </div>
- *       
  *       <div className="product-grid">
- *         {productSlice.currentItems.map(product => (
- *           <ProductCard key={product.id} product={product} />
+ *         {productSlice.currentItems.map((product, index) => (
+ *           <ProductCard 
+ *             key={productSlice.getItemId(product, index)} 
+ *             product={product} 
+ *           />
  *         ))}
  *       </div>
  *       
@@ -220,7 +237,8 @@ export function useArraySlice<T>(
     initialPage = 0,
     initialVisible = true,
     searchFunction,
-    initialSearchTerm = ''
+    initialSearchTerm = '',
+    getItemId
   } = options;
 
   // React DevTools integration - displayName for debugging
@@ -239,6 +257,15 @@ export function useArraySlice<T>(
 
   // React 18+ progressive enhancement: defer search term for better concurrent rendering
   const deferredSearchTerm = useDeferredValue(searchTerm);
+
+  // Create a stable mapping of items to their original indices for ID generation
+  const itemToOriginalIndex = React.useMemo(() => {
+    const map = new Map<T, number>();
+    data.forEach((item, index) => {
+      map.set(item, index);
+    });
+    return map;
+  }, [data]);
 
   // Filter data based on search term (using deferred value for React 18+ concurrent rendering)
   const filteredData = React.useMemo(() => {
@@ -344,6 +371,19 @@ export function useArraySlice<T>(
     pageSize,
   }), [setPageSizeWithAdjustment, pageSize]);
 
+  // ID management function - provides stable IDs for items
+  const getItemIdForResult = React.useCallback((item: T, sliceIndex: number) => {
+    if (getItemId) {
+      // Use user-provided ID function with the original index
+      const originalIndex = itemToOriginalIndex.get(item) ?? sliceIndex;
+      return getItemId(item, originalIndex);
+    } else {
+      // Use collision-resistant fallback ID
+      const originalIndex = itemToOriginalIndex.get(item) ?? sliceIndex;
+      return createFallbackId(item, originalIndex);
+    }
+  }, [getItemId, itemToOriginalIndex]);
+
   const result = React.useMemo(() => ({
     currentItems,
     totalItems,
@@ -355,6 +395,7 @@ export function useArraySlice<T>(
     visibility,
     search,
     controls,
+    getItemId: getItemIdForResult,
     // React DevTools debug information (development only)
     ...(process.env.NODE_ENV !== 'production' && {
       _debug: {
@@ -375,6 +416,7 @@ export function useArraySlice<T>(
     visibility,
     search,
     controls,
+    getItemIdForResult,
     hookId,
     data.length,
     filteredData.length

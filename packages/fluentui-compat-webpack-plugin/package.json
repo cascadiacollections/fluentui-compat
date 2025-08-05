@@ -34,9 +34,9 @@
     "@babel/traverse": "^7.28.0",
     "@babel/types": "^7.28.0",
     "@types/babel__generator": "^7.27.0",
-    "@types/babel__traverse": "^7.20.7",
+    "@types/babel__traverse": "^7.28.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.0.10",
+    "@types/node": "^24.2.0",
     "@types/webpack": "^4.41.0 || ^5.28.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
@@ -44,7 +44,7 @@
     "jest": "^30.0.4",
     "jest-junit": "^16.0.0",
     "ts-jest": "^29.4.0",
-    "typescript": "~5.8.3",
+    "typescript": "~5.9.2",
     "webpack": "^5.95.0"
   },
   "files": [

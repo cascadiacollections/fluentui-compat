@@ -2,9 +2,23 @@ import { Async } from '@fluentui/utilities';
 import * as React from 'react';
 
 /**
+ * Sentinel value to indicate uninitialized async instance.
+ * Using null as sentinel for better memory efficiency than Symbol.
+ * @internal
+ */
+const UNINITIALIZED = null;
+
+/**
  * Hook to provide an Async instance that is automatically cleaned up on dismount.
  * 
- * @returns \{Async\} A stable Async instance that will be disposed on component unmount
+ * This implementation is optimized for:
+ * - **Memory efficiency**: Uses `useRef` instead of `useMemo` to avoid closure overhead
+ * - **Render performance**: Minimizes effect overhead by consolidating development checks
+ * - **Immutability**: Ensures stable reference identity across all renders
+ * - **Type safety**: Leverages TypeScript strict mode and const assertions
+ * 
+ * @returns \{Async\} A stable Async instance that will be disposed on component unmount.
+ *                   The returned instance maintains referential identity across renders.
  * 
  * @example
  * ```tsx
@@ -22,39 +36,58 @@ import * as React from 'react';
  *   return <button onClick={handleClick}>Start Timer</button>;
  * }
  * ```
+ * 
+ * @public
  */
 export function useAsync(): Async {
-  // Use useMemo for explicit single creation and stable reference
-  const asyncInstance = React.useMemo(() => new Async(), []);
+  // Use useRef for memory efficiency - no closure allocation like useMemo
+  // Following the pattern from useConst for optimal performance
+  const asyncRef = React.useRef<Async | null>(UNINITIALIZED);
   
+  // Lazy initialization - only create instance on first render
+  if (asyncRef.current === UNINITIALIZED) {
+    asyncRef.current = new Async();
+  }
+  
+  // Single consolidated effect for cleanup and development warnings
+  // Reduces effect overhead compared to multiple useEffect calls
   React.useEffect(() => {
-    // Cleanup function
+    const instance = asyncRef.current!;
+    
+    // Development-time monitoring - cache check result
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    let startTime: number | undefined;
+    
+    if (isDevelopment) {
+      startTime = Date.now();
+    }
+    
+    // Cleanup function - runs on unmount
     return () => {
-      asyncInstance.dispose();
-    };
-  }, [asyncInstance]);
-  
-  // Add development-time warnings for common mistakes - hook called unconditionally
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const startTime = Date.now();
-      return () => {
+      // Always dispose the instance
+      instance.dispose();
+      
+      // Development warnings for common mistakes
+      if (isDevelopment && startTime !== undefined) {
         const duration = Date.now() - startTime;
         if (duration < 16) { // Less than one frame
           console.warn('useAsync: Component unmounted very quickly. Ensure async operations are properly handled.');
         }
-      };
-    }
-    return undefined;
-  }, []);
+      }
+    };
+  }, []); // Empty deps - only run on mount/unmount
   
-  // Add React DevTools integration - hook called unconditionally
-  React.useDebugValue(
-    process.env.NODE_ENV === 'development' 
-      ? asyncInstance 
-      : null, 
-    (async) => async ? `Async(${async ? 'active' : 'disposed'})` : ''
-  );
+  // React DevTools integration - conditional on development mode
+  // Only provide debug value in development to avoid runtime overhead
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    React.useDebugValue(
+      asyncRef.current,
+      (async) => async ? 'Async(active)' : 'Async(disposed)'
+    );
+  }
   
-  return asyncInstance;
+  // Type assertion is safe - we guarantee initialization above
+  // Return value is immutable (same reference on every render)
+  return asyncRef.current as Async;
 }

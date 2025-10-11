@@ -28,11 +28,53 @@ module.exports = {
  */
 function readPackage(packageJson, context) {
 
-  // // The karma types have a missing dependency on typings from the log4js package.
-  // if (packageJson.name === '@types/karma') {
-  //  context.log('Fixed up dependencies for @types/karma');
-  //  packageJson.dependencies['log4js'] = '0.6.38';
-  // }
+  // Override @fluentui/utilities peer dependencies to support React 19
+  if (packageJson.name === '@fluentui/utilities') {
+    context.log('Overriding peer dependencies for @fluentui/utilities to support React 19');
+    packageJson.peerDependencies = {
+      ...packageJson.peerDependencies,
+      '@types/react': '>=16.8.0 <20.0.0',
+      'react': '>=16.8.0 <20.0.0'
+    };
+  }
+
+  // Override @fluentui/react-window-provider peer dependencies to support React 19
+  if (packageJson.name === '@fluentui/react-window-provider') {
+    context.log('Overriding peer dependencies for @fluentui/react-window-provider to support React 19');
+    packageJson.peerDependencies = {
+      ...packageJson.peerDependencies,
+      '@types/react': '>=16.8.0 <20.0.0',
+      'react': '>=16.8.0 <20.0.0'
+    };
+  }
+
+  // Override @testing-library/react peer dependencies to support React 19
+  if (packageJson.name === '@testing-library/react') {
+    context.log('Overriding peer dependencies for @testing-library/react to support React 19');
+    packageJson.peerDependencies = {
+      ...packageJson.peerDependencies,
+      'react': '^18.0.0 || ^19.0.0',
+      'react-dom': '^18.0.0 || ^19.0.0'
+    };
+  }
+
+  // Override @types/react-dom peer dependencies to support React 19
+  if (packageJson.name === '@types/react-dom') {
+    context.log('Overriding peer dependencies for @types/react-dom to support React 19');
+    packageJson.peerDependencies = {
+      ...packageJson.peerDependencies,
+      '@types/react': '^18.0.0 || ^19.0.0'
+    };
+  }
+
+  // Override @fluentui/react-context-selector peer dependencies to support scheduler 0.23.2
+  if (packageJson.name === '@fluentui/react-context-selector') {
+    context.log('Overriding peer dependencies for @fluentui/react-context-selector to support scheduler 0.23.2');
+    packageJson.peerDependencies = {
+      ...packageJson.peerDependencies,
+      'scheduler': '>=0.19.0 <0.24.0'
+    };
+  }
 
   return packageJson;
 }

@@ -31,8 +31,8 @@
   },
   "peerDependencies": {
     "@fluentui/react-icons": ">=2.0.0",
-    "react": ">=16.14.0 <19.0.0",
-    "react-dom": ">=16.14.0 <19.0.0"
+    "react": ">=16.14.0 <20.0.0",
+    "react-dom": ">=16.14.0 <20.0.0"
   },
   "devDependencies": {
     "@fluentui/react-components": "^9.0.0",
@@ -40,8 +40,9 @@
     "@microsoft/api-documenter": "^7.25.17",
     "@microsoft/api-extractor": "^7.44.0",
     "@rushstack/heft": "^0.74.0",
+    "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^14.3.1",
+    "@testing-library/react": "^16.1.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.1",
     "@types/react": "^19.1.7",
@@ -56,6 +57,7 @@
     "jest-environment-jsdom": "^30.0.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "scheduler": "^0.23.0",
     "ts-jest": "^29.2.5",
     "typescript": "~5.9.2"
   },

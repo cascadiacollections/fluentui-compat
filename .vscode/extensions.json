@@ -1,41 +1,54 @@
 {
   "recommendations": [
+    // AI & GitHub Copilot
+    "github.copilot",
+    "github.copilot-chat",
+    
     // TypeScript and JavaScript
     "ms-vscode.vscode-typescript-next",
     
-    // Code formatting
+    // Code formatting and quality
     "esbenp.prettier-vscode",
-    
-    // Linting
     "dbaeumer.vscode-eslint",
     
     // Testing
     "firsttris.vscode-jest-runner",
-    "ms-vscode.test-adapter-converter",
+    "orta.vscode-jest",
     
     // React development
     "formulahendry.auto-rename-tag",
-    "bradlc.vscode-tailwindcss",
+    "dsznajder.es7-react-js-snippets",
+    "burkeholland.simple-react-snippets",
     
     // General development
     "christian-kohler.path-intellisense",
     "ms-vscode.vscode-json",
-    "ms-vscode.vscode-npm-scripts",
-    
-    // Git
-    "eamodio.gitlens",
-    
-    // Debugging
-    "ms-vscode.vscode-js-debug",
-    
-    // Documentation
     "yzhang.markdown-all-in-one",
     
-    // Monorepo support
-    "ms-vscode.vscode-workspace-trust"
+    // Git and version control
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github",
+    "github.vscode-github-actions",
+    
+    // Debugging
+    "ms-vscode.js-debug",
+    
+    // Monorepo and package management
+    "arcanis.vscode-zipfs",
+    
+    // Productivity
+    "usernamehw.errorlens",
+    "aaron-bond.better-comments",
+    "streetsidesoftware.code-spell-checker",
+    
+    // Documentation
+    "bierner.markdown-preview-github-styles"
   ],
+  
   "unwantedRecommendations": [
     "ms-vscode.vscode-typescript",
-    "hookyqr.beautify"
+    "hookyqr.beautify",
+    "ms-vscode.node-debug2",
+    "ms-vscode.vscode-test-adapter-api"
   ]
 }

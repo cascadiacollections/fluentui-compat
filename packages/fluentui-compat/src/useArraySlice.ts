@@ -1,8 +1,8 @@
 import * as React from 'react';
 
 // React 18+ progressive support - conditionally use newer APIs with proper typing
-const useId: () => string = React.useId ?? (() => Math.random().toString(36).substr(2, 9));
-const useDeferredValue = React.useDeferredValue ?? (<T>(value: T): T => value);
+const useId: () => string = (React as any).useId ?? (() => `hook-${Math.random().toString(36).substring(2, 11)}`);
+const useDeferredValue = (React as any).useDeferredValue ?? (<T>(value: T): T => value);
 
 /**
  * Generates a collision-resistant hash from a string using a simple but effective algorithm.

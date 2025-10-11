@@ -99,8 +99,8 @@ Creates a memoized compound icon component.
 
 This package requires the following peer dependencies:
 
-- `react` >= 16.14.0 < 19.0.0
-- `react-dom` >= 16.14.0 < 19.0.0
+- `react` >= 16.14.0 < 20.0.0
+- `react-dom` >= 16.14.0 < 20.0.0
 - `@fluentui/react-icons` >= 2.0.0
 
 ## Dependencies

@@ -1,0 +1,9 @@
+{
+  "name": "rush-mcp-server-autoinstaller",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Autoinstaller for @rushstack/mcp-server to enable AI coding assistants",
+  "dependencies": {
+    "@rushstack/mcp-server": "^0.3.1"
+  }
+}

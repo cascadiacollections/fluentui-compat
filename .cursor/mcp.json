@@ -1,0 +1,10 @@
+{
+  "$schema": "https://github.com/microsoft/vscode/raw/main/extensions/github-authentication/mcp-schema.json",
+  "mcpServers": {
+    "rush-mcp-server": {
+      "comment": "RushStack MCP server integration for AI coding assistants. See https://rushjs.io/pages/ai/rush_mcp/",
+      "packageName": "@rushstack/mcp-server",
+      "entryPoint": "lib/start"
+    }
+  }
+}

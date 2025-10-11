@@ -90,6 +90,39 @@ This repository includes DevContainer configuration for consistent development e
 
 The DevContainer will automatically run `rush update` after creation to install all dependencies.
 
+## AI Coding Assistant Support
+
+This repository includes integration with the [RushStack MCP server](https://rushjs.io/pages/ai/rush_mcp/) to enhance AI coding assistants like GitHub Copilot, Cursor, and VS Code with Copilot.
+
+### What is MCP?
+
+The Model Context Protocol (MCP) is a standardized protocol that enables AI coding assistants to understand and work with your Rush monorepo structure. The RushStack MCP server provides:
+
+- **Repository structure awareness**: Helps AI understand your monorepo organization
+- **Project dependency information**: Enables AI to understand relationships between packages
+- **Rush-specific commands**: Provides AI with knowledge of Rush tooling and workflows
+- **Build and configuration context**: Gives AI insight into your build system
+
+### Configuration
+
+The MCP server is pre-configured in this repository via `.cursor/mcp.json` and is automatically available when using compatible AI coding assistants. The server is installed as an autoinstaller package managed by Rush.
+
+#### Supported AI Coding Assistants
+
+- **Cursor**: Automatically detects and uses `.cursor/mcp.json`
+- **VS Code with GitHub Copilot**: Requires MCP extension and configuration
+- **Other MCP-compatible tools**: Can be configured to use the Rush MCP server
+
+#### Manual Setup (if needed)
+
+If you're using an AI coding assistant that requires manual MCP configuration, the server is located at:
+
+```
+common/autoinstallers/rush-mcp-server/node_modules/.bin/rush-mcp-server
+```
+
+For more information about the Rush MCP server, see the [official documentation](https://rushjs.io/pages/ai/rush_mcp/).
+
 ## Packages
 
 This monorepo contains two main packages:

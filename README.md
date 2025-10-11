@@ -231,6 +231,50 @@ function MyComponent() {
 - **React DevTools Integration**: Provides debugging information in development
 - **Performance Optimized**: Uses stable references to prevent unnecessary re-renders
 
+## useEventCallback
+
+A React hook that creates stable event handlers that always call the latest version of the callback, preventing unnecessary re-renders while accessing fresh props/state.
+
+### useEventCallback Usage
+
+```typescript
+import { useEventCallback } from "@cascadiacollections/fluentui-compat";
+import { useState, useCallback } from "react";
+
+function SearchComponent() {
+  const [query, setQuery] = useState("");
+  const [filters, setFilters] = useState({});
+
+  // The callback reference stays stable across renders
+  // but always accesses the latest query and filters
+  const handleSearch = useEventCallback(() => {
+    performSearch(query, filters);
+  });
+
+  return (
+    <>
+      <input value={query} onChange={(e) => setQuery(e.target.value)} />
+      <MemoizedResults onSearch={handleSearch} />
+    </>
+  );
+}
+```
+
+### useEventCallback Features
+
+- **Stable Reference**: The returned callback has a stable identity that never changes
+- **Fresh Values**: Always executes the latest version of the callback with current props/state
+- **Performance Optimized**: Prevents re-renders in child components that depend on the callback
+- **Type Safe**: Full TypeScript support with generic argument and return types
+- **React 19 Compatible**: Uses useLayoutEffect for synchronous updates
+
+### When to Use useEventCallback
+
+- Event handlers that depend on frequently changing props/state
+- Callbacks passed to memoized child components to prevent unnecessary re-renders
+- Event listeners attached to window, document, or long-lived DOM elements
+- Callbacks in useEffect dependencies that shouldn't trigger the effect on every change
+
 ## Webpack Plugin Usage
 
 For automatic import rewriting in your build process, use the webpack plugin:

@@ -4,6 +4,7 @@ export { useAsync } from './useAsync';
 export { useBoolean } from './useBoolean';
 export type { IUseBooleanCallbacks } from './useBoolean';
 export { useConst } from './useConst';
+export { useEventCallback } from './useEventCallback';
 export { useForceUpdate } from './useForceUpdate';
 export { useSetTimeout } from './useSetTimeout';
 export type { UseSetTimeoutReturnType, TimeoutId } from './useSetTimeout';

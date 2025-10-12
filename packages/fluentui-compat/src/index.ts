@@ -1,7 +1,13 @@
 export { bundleIcon } from './bundleIcon';
 export type { BundledIconProps } from './bundleIcon';
 export { useAsync } from './useAsync';
+export { useBoolean } from './useBoolean';
+export type { IUseBooleanCallbacks } from './useBoolean';
 export { useConst } from './useConst';
+export { useEventCallback } from './useEventCallback';
+export { useForceUpdate } from './useForceUpdate';
+export { useSetTimeout } from './useSetTimeout';
+export type { UseSetTimeoutReturnType, TimeoutId } from './useSetTimeout';
 export { SmartFluentProvider, FluentProvider } from './FluentProvider';
 export type { SmartFluentProviderProps } from './FluentProvider';
 export { FluentThemeConsumer } from './FluentThemeConsumer';

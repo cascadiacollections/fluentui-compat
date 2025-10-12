@@ -7,6 +7,8 @@
   "typescript.inlayHints.parameterNames.enabled": "all",
   "typescript.inlayHints.variableTypes.enabled": true,
   "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+  "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
+  "typescript.inlayHints.enumMemberValues.enabled": true,
 
   // Editor settings
   "editor.formatOnSave": true,
@@ -18,6 +20,11 @@
   "editor.rulers": [80, 120],
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
+  "editor.inlineSuggest.enabled": true,
+  "editor.suggestSelection": "first",
+  "editor.linkedEditing": true,
+  "editor.wordWrap": "on",
+  "editor.wordWrapColumn": 120,
 
   // ESLint settings
   "eslint.workingDirectories": [
@@ -30,14 +37,28 @@
     "typescript",
     "typescriptreact"
   ],
+  "eslint.format.enable": false,
+  "eslint.lintTask.enable": true,
 
   // Jest settings
   "jest.autoRun": "off",
   "jest.runMode": "on-demand",
+  "jest.coverageFormatter": "DefaultFormatter",
+
+  // GitHub Copilot settings
+  "github.copilot.enable": {
+    "*": true,
+    "markdown": true,
+    "typescript": true,
+    "typescriptreact": true,
+    "javascript": true,
+    "javascriptreact": true
+  },
 
   // File associations
   "files.associations": {
-    "*.json": "jsonc"
+    "*.json": "jsonc",
+    ".pnpmfile.cjs": "javascript"
   },
 
   // Search settings
@@ -47,7 +68,9 @@
     "**/temp": true,
     "**/common/temp": true,
     "**/.rush": true,
-    "**/rush-logs": true
+    "**/rush-logs": true,
+    "**/*.d.ts": true,
+    "**/coverage": true
   },
 
   // File watcher settings
@@ -57,21 +80,58 @@
     "**/temp/**": true,
     "**/common/temp/**": true,
     "**/.rush/**": true,
-    "**/rush-logs/**": true
+    "**/rush-logs/**": true,
+    "**/coverage/**": true
   },
 
   // Git settings
   "git.ignoreLimitWarning": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
 
   // NPM settings
   "npm.packageManager": "pnpm",
+  "npm.enableRunFromFolder": true,
 
   // Explorer settings
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
-    "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.d.ts.map",
-    "*.tsx": "${capture}.js, ${capture}.d.ts, ${capture}.d.ts.map",
+    "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.d.ts.map, ${capture}.test.ts, ${capture}.test.tsx",
+    "*.tsx": "${capture}.js, ${capture}.d.ts, ${capture}.d.ts.map, ${capture}.test.tsx",
     "tsconfig.json": "tsconfig.*.json",
-    "package.json": "package-lock.json, pnpm-lock.yaml, yarn.lock"
-  }
+    "package.json": "package-lock.json, pnpm-lock.yaml, yarn.lock, .npmrc, .npmignore",
+    ".eslintrc.js": ".eslintrc.*, .eslintignore",
+    "jest.config.js": "jest.config.*, jest.setup.*"
+  },
+
+  // Terminal settings
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+
+  // Markdown settings
+  "markdown.validate.enabled": true,
+  "markdown.updateLinksOnFileMove.enabled": "always",
+
+  // JSON settings
+  "json.schemas": [
+    {
+      "fileMatch": ["rush.json"],
+      "url": "https://rushjs.io/schemas/rush.schema.json"
+    },
+    {
+      "fileMatch": ["common/config/rush/*.json"],
+      "url": "https://rushjs.io/schemas/command-line.schema.json"
+    }
+  ],
+
+  // Emmet
+  "emmet.includeLanguages": {
+    "typescript": "typescriptreact",
+    "javascript": "javascriptreact"
+  },
+
+  // Problems panel
+  "problems.showCurrentInStatus": true
 }

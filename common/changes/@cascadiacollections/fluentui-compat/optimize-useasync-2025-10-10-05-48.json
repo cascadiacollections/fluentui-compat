@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Optimize useAsync for runtime memory and React render performance. Replaced useMemo with useRef to eliminate closure overhead. Consolidated multiple useEffect calls into single effect to reduce hook overhead. Improved immutability patterns and TypeScript type safety.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat"
+}

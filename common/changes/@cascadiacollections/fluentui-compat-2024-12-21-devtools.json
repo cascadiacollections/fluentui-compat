@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Add DevTools support and development build logging to useForceUpdate hook for performance monitoring",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "KevinTCoughlin@users.noreply.github.com"
+}

@@ -1,44 +1,132 @@
 {
-  "name": "@cascadiacollections/fluent-compat devcontainer",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "name": "FluentUI Compat Development",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bookworm",
+  
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20",
+      "nodeGypDependencies": true
+    }
   },
+  
   "customizations": {
     "vscode": {
       "extensions": [
+        // AI & Copilot
+        "github.copilot",
+        "github.copilot-chat",
+        
+        // TypeScript & JavaScript
         "ms-vscode.vscode-typescript-next",
+        
+        // Code Quality & Formatting
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
-        "ms-vscode.vscode-json",
-        "ms-vscode.vscode-npm-scripts",
-        "formulahendry.auto-rename-tag",
-        "christian-kohler.path-intellisense",
+        
+        // Testing
         "firsttris.vscode-jest-runner",
-        "ms-vscode.vscode-test-adapter-api",
-        "ms-vscode.node-debug2"
+        "orta.vscode-jest",
+        
+        // React Development
+        "formulahendry.auto-rename-tag",
+        "dsznajder.es7-react-js-snippets",
+        
+        // Utilities
+        "christian-kohler.path-intellisense",
+        "ms-vscode.vscode-json",
+        "yzhang.markdown-all-in-one",
+        
+        // Git & Version Control
+        "eamodio.gitlens",
+        "github.vscode-pull-request-github",
+        
+        // Debugging
+        "ms-vscode.js-debug",
+        
+        // Monorepo Support
+        "arcanis.vscode-zipfs"
       ],
+      
       "settings": {
+        // Editor
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": "explicit"
+          "source.fixAll.eslint": "explicit",
+          "source.organizeImports": "explicit"
         },
+        "editor.inlineSuggest.enabled": true,
+        
+        // TypeScript
         "typescript.preferences.importModuleSpecifier": "relative",
         "typescript.suggest.autoImports": true,
-        "jest.autoRun": "off",
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "typescript.preferences.includePackageJsonAutoImports": "on",
+        
+        // ESLint
         "eslint.workingDirectories": [
-          "packages/fluentui-compat"
-        ]
+          "packages/fluentui-compat",
+          "packages/fluentui-compat-webpack-plugin"
+        ],
+        "eslint.validate": [
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact"
+        ],
+        
+        // Jest
+        "jest.autoRun": "off",
+        "jest.runMode": "on-demand",
+        
+        // GitHub Copilot
+        "github.copilot.enable": {
+          "*": true,
+          "markdown": true,
+          "typescript": true,
+          "typescriptreact": true
+        },
+        "github.copilot.advanced": {
+          "debug.overrideEngine": "gpt-4"
+        },
+        
+        // NPM
+        "npm.packageManager": "pnpm",
+        
+        // Files
+        "files.exclude": {
+          "**/node_modules": true,
+          "**/dist": true,
+          "**/.rush": true
+        }
       }
     }
   },
+  
   "onCreateCommand": {
-    "install-rush": "npm install -g @microsoft/rush"
+    "install-rush": "npm install -g @microsoft/rush@latest"
   },
+  
   "postCreateCommand": {
-    "setup": "rush update"
+    "setup": "rush update && rush build"
   },
+  
+  "postAttachCommand": {
+    "install-hooks": "rush install"
+  },
+  
   "forwardPorts": [],
-  "remoteUser": "node"
+  
+  "remoteUser": "node",
+  
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gitconfig,target=/home/node/.gitconfig,type=bind,consistency=cached"
+  ],
+  
+  "remoteEnv": {
+    "NODE_ENV": "development"
+  }
 }

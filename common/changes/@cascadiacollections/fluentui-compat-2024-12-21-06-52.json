@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Add useSetTimeout hook with performance optimized timeout management and automatic cleanup",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "41898282+github-actions[bot]@users.noreply.github.com"
+}

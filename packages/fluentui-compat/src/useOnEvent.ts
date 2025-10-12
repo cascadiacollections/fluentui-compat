@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { useEventCallback } from './useEventCallback';
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
@@ -134,6 +133,7 @@ import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
  * 
  * @public
  */
+/* eslint-disable no-redeclare, no-undef */
 export function useOnEvent<K extends keyof WindowEventMap>(
   target: Window | null | undefined,
   eventName: K,
@@ -161,6 +161,7 @@ export function useOnEvent(
   handler: (event: Event) => void,
   options?: boolean | AddEventListenerOptions
 ): void;
+/* eslint-disable no-redeclare, no-undef */
 
 export function useOnEvent(
   target: EventTarget | null | undefined,
@@ -187,3 +188,5 @@ export function useOnEvent(
     };
   }, [target, eventName, stableHandler, options]);
 }
+
+/* eslint-enable no-redeclare, no-undef */

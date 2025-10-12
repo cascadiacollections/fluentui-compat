@@ -119,7 +119,6 @@ import * as React from 'react';
 export function useMergedRefs<T = any>(
   ...refs: Array<React.Ref<T> | undefined | null>
 ): React.RefCallback<T> {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return React.useCallback(
     (instance: T | null) => {
       // Update all provided refs with the new instance
@@ -139,6 +138,8 @@ export function useMergedRefs<T = any>(
         }
       });
     },
+    // We intentionally use the rest parameter as the dependency array
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     refs
   );
 }

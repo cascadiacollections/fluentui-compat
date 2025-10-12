@@ -107,15 +107,17 @@ let globalIdCounter = 0;
 export function useId(prefix: string = 'id'): string {
   // Use React's built-in useId if available (React 18+)
   // This provides better SSR hydration and avoids counter mismatches
-  if ('useId' in React && typeof (React as any).useId === 'function') {
-    const reactId = (React as any).useId();
-    // React's useId returns a string like ':r1:' so we add our prefix
-    return `${prefix}${reactId}`;
-  }
+  const hasNativeUseId = 'useId' in React && typeof (React as any).useId === 'function';
+  const nativeId = hasNativeUseId ? (React as any).useId() : null;
   
   // Fallback implementation for React 16 and 17
   // Use useRef to store the ID - it's only initialized once
   const idRef = React.useRef<string | null>(null);
+  
+  if (hasNativeUseId && nativeId) {
+    // React's useId returns a string like ':r1:' so we add our prefix
+    return `${prefix}${nativeId}`;
+  }
   
   if (idRef.current === null) {
     // Generate a new unique ID on first render

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Add memoizeFunction utilities with high-performance memoization, configurable cache management, WeakMap-based caching, and support for primitive and object arguments",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "41898282+github-actions[bot]@users.noreply.github.com"
+}

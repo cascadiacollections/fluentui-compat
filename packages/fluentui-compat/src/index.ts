@@ -13,3 +13,4 @@ export { useOnEvent } from './useOnEvent';
 export { usePrevious } from './usePrevious';
 export { useSetTimeout } from './useSetTimeout';
 export type { UseSetTimeoutReturnType, TimeoutId } from './useSetTimeout';
+export { memoizeFunction, createMemoizer, resetMemoizations, setMemoizeWeakMap } from './memoizeFunction';

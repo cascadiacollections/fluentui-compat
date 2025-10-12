@@ -1,5 +1,17 @@
 # GitHub Copilot Instructions
 
+## Scope and Applicability
+
+These instructions apply to the entire **fluentui-compat** repository and all packages within it. They guide GitHub Copilot and other AI coding assistants when working with:
+
+- **TypeScript/JavaScript files** (`.ts`, `.tsx`, `.js`, `.jsx`)
+- **Test files** using Jest and React Testing Library
+- **Configuration files** for build tools (TypeScript, ESLint, Jest, Webpack, Rush)
+- **Documentation files** (`.md`)
+- **All packages** in the monorepo under `packages/`
+
+These instructions are particularly important for maintaining consistency in code quality, testing patterns, and the critical requirement of change files for all package modifications.
+
 ## Project Overview
 
 This is **fluentui-compat**, a modern Rush monorepo containing high-performance utilities and components for FluentUI React. The project specializes in render performance optimizations and provides compatibility layers enabling FluentUI components to work seamlessly across React 16, 17, 18, and 19.
@@ -206,3 +218,7 @@ When working on this codebase, always remember:
 3. React 16-19 compatibility
 4. Comprehensive testing with modern patterns
 5. API surface management with API Extractor
+
+## Summary
+
+Following these guidelines ensures high-quality contributions that maintain the project's performance focus, broad React compatibility, and monorepo best practices. Always prioritize minimal bundle size impact, optimal render performance, and proper cleanup in all code you write or modify.

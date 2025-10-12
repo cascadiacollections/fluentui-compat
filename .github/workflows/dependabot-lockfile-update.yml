@@ -4,25 +4,34 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+# Cancel in-progress runs when a new workflow with the same group is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
   update-lockfile:
+    name: Update Lockfile for Dependabot PRs
     # Only run for dependabot PRs
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout PR
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 20
 
@@ -76,13 +85,13 @@ jobs:
           echo "Committing lockfile changes..."
           # Add all pnpm lockfiles that may have been updated
           git add common/config/rush/pnpm-lock.yaml packages/fluentui-compat-webpack-plugin/pnpm-lock.yaml
-          
+
           # Check if anything was actually staged
           if git diff --staged --quiet; then
             echo "No lockfile changes to commit"
             exit 0
           fi
-          
+
           git commit -m "chore: update pnpm lockfile for dependabot changes"
           git push
           echo "Successfully committed and pushed lockfile changes"

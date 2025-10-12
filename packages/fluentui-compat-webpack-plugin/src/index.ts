@@ -38,7 +38,8 @@ const DEFAULT_MAPPINGS: ImportMapping[] = [
     to: '@cascadiacollections/fluentui-compat',
     exports: {
       'useAsync': 'useAsync',
-      'useConst': 'useConst'
+      'useConst': 'useConst',
+      'useIsomorphicLayoutEffect': 'useIsomorphicLayoutEffect'
     }
   }
 ];

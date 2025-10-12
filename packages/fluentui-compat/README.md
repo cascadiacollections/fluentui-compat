@@ -40,6 +40,106 @@ function MyComponent() {
 - **React DevTools Integration**: Provides debugging information in development
 - **Performance Optimized**: Uses stable references to prevent unnecessary re-renders
 
+## Additional React Hooks
+
+The fluentui-compat package provides several additional high-performance React hooks optimized for modern applications:
+
+### useId
+
+Generates a stable unique ID for component instances, useful for accessibility attributes and form elements.
+
+```typescript
+import { useId } from 'fluentui-compat';
+
+function FormField() {
+  const inputId = useId('text-field');
+  
+  return (
+    <div>
+      <label htmlFor={inputId}>Name:</label>
+      <input id={inputId} type="text" />
+    </div>
+  );
+}
+```
+
+### usePrevious
+
+Tracks and returns the previous value of a prop or state across renders.
+
+```typescript
+import { usePrevious } from 'fluentui-compat';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  const previousCount = usePrevious(count);
+  
+  return (
+    <div>
+      <p>Current: {count}</p>
+      <p>Previous: {previousCount}</p>
+      <button onClick={() => setCount(c => c + 1)}>Increment</button>
+    </div>
+  );
+}
+```
+
+### useIsomorphicLayoutEffect
+
+A drop-in replacement for `useLayoutEffect` that works with server-side rendering by using `useEffect` on the server and `useLayoutEffect` in the browser.
+
+```typescript
+import { useIsomorphicLayoutEffect } from 'fluentui-compat';
+
+function MeasuredComponent() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState(0);
+  
+  useIsomorphicLayoutEffect(() => {
+    if (ref.current) {
+      setHeight(ref.current.offsetHeight);
+    }
+  }, []);
+  
+  return <div ref={ref}>Height: {height}px</div>;
+}
+```
+
+### useMergedRefs
+
+Merges multiple refs into a single callback ref, useful when you need to handle multiple refs on the same element.
+
+```typescript
+import { useMergedRefs } from 'fluentui-compat';
+import { forwardRef, useRef } from 'react';
+
+const FancyInput = forwardRef<HTMLInputElement>((props, forwardedRef) => {
+  const internalRef = useRef<HTMLInputElement>(null);
+  const mergedRef = useMergedRefs(internalRef, forwardedRef);
+  
+  return <input ref={mergedRef} {...props} />;
+});
+```
+
+### useOnEvent
+
+Attaches event listeners to window or document with automatic cleanup.
+
+```typescript
+import { useOnEvent } from 'fluentui-compat';
+import { useState } from 'react';
+
+function WindowSize() {
+  const [width, setWidth] = useState(window.innerWidth);
+  
+  useOnEvent(window, 'resize', () => {
+    setWidth(window.innerWidth);
+  });
+  
+  return <div>Window width: {width}px</div>;
+}
+```
+
 ## bundleIcon
 
 An optimized higher-order component for creating compound icons that can switch between filled and regular variants. This component is memoized for optimal render performance.

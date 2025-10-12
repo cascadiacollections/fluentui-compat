@@ -8,3 +8,4 @@ export { useEventCallback } from './useEventCallback';
 export { useForceUpdate } from './useForceUpdate';
 export { useSetTimeout } from './useSetTimeout';
 export type { UseSetTimeoutReturnType, TimeoutId } from './useSetTimeout';
+export { memoizeFunction, createMemoizer, resetMemoizations, setMemoizeWeakMap } from './memoizeFunction';

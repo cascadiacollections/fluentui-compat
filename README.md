@@ -134,6 +134,7 @@ The core compatibility library containing optimized FluentUI components and util
 - **bundleIcon**: Optimized higher-order component for creating compound icons
 - **useAsync**: React hook that provides an Async instance with automatic cleanup
 - **useConst**: React hook for creating constant values that don't change between renders
+- **memoizeFunction**: High-performance memoization utilities with configurable cache management
 
 ### `@cascadiacollections/fluentui-compat-webpack-plugin`
 
@@ -274,6 +275,65 @@ function SearchComponent() {
 - Callbacks passed to memoized child components to prevent unnecessary re-renders
 - Event listeners attached to window, document, or long-lived DOM elements
 - Callbacks in useEffect dependencies that shouldn't trigger the effect on every change
+
+## memoizeFunction
+
+High-performance memoization utilities optimized for runtime performance and memory efficiency. Based on FluentUI utilities with modern JavaScript optimizations.
+
+### memoizeFunction Usage
+
+```typescript
+import { memoizeFunction, createMemoizer, resetMemoizations } from "@cascadiacollections/fluentui-compat";
+
+// Basic memoization with configurable cache size
+const expensiveComputation = memoizeFunction((a: number, b: string) => {
+  console.log('Computing...'); // Only called once for same arguments
+  return a * b.length + Math.random();
+}, 100); // Max 100 cached results before reset
+
+const result1 = expensiveComputation(5, "hello"); // Computes
+const result2 = expensiveComputation(5, "hello"); // Cached
+
+// For single-object-argument functions, use createMemoizer
+const optimizedTransform = createMemoizer((obj: SomeObject) => ({
+  ...obj,
+  computed: performExpensiveComputation(obj)
+}));
+
+// Global cache reset
+resetMemoizations(); // Clears all memoized function caches
+```
+
+### memoizeFunction API
+
+#### `memoizeFunction(fn, maxCacheSize?, ignoreNullOrUndefinedResult?)`
+
+Memoizes a function with configurable cache management.
+
+**Parameters:**
+- `fn`: Function to memoize
+- `maxCacheSize`: Maximum cache entries before reset (default: 100, 0 = unlimited)
+- `ignoreNullOrUndefinedResult`: Re-compute null/undefined results until non-null (default: false)
+
+#### `createMemoizer(fn)`
+
+Creates a WeakMap-based memoizer for single-argument functions with object/function parameters.
+
+**Parameters:**
+- `fn`: Function to memoize (must accept single object/function argument)
+
+#### `resetMemoizations()`
+
+Resets all memoized function caches globally.
+
+### memoizeFunction Features
+
+- **WeakMap-Based Caching**: Automatic memory management with garbage collection
+- **Configurable Cache Limits**: Prevent memory leaks with size-based cache resets
+- **Error Caching**: Exceptions are cached to avoid re-computation of failing operations  
+- **Primitive Value Support**: Efficient caching of primitive arguments using shared dictionary
+- **Global Reset Capability**: Bulk cache invalidation for testing and development
+- **Performance Optimized**: Minimized object allocation and fast argument normalization
 
 ## Webpack Plugin Usage
 

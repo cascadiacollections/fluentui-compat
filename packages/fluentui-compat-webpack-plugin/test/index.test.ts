@@ -112,10 +112,31 @@ describe("FluentUICompatPlugin", () => {
         "FluentUICompatPlugin",
         expect.any(Function)
       );
-      expect(mockCompiler.hooks.compilation.tap).toHaveBeenCalledWith(
-        "FluentUICompatPlugin",
-        expect.any(Function)
-      );
+    });
+
+    it("should register import rewrite loader when compiler.options exists", () => {
+      const mockCompilerWithOptions = {
+        ...createMockCompiler(),
+        options: {
+          module: {
+            rules: []
+          }
+        }
+      };
+
+      const plugin = new FluentUICompatPlugin();
+      plugin.apply(mockCompilerWithOptions as any);
+
+      // Check that a loader rule was added
+      expect(mockCompilerWithOptions.options.module.rules.length).toBeGreaterThan(0);
+      
+      // Check that the first rule is our import rewrite loader
+      const loaderRule = mockCompilerWithOptions.options.module.rules[0];
+      expect(loaderRule).toHaveProperty('test');
+      expect(loaderRule).toHaveProperty('exclude');
+      expect(loaderRule).toHaveProperty('use');
+      expect((loaderRule as any).use).toHaveProperty('loader');
+      expect((loaderRule as any).use.loader).toContain('importRewriteLoader');
     });
 
     it("should register factory hooks for Webpack 5", () => {

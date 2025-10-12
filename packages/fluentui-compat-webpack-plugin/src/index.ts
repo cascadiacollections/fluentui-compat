@@ -83,8 +83,33 @@ export class FluentUICompatPlugin implements WebpackPlugin {
 
   apply(compiler: Compiler): void {
     const pluginName = 'FluentUICompatPlugin';
+    const path = require('path');
 
-    // Hook into the normalModuleFactory to intercept and rewrite imports
+    // Register the import rewrite loader for source files if compiler.options exists
+    // This loader uses Babel AST transformation to selectively rewrite imports
+    if (compiler.options) {
+      const loaderPath = path.resolve(__dirname, 'importRewriteLoader.js');
+      
+      compiler.options.module = compiler.options.module || { rules: [] };
+      compiler.options.module.rules = compiler.options.module.rules || [];
+      
+      // Add the loader at the beginning to ensure it runs on source files
+      compiler.options.module.rules.unshift({
+        test: /\.(js|mjs|jsx|ts|tsx)$/,
+        // Exclude node_modules to avoid rewriting third-party code
+        exclude: /node_modules/,
+        use: {
+          loader: loaderPath,
+          options: {
+            mappings: this.options.mappings,
+            verbose: this.options.verbose
+          }
+        }
+      });
+    }
+
+    // Also hook into the normalModuleFactory for package-level resolution
+    // This ensures deep imports (e.g., '@fluentui/utilities/lib/Async') are handled
     compiler.hooks.normalModuleFactory.tap(pluginName, (factory: any) => {
       // Use different hooks based on Webpack version
       if (factory.hooks.beforeResolve) {
@@ -116,15 +141,6 @@ export class FluentUICompatPlugin implements WebpackPlugin {
           });
         });
       }
-    });
-
-    // Additional hook for handling require() calls and dynamic imports
-    compiler.hooks.compilation.tap(pluginName, (compilation: any) => {
-      // Hook into the parser to handle require() and import() expressions
-      compilation.hooks.normalModuleLoader.tap(pluginName, () => {
-        // This will be handled by the module rewriting logic above
-        // Additional processing could be added here if needed
-      });
     });
   }
 

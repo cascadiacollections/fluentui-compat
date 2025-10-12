@@ -33,6 +33,13 @@ rush change
 rush change --verify
 ```
 
+**Important Notes**:
+- Change files are stored in `common/changes/@cascadiacollections/<package-name>/`
+- Each change file is a JSON file describing the change type (major/minor/patch/none) and comment
+- Change files MUST be committed along with code changes
+- Without change files, CI builds will fail with: "require change descriptions, but change descriptions were not detected"
+- In CI environments with shallow clones, ensure main branch is properly fetched: `git fetch origin main:refs/remotes/origin/main`
+
 ### DevContainer (Recommended)
 The project includes a modern DevContainer configuration with:
 - Node.js 20 LTS
@@ -182,6 +189,39 @@ Uses `.pnpmfile.cjs` to override peer dependencies of third-party packages for R
 - **Package README**: Comprehensive README files in each package directory
 - **Change logs**: Automatically generated from change files during publish
 - **Examples**: Real-world usage examples in package documentation
+
+## Troubleshooting
+
+### CI Build Errors: "require change descriptions"
+
+**Error Message:**
+```
+ERROR: The following projects have been changed and require change descriptions,
+but change descriptions were not detected for them:
+- @cascadiacollections/fluentui-compat
+```
+
+**Solution:**
+1. Ensure main branch is fetched: `git fetch origin main:refs/remotes/origin/main`
+2. Run `rush change` and follow prompts to create change file
+3. Commit the generated change file in `common/changes/` along with your code changes
+4. Change files are required for ALL package modifications (even documentation)
+
+**Common Causes:**
+- Forgot to run `rush change` after modifying package files
+- Change file not committed to git
+- Shallow git clone missing merge-base (common in CI)
+
+### Git Shallow Clone Issues
+
+If `rush change` fails with "Unable to determine merge base":
+```bash
+# Fetch the main branch properly
+git fetch origin main:refs/remotes/origin/main
+
+# Then run rush change
+rush change
+```
 
 ## AI-Assisted Development with Copilot
 

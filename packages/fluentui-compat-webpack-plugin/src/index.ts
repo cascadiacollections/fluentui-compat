@@ -46,8 +46,19 @@ const DEFAULT_MAPPINGS: ImportMapping[] = [
 /**
  * Webpack plugin that rewrites imports from FluentUI packages to use fluentui-compat alternatives
  * 
- * This plugin is compatible with both Webpack 4 and 5 and can rewrite both ES6 import statements
- * and CommonJS require() calls.
+ * This plugin uses a dual approach for comprehensive import rewriting:
+ * 
+ * 1. **AST Transformation (via loader)**: Processes source files with Babel to rewrite import statements,
+ *    allowing selective rewriting where only specific named exports are mapped while others remain with
+ *    the original package. This handles cases like:
+ *    `import { useAsync, OtherExport } from '@fluentui/utilities'`
+ *    which becomes two imports - one for mapped exports and one for unmapped.
+ * 
+ * 2. **Module Resolution Rewriting (via hooks)**: Intercepts module resolution to handle deep imports
+ *    like `@fluentui/utilities/lib/Async` that bypass normal import statements.
+ * 
+ * The plugin is compatible with both Webpack 4 and 5 and works with ES6 import statements,
+ * CommonJS require() calls, TypeScript, and JavaScript files.
  * 
  * @example
  * ```javascript

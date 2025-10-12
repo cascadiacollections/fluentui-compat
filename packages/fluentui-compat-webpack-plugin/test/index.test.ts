@@ -46,6 +46,32 @@ describe("importRewriteLoader", () => {
       `import FluentUI, * as Fluent from '@fluentui/utilities'`
     );
   });
+
+  it("handles multiple imports with complex scenarios", () => {
+    const input = `
+import { useAsync, useConst, SomethingElse, AnotherThing } from '@fluentui/utilities';
+import { Foo } from '@other/package';
+    `.trim();
+    
+    const output = importRewriteLoader.call(
+      { getOptions: () => ({ verbose: false }) },
+      input
+    );
+    
+    // Should have compat import for mapped exports
+    expect(output).toContain(`from "@cascadiacollections/fluentui-compat"`);
+    expect(output).toMatch(/useAsync/);
+    expect(output).toMatch(/useConst/);
+    
+    // Should preserve original import for unmapped exports
+    expect(output).toContain(`from '@fluentui/utilities'`);
+    expect(output).toMatch(/SomethingElse/);
+    expect(output).toMatch(/AnotherThing/);
+    
+    // Should not touch other packages
+    expect(output).toContain(`from '@other/package'`);
+    expect(output).toMatch(/Foo/);
+  });
 });
 import { FluentUICompatPlugin, ImportMapping } from "../src/index";
 

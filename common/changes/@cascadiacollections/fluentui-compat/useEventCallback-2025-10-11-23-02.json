@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Add useEventCallback hook for stable event handlers that access fresh props/state. Implements latest React 19 patterns with useLayoutEffect for synchronous callback ref updates and useConst for stable function reference. Includes comprehensive JSDoc documentation, 19 test cases, and README documentation.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat"
+}

@@ -97,7 +97,7 @@ Creates a memoized compound icon component.
 
 ## SmartFluentProvider
 
-An intelligent FluentProvider that automatically detects when it would be redundant and either warns in development or skips creating a provider in production. This helps prevent unnecessary provider nesting while maintaining the same API as the standard FluentProvider.
+An intelligent FluentProvider that automatically detects when it would be redundant and warns in development. This helps prevent unnecessary provider nesting while maintaining the same API as the standard FluentProvider.
 
 ### Usage
 
@@ -110,7 +110,7 @@ function App() {
     <SmartFluentProvider theme={webLightTheme}>
       {/* Will automatically detect if this provider is redundant */}
       <SmartFluentProvider theme={webLightTheme}>
-        <MyComponent /> {/* Warning in dev, optimized in production */}
+        <MyComponent /> {/* Warning in dev */}
       </SmartFluentProvider>
     </SmartFluentProvider>
   );
@@ -125,10 +125,10 @@ function App() {
 
 ### Features
 
-- **Anti-Deduplication**: Automatically detects redundant providers
+- **Redundancy Detection**: Automatically detects redundant providers
 - **Development Warnings**: Warns about unnecessary nesting in development
-- **Production Optimized**: Skips redundant providers in production builds
 - **Same API**: Drop-in replacement for FluentProvider
+- **API Compatible**: Maintains consistent behavior and DOM structure
 
 ## FluentThemeConsumer
 

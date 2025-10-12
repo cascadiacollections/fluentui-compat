@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { 
   useFluent_unstable as useFluent,
   ThemeContext_unstable as ThemeContext 
@@ -8,14 +8,13 @@ import {
 } from '@fluentui/react-components';
 import type { FluentProviderProps } from '@fluentui/react-components';
 
-// Helper to compare theme objects
-function areThemesEqual(theme1: any, theme2: any): boolean {
-  // Quick reference check
+/**
+ * Helper to compare theme objects using reference equality.
+ * This is a conservative approach that avoids false positives.
+ */
+function areThemesEqual(theme1: unknown, theme2: unknown): boolean {
   if (theme1 === theme2) return true;
   if (!theme1 || !theme2) return false;
-  
-  // For now, if they're different objects, assume they're different themes
-  // This is a conservative approach that avoids false positives
   return false;
 }
 
@@ -42,55 +41,58 @@ export interface SmartFluentProviderProps extends FluentProviderProps {
  * ```
  */
 export const SmartFluentProvider = React.forwardRef<HTMLDivElement, SmartFluentProviderProps>((props, ref) => {
-  const { forceRender = false, ...restProps } = props;
+  const { forceRender = false, theme, dir, targetDocument, overrides_unstable, customStyleHooks_unstable, children, ...restProps } = props;
   const parentContext = useFluent();
   const parentTheme = React.useContext(ThemeContext);
   
   // Check if this provider would be redundant
   const wouldBeRedundant = React.useMemo(() => {
     if (forceRender) return false;
-    if (!props.theme) return true;
-    
-    // If we don't have a parent theme, this provider is not redundant
+    if (!theme) return true;
     if (!parentTheme) return false;
     
-    // If themes are the same, this provider adds no value
-    if (areThemesEqual(parentTheme, props.theme)) {
-      // Also check other props for redundancy
-      const {
-        dir = parentContext.dir,
-        targetDocument = parentContext.targetDocument,
-        overrides_unstable = {},
-        customStyleHooks_unstable
-      } = props;
+    // If themes are the same, check other props for redundancy
+    if (areThemesEqual(parentTheme, theme)) {
+      const effectiveDir = dir ?? parentContext.dir;
+      const effectiveTargetDocument = targetDocument ?? parentContext.targetDocument;
+      const hasOverrides = overrides_unstable && Object.keys(overrides_unstable).length > 0;
       
       return (
-        dir === parentContext.dir &&
-        targetDocument === parentContext.targetDocument &&
-        Object.keys(overrides_unstable).length === 0 &&
+        effectiveDir === parentContext.dir &&
+        effectiveTargetDocument === parentContext.targetDocument &&
+        !hasOverrides &&
         !customStyleHooks_unstable
       );
     }
     
     return false;
-  }, [props, parentContext, parentTheme, forceRender]);
+  }, [forceRender, theme, parentTheme, dir, targetDocument, overrides_unstable, customStyleHooks_unstable, parentContext.dir, parentContext.targetDocument]);
   
-  // In development, warn about redundant providers
-  if (process.env.NODE_ENV !== 'production' && wouldBeRedundant && !forceRender) {
-    console.warn(
-      'SmartFluentProvider: This provider appears redundant. ' +
-      'It provides the same theme and context as its parent. ' +
-      'Consider removing it to improve performance.'
-    );
-  }
+  // In development, warn about redundant providers using useEffect
+  React.useEffect(() => {
+    if (process.env.NODE_ENV !== 'production' && wouldBeRedundant) {
+      console.warn(
+        'SmartFluentProvider: This provider appears redundant. ' +
+        'It provides the same theme and context as its parent. ' +
+        'Consider removing it to improve performance.'
+      );
+    }
+  }, [wouldBeRedundant]);
   
-  // If redundant, just render children without wrapping
-  if (wouldBeRedundant && process.env.NODE_ENV === 'production') {
-    return <div ref={ref}>{props.children}</div>;
-  }
-  
-  // Continue with normal provider logic using the original FluentProvider
-  return <OriginalFluentProvider ref={ref} {...restProps} />;
+  // Always use OriginalFluentProvider for consistent behavior and API compatibility
+  return (
+    <OriginalFluentProvider 
+      ref={ref} 
+      theme={theme}
+      dir={dir}
+      targetDocument={targetDocument}
+      overrides_unstable={overrides_unstable}
+      customStyleHooks_unstable={customStyleHooks_unstable}
+      {...restProps}
+    >
+      {children}
+    </OriginalFluentProvider>
+  );
 });
 
 SmartFluentProvider.displayName = 'SmartFluentProvider';

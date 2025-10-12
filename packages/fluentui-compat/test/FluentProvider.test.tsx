@@ -72,7 +72,7 @@ describe('SmartFluentProvider', () => {
     expect(mockWarn).not.toHaveBeenCalled();
   });
 
-  test('should skip provider wrapper in production when redundant', () => {
+  test('should not warn in production when redundant', () => {
     process.env.NODE_ENV = 'production';
     const sharedTheme = webLightTheme;
     
@@ -84,7 +84,7 @@ describe('SmartFluentProvider', () => {
       </OriginalFluentProvider>
     );
     
-    // In production, redundant providers should render as simple div
+    // In production, redundant providers should not warn
     const child = screen.getByTestId('child');
     expect(child).toBeInTheDocument();
     expect(mockWarn).not.toHaveBeenCalled();

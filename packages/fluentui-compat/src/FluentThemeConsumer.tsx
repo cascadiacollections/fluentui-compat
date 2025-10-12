@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { 
   ThemeContext_unstable as ThemeContext
 } from '@fluentui/react-shared-contexts';
@@ -39,22 +39,22 @@ export const FluentThemeConsumer = React.memo<FluentThemeConsumerProps>(({
 }) => {
   const parentTheme = React.useContext(ThemeContext);
   
-  // Shallow merge with parent theme - always call useMemo to comply with hooks rules
+  // Shallow merge with parent theme
   const mergedTheme = React.useMemo(
     () => themeOverrides ? { ...parentTheme, ...themeOverrides } : parentTheme,
     [parentTheme, themeOverrides]
   );
   
-  // Only create new context if we have overrides
-  if (!themeOverrides) {
-    return <div className={className}>{children}</div>;
-  }
-  
-  return (
+  // Conditionally render based on whether we have overrides
+  return themeOverrides ? (
     <div className={className} data-theme-override>
       <ThemeContext.Provider value={mergedTheme}>
         {children}
       </ThemeContext.Provider>
     </div>
+  ) : (
+    <div className={className}>{children}</div>
   );
 });
+
+FluentThemeConsumer.displayName = 'FluentThemeConsumer';

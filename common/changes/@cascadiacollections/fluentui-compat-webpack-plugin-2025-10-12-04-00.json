@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+      "comment": "Update default mappings to include useIsomorphicLayoutEffect from @fluentui/utilities",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+  "email": "copilot@github.com"
+}

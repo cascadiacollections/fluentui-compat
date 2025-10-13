@@ -38,7 +38,8 @@ const DEFAULT_MAPPINGS: ImportMapping[] = [
     to: '@cascadiacollections/fluentui-compat',
     exports: {
       'useAsync': 'useAsync',
-      'useConst': 'useConst'
+      'useConst': 'useConst',
+      'useIsomorphicLayoutEffect': 'useIsomorphicLayoutEffect'
     }
   }
 ];
@@ -46,8 +47,19 @@ const DEFAULT_MAPPINGS: ImportMapping[] = [
 /**
  * Webpack plugin that rewrites imports from FluentUI packages to use fluentui-compat alternatives
  * 
- * This plugin is compatible with both Webpack 4 and 5 and can rewrite both ES6 import statements
- * and CommonJS require() calls.
+ * This plugin uses a dual approach for comprehensive import rewriting:
+ * 
+ * 1. **AST Transformation (via loader)**: Processes source files with Babel to rewrite import statements,
+ *    allowing selective rewriting where only specific named exports are mapped while others remain with
+ *    the original package. This handles cases like:
+ *    `import { useAsync, OtherExport } from '@fluentui/utilities'`
+ *    which becomes two imports - one for mapped exports and one for unmapped.
+ * 
+ * 2. **Module Resolution Rewriting (via hooks)**: Intercepts module resolution to handle deep imports
+ *    like `@fluentui/utilities/lib/Async` that bypass normal import statements.
+ * 
+ * The plugin is compatible with both Webpack 4 and 5 and works with ES6 import statements,
+ * CommonJS require() calls, TypeScript, and JavaScript files.
  * 
  * @example
  * ```javascript
@@ -83,8 +95,33 @@ export class FluentUICompatPlugin implements WebpackPlugin {
 
   apply(compiler: Compiler): void {
     const pluginName = 'FluentUICompatPlugin';
+    const path = require('path');
 
-    // Hook into the normalModuleFactory to intercept and rewrite imports
+    // Register the import rewrite loader for source files if compiler.options exists
+    // This loader uses Babel AST transformation to selectively rewrite imports
+    if (compiler.options) {
+      const loaderPath = path.resolve(__dirname, 'importRewriteLoader.js');
+      
+      compiler.options.module = compiler.options.module || { rules: [] };
+      compiler.options.module.rules = compiler.options.module.rules || [];
+      
+      // Add the loader at the beginning to ensure it runs on source files
+      compiler.options.module.rules.unshift({
+        test: /\.(js|mjs|jsx|ts|tsx)$/,
+        // Exclude node_modules to avoid rewriting third-party code
+        exclude: /node_modules/,
+        use: {
+          loader: loaderPath,
+          options: {
+            mappings: this.options.mappings,
+            verbose: this.options.verbose
+          }
+        }
+      });
+    }
+
+    // Also hook into the normalModuleFactory for package-level resolution
+    // This ensures deep imports (e.g., '@fluentui/utilities/lib/Async') are handled
     compiler.hooks.normalModuleFactory.tap(pluginName, (factory: any) => {
       // Use different hooks based on Webpack version
       if (factory.hooks.beforeResolve) {
@@ -116,15 +153,6 @@ export class FluentUICompatPlugin implements WebpackPlugin {
           });
         });
       }
-    });
-
-    // Additional hook for handling require() calls and dynamic imports
-    compiler.hooks.compilation.tap(pluginName, (compilation: any) => {
-      // Hook into the parser to handle require() and import() expressions
-      compilation.hooks.normalModuleLoader.tap(pluginName, () => {
-        // This will be handled by the module rewriting logic above
-        // Additional processing could be added here if needed
-      });
     });
   }
 

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+      "comment": "Integrate importRewriteLoader for proper selective import rewriting. Add comprehensive unit test coverage achieving 100% statement, function, and line coverage with 40 tests. Fix plugin to use dual approach (AST transformation + module resolution) for handling mixed imports.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+  "email": "copilot@github.com"
+}

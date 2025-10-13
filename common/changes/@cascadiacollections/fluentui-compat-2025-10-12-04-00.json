@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Add five new React hooks: useId for stable ID generation, usePrevious for tracking previous values, useIsomorphicLayoutEffect for SSR-safe layout effects, useMergedRefs for combining multiple refs, and useOnEvent for document/window event listeners with automatic cleanup",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "copilot@github.com"
+}

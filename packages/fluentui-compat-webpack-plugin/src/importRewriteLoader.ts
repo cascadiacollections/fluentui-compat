@@ -83,8 +83,8 @@ export default function importRewriteLoader(this: any, source: string) {
               ? spec.imported.name
               : spec.imported.value;
             return t.importSpecifier(
-              t.identifier(exportMap![importedName]),
-              spec.local
+              spec.local,
+              t.identifier(exportMap![importedName])
             );
           }),
           t.stringLiteral(to)

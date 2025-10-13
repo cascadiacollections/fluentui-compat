@@ -1,4 +1,4 @@
-import { Async } from '@fluentui/utilities';
+import { Async } from './Async';
 import * as React from 'react';
 
 /**

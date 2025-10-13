@@ -9,10 +9,6 @@ importers:
   .: {}
 
   ../../packages/fluentui-compat:
-    dependencies:
-      '@fluentui/utilities':
-        specifier: ^8.15.22
-        version: 8.16.0(@types/react@19.2.2)(react@19.2.0)
     devDependencies:
       '@fluentui/react-components':
         specifier: ^9.0.0
@@ -693,25 +689,11 @@ packages:
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
     dev: true
 
-  /@fluentui/dom-utilities@2.3.10:
-    resolution: {integrity: sha512-6WDImiLqTOpkEtfUKSStcTDpzmJfL6ZammomcjawN9xH/8u8G3Hx72CIt2MNck9giw/oUlNLJFdWRAjeP3rmPQ==}
-    dependencies:
-      '@fluentui/set-version': 8.2.24
-      tslib: 2.8.1
-    dev: false
-
   /@fluentui/keyboard-keys@9.0.8:
     resolution: {integrity: sha512-iUSJUUHAyTosnXK8O2Ilbfxma+ZyZPMua5vB028Ys96z80v+LFwntoehlFsdH3rMuPsA8GaC1RE7LMezwPBPdw==}
     dependencies:
       '@swc/helpers': 0.5.17
     dev: true
-
-  /@fluentui/merge-styles@8.6.14:
-    resolution: {integrity: sha512-vghuHFAfQgS9WLIIs4kgDOCh/DHd5vGIddP4/bzposhlAVLZR6wUBqldm9AuCdY88r5LyCRMavVJLV+Up3xdvA==}
-    dependencies:
-      '@fluentui/set-version': 8.2.24
-      tslib: 2.8.1
-    dev: false
 
   /@fluentui/priority-overflow@9.2.0:
     resolution: {integrity: sha512-uwB5drtNGeEdLO3CEzM/VolyzkywIgpNhuOzFrLbKFxq20kCqteRDkUJIySgYu/+rK+Cyl8xiKmLzey49nlocg==}
@@ -2294,44 +2276,11 @@ packages:
       react-dom: 19.2.0(react@19.2.0)
     dev: true
 
-  /@fluentui/react-window-provider@2.2.30(@types/react@19.2.2)(react@19.2.0):
-    resolution: {integrity: sha512-2SXuiZcU29W0D9zfExcTfzVx97OI50YCn5fGGO0bTDuP5VxzTQp1mipAY4qm/yJMMinoXkzBGLl1rK0Tdtxh1w==}
-    peerDependencies:
-      '@types/react': '>=16.8.0 <20.0.0'
-      react: '>=16.8.0 <20.0.0'
-    dependencies:
-      '@fluentui/set-version': 8.2.24
-      '@types/react': 19.2.2
-      react: 19.2.0
-      tslib: 2.8.1
-    dev: false
-
-  /@fluentui/set-version@8.2.24:
-    resolution: {integrity: sha512-8uNi2ThvNgF+6d3q2luFVVdk/wZV0AbRfJ85kkvf2+oSRY+f6QVK0w13vMorNhA5puumKcZniZoAfUF02w7NSg==}
-    dependencies:
-      tslib: 2.8.1
-    dev: false
-
   /@fluentui/tokens@1.0.0-alpha.22:
     resolution: {integrity: sha512-i9fgYyyCWFRdUi+vQwnV6hp7wpLGK4p09B+O/f2u71GBXzPuniubPYvrIJYtl444DD6shLjYToJhQ1S6XTFwLg==}
     dependencies:
       '@swc/helpers': 0.5.17
     dev: true
-
-  /@fluentui/utilities@8.16.0(@types/react@19.2.2)(react@19.2.0):
-    resolution: {integrity: sha512-V8ZUYNhkUKjic5nxn8UeDnSxp3nJOY3rN3+Xszc/pGCSC2JW8DWfmtHV2lXOeyG3qnqOAfyeeysRopSnjEKoxw==}
-    peerDependencies:
-      '@types/react': '>=16.8.0 <20.0.0'
-      react: '>=16.8.0 <20.0.0'
-    dependencies:
-      '@fluentui/dom-utilities': 2.3.10
-      '@fluentui/merge-styles': 8.6.14
-      '@fluentui/react-window-provider': 2.2.30(@types/react@19.2.2)(react@19.2.0)
-      '@fluentui/set-version': 8.2.24
-      '@types/react': 19.2.2
-      react: 19.2.0
-      tslib: 2.8.1
-    dev: false
 
   /@griffel/core@1.19.2:
     resolution: {integrity: sha512-WkB/QQkjy9dE4vrNYGhQvRRUHFkYVOuaznVOMNTDT4pS9aTJ9XPrMTXXlkpcwaf0D3vNKoerj4zAwnU2lBzbOg==}
@@ -3214,6 +3163,7 @@ packages:
     resolution: {integrity: sha512-6mDvHUFSjyT2B2yeNx2nUgMxh9LtOWvkhIU3uePn2I2oyNymUAX1NIsdgviM4CH+JSrp2D2hsMvJOkxY+0wNRA==}
     dependencies:
       csstype: 3.1.3
+    dev: true
 
   /@types/stack-utils@2.0.3:
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
@@ -4316,6 +4266,7 @@ packages:
 
   /csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
+    dev: true
 
   /data-urls@5.0.0:
     resolution: {integrity: sha512-ZYP5VBHshaDAiVZxjbRVcFJpc+4xGgT0bK3vzy1HLN8jTO975HEbuYzZJcHoQEY5K1a0z8YayJkyVETa08eNTg==}
@@ -6772,6 +6723,7 @@ packages:
   /react@19.2.0:
     resolution: {integrity: sha512-tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ==}
     engines: {node: '>=0.10.0'}
+    dev: true
 
   /redent@3.0.0:
     resolution: {integrity: sha512-6tDA8g98We0zd0GvVeMT9arEOnTw9qM03L9cJXaCjrip1OO764RDBLBfrB4cwzNGDj5OA5ioymC9GkizgWJDUg==}
@@ -7427,6 +7379,7 @@ packages:
 
   /tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+    dev: true
 
   /type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}

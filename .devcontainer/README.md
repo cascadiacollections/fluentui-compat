@@ -5,7 +5,7 @@ This DevContainer provides a modern, AI-enhanced development environment for the
 ## Features
 
 ### Core Environment
-- **Node.js 20 LTS (Bookworm)** - Latest LTS with full ESM and modern features support
+- **Node.js 22 LTS (Bookworm)** - Latest LTS with full ESM and modern features support
 - **Rush CLI (Latest)** - Pre-installed for monorepo management  
 - **GitHub CLI** - For Git and GitHub operations
 - **PNPM 8.15.8** - Fast, disk-efficient package manager

@@ -47,7 +47,7 @@ See [COMPLEMENTARY_APIS.md](./COMPLEMENTARY_APIS.md) for a comprehensive enumera
 
 ### Prerequisites
 
-- Node.js >=18.20.3 <19.0.0 or >=20.14.0 <21.0.0 (LTS versions)
+- Node.js >=18.20.3 <19.0.0 or >=20.14.0 <21.0.0 or >=22.0.0 <23.0.0 (LTS versions, Node.js 22 LTS recommended)
 - Rush CLI: `npm install -g @microsoft/rush`
 
 ### Installation
@@ -71,7 +71,7 @@ rush build
 
 This repository includes DevContainer configuration for consistent development environments. The DevContainer provides:
 
-- Node.js 20 LTS (Bookworm base image)
+- Node.js 22 LTS (Bookworm base image)
 - Rush CLI pre-installed
 - VS Code extensions for TypeScript, React, ESLint, and Jest
 - GitHub Copilot integration

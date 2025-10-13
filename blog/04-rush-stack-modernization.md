@@ -413,7 +413,7 @@ To make onboarding even easier, we integrated everything into a DevContainer:
 // .devcontainer/devcontainer.json
 {
   "name": "FluentUI Compat",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
   
   "postCreateCommand": "npm install -g @microsoft/rush && rush update",
   

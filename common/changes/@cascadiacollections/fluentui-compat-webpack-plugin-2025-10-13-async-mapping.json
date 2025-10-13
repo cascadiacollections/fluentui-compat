@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+      "comment": "Add Async class to default import mappings. Update documentation to reflect Async class availability.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+  "email": "copilot@github.com"
+}

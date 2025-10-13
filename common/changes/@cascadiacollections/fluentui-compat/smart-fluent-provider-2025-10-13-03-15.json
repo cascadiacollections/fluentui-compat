@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Implement SmartFluentProvider and FluentThemeConsumer components from PR #52. SmartFluentProvider detects redundant provider nesting and warns in development. FluentThemeConsumer provides a lightweight alternative for theme overrides without full provider overhead.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "copilot@github.com"
+}

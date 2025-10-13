@@ -17,3 +17,7 @@ export { useSetTimeout } from './useSetTimeout';
 export type { UseSetTimeoutReturnType, TimeoutId } from './useSetTimeout';
 export { memoizeFunction, createMemoizer, resetMemoizations, setMemoizeWeakMap } from './memoizeFunction';
 export { getWindow } from './getWindow';
+export { SmartFluentProvider, FluentProvider } from './FluentProvider';
+export type { SmartFluentProviderProps } from './FluentProvider';
+export { FluentThemeConsumer } from './FluentThemeConsumer';
+export type { FluentThemeConsumerProps } from './FluentThemeConsumer';

@@ -151,6 +151,37 @@ import { Foo } from '@other/package';
     // Type imports should not be rewritten (they don't have runtime impact)
     expect(output).toContain(`from '@fluentui/utilities'`);
   });
+
+  it("handles aliased imports correctly", () => {
+    const input = `import { useAsync as myAsync } from '@fluentui/utilities';`;
+    const output = importRewriteLoader.call(
+      { getOptions: () => ({ verbose: false }) },
+      input
+    );
+    
+    // Should preserve the alias correctly: import { useAsync as myAsync }
+    expect(output).toContain(`from "@cascadiacollections/fluentui-compat"`);
+    expect(output).toContain("useAsync as myAsync");
+    // Should NOT have them backwards
+    expect(output).not.toContain("myAsync as useAsync");
+  });
+
+  it("handles mixed aliased and non-aliased imports", () => {
+    const input = `import { useAsync as myAsync, useConst, OtherThing } from '@fluentui/utilities';`;
+    const output = importRewriteLoader.call(
+      { getOptions: () => ({ verbose: false }) },
+      input
+    );
+    
+    // Should have compat import with aliased and non-aliased mapped exports
+    expect(output).toContain(`from "@cascadiacollections/fluentui-compat"`);
+    expect(output).toContain("useAsync as myAsync");
+    expect(output).toContain("useConst");
+    
+    // Should preserve original import for unmapped exports
+    expect(output).toContain(`from '@fluentui/utilities'`);
+    expect(output).toContain("OtherThing");
+  });
 });
 import { FluentUICompatPlugin, ImportMapping } from "../src/index";
 

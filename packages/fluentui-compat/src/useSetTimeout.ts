@@ -12,7 +12,7 @@ export type UseSetTimeoutReturnType = {
 const DEV_MAX_ACTIVE_TIMEOUTS = 50;
 const DEV_LONG_TIMEOUT_THRESHOLD = 60000; // 1 minute
 
-/** Check if we're in development mode (evaluated at runtime) */
+/** Check if we're in development mode (evaluated at runtime for test compatibility) */
 const isDevelopment = () => process.env.NODE_ENV !== 'production';
 
 /**

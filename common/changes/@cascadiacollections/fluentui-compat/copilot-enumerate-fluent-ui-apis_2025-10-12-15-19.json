@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Add comprehensive API documentation, enumeration of complementary APIs, and blog posts for all existing APIs. Optimize useAsync to use Symbol sentinel for better type safety.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat"
+}

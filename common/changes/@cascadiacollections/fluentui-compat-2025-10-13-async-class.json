@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Add optimized Async class with advanced features (ID pooling, batch operations, window caching, throttle/debounce). Export Async, ICancelable, and getWindow utility. Remove @fluentui/utilities dependency. Update useAsync to use local Async implementation.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "copilot@github.com"
+}

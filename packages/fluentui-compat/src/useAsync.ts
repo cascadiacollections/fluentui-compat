@@ -1,12 +1,12 @@
-import { Async } from '@fluentui/utilities';
+import { Async } from './Async';
 import * as React from 'react';
 
 /**
  * Sentinel value to indicate uninitialized async instance.
- * Using null as sentinel for better memory efficiency than Symbol.
+ * Using Symbol ensures no possible collision with user values.
  * @internal
  */
-const UNINITIALIZED = null;
+const UNINITIALIZED = Symbol('useAsync.uninitialized');
 
 /**
  * Hook to provide an Async instance that is automatically cleaned up on dismount.
@@ -42,7 +42,7 @@ const UNINITIALIZED = null;
 export function useAsync(): Async {
   // Use useRef for memory efficiency - no closure allocation like useMemo
   // Following the pattern from useConst for optimal performance
-  const asyncRef = React.useRef<Async | null>(UNINITIALIZED);
+  const asyncRef = React.useRef<Async | typeof UNINITIALIZED>(UNINITIALIZED);
   
   // Lazy initialization - only create instance on first render
   if (asyncRef.current === UNINITIALIZED) {
@@ -52,7 +52,8 @@ export function useAsync(): Async {
   // Single consolidated effect for cleanup and development warnings
   // Reduces effect overhead compared to multiple useEffect calls
   React.useEffect(() => {
-    const instance = asyncRef.current!;
+    // Type assertion is safe - we guarantee initialization before effect runs
+    const instance = asyncRef.current as Async;
     
     // Development-time monitoring - cache check result
     const isDevelopment = process.env.NODE_ENV === 'development';

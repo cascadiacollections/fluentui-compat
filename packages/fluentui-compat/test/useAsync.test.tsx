@@ -2,12 +2,12 @@ import React from 'react';
 import { render, renderHook, act } from '@testing-library/react';
 import { useAsync } from '../src/useAsync';
 
-// Mock the Async class from @fluentui/utilities
+// Mock the Async class from local module
 const mockDispose = jest.fn();
 const mockSetTimeout = jest.fn();
 const mockSetInterval = jest.fn();
 
-jest.mock('@fluentui/utilities', () => ({
+jest.mock('../src/Async', () => ({
   Async: jest.fn().mockImplementation(() => ({
     dispose: mockDispose,
     setTimeout: mockSetTimeout,

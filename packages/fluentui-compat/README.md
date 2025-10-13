@@ -12,7 +12,9 @@ npm install fluentui-compat
 
 ## useAsync
 
-A React hook that provides an Async instance from `@fluentui/utilities` that is automatically cleaned up on component unmount. This hook ensures proper cleanup of timeouts, intervals, and other async operations.
+A React hook that provides an optimized Async instance that is automatically cleaned up on component unmount. This hook ensures proper cleanup of timeouts, intervals, and other async operations.
+
+The underlying `Async` class is a high-performance utility optimized for React applications with features like ID pooling, batch timer operations, and window reference caching.
 
 ### Usage
 
@@ -39,6 +41,63 @@ function MyComponent() {
 - **Development Warnings**: Warns about potential race conditions in development mode  
 - **React DevTools Integration**: Provides debugging information in development
 - **Performance Optimized**: Uses stable references to prevent unnecessary re-renders
+- **Memory Efficient**: ID pooling and batch operations reduce allocations
+
+## Async Class
+
+The `Async` class provides a comprehensive API for managing asynchronous operations with automatic cleanup. It can be used directly when you need more control than the `useAsync` hook provides.
+
+### Usage
+
+```typescript
+import { Async } from 'fluentui-compat';
+
+class MyComponent extends React.Component {
+  private async: Async;
+  
+  constructor(props) {
+    super(props);
+    this.async = new Async(this);
+  }
+  
+  componentWillUnmount() {
+    this.async.dispose();
+  }
+  
+  handleClick = () => {
+    this.async.setTimeout(() => {
+      console.log('Delayed action');
+    }, 1000);
+  }
+  
+  render() {
+    return <button onClick={this.handleClick}>Start Timer</button>;
+  }
+}
+```
+
+### API
+
+The `Async` class provides the following methods:
+
+- `setTimeout(callback, duration)` - Schedule a timeout with automatic cleanup
+- `clearTimeout(id)` - Clear a scheduled timeout
+- `setInterval(callback, duration)` - Schedule an interval with automatic cleanup
+- `clearInterval(id)` - Clear a scheduled interval
+- `setImmediate(callback, element?)` - Schedule immediate execution
+- `clearImmediate(id, element?)` - Clear immediate execution
+- `requestAnimationFrame(callback, element?)` - Schedule animation frame
+- `cancelAnimationFrame(id, element?)` - Cancel animation frame
+- `throttle(func, wait, options?)` - Create a throttled function
+- `debounce(func, wait, options?)` - Create a debounced function with `cancel()`, `flush()`, and `pending()` methods
+- `dispose()` - Clean up all async operations
+
+### Performance Features
+
+- **ID Pooling**: Reuses numeric identifiers to reduce memory allocations
+- **Batch Operations**: Groups timer cleanup operations for better performance
+- **Window Caching**: Reduces repeated DOM queries
+- **Development Metrics**: Tracks usage patterns in development mode
 
 ## Additional React Hooks
 
@@ -202,12 +261,6 @@ This package requires the following peer dependencies:
 - `react` >= 16.14.0 < 20.0.0
 - `react-dom` >= 16.14.0 < 20.0.0
 - `@fluentui/react-icons` >= 2.0.0
-
-## Dependencies
-
-This package includes:
-
-- `@fluentui/utilities` for the Async utility class used by useAsync
 
 ## License
 

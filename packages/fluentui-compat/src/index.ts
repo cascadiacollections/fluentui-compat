@@ -1,5 +1,7 @@
 export { bundleIcon } from './bundleIcon';
 export type { BundledIconProps } from './bundleIcon';
+export { Async } from './Async';
+export type { ICancelable } from './Async';
 export { useAsync } from './useAsync';
 export { useBoolean } from './useBoolean';
 export type { IUseBooleanCallbacks } from './useBoolean';
@@ -14,3 +16,4 @@ export { usePrevious } from './usePrevious';
 export { useSetTimeout } from './useSetTimeout';
 export type { UseSetTimeoutReturnType, TimeoutId } from './useSetTimeout';
 export { memoizeFunction, createMemoizer, resetMemoizations, setMemoizeWeakMap } from './memoizeFunction';
+export { getWindow } from './getWindow';

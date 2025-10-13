@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+      "comment": "Fix critical bug in importRewriteLoader where arguments to t.importSpecifier() were swapped, causing aliased imports to be transformed incorrectly. Add test coverage for aliased imports to prevent regression.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+  "email": "copilot@github.com"
+}

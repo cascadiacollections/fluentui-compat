@@ -79,7 +79,7 @@ The transformation happens **during bundling**, so:
 
 ## Architecture
 
-The plugin consists of two main components:
+The plugin uses a dual approach for maximum flexibility:
 
 ### 1. Webpack Plugin (index.ts)
 
@@ -90,19 +90,35 @@ class FluentUICompatPlugin {
   }
   
   apply(compiler) {
-    // Register the import rewrite loader
-    compiler.options.module.rules.unshift({
-      test: /\.(js|mjs|jsx|ts|tsx)$/,
-      use: {
-        loader: require.resolve('./importRewriteLoader'),
-        options: this.options
-      }
+    // Register the import rewrite loader for AST-based transformation
+    if (compiler.options) {
+      compiler.options.module.rules.unshift({
+        test: /\.(js|mjs|jsx|ts|tsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: require.resolve('./importRewriteLoader'),
+          options: this.options
+        }
+      });
+    }
+    
+    // Also hook into module resolution for deep imports
+    compiler.hooks.normalModuleFactory.tap('FluentUICompatPlugin', (factory) => {
+      // Intercept and rewrite module resolution requests
+      factory.hooks.beforeResolve.tap('FluentUICompatPlugin', (resolveData) => {
+        // Rewrite deep imports like '@fluentui/utilities/lib/Async'
+        resolveData.request = this.rewriteRequest(resolveData.request);
+      });
     });
   }
 }
 ```
 
-The plugin registers a Webpack loader that processes JavaScript and TypeScript files.
+The plugin uses two complementary approaches:
+
+1. **AST Transformation (via loader)**: Rewrites import statements in your source code, allowing for selective rewriting where only specific named exports are mapped to the compat package while others remain with the original package.
+
+2. **Module Resolution Rewriting (via hooks)**: Intercepts module resolution to handle deep imports like `@fluentui/utilities/lib/Async` that bypass the standard import statement.
 
 ### 2. Import Rewrite Loader (importRewriteLoader.ts)
 

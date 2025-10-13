@@ -54,7 +54,7 @@ rush change --verify
 
 ### DevContainer (Recommended)
 The project includes a modern DevContainer configuration with:
-- Node.js 20 LTS
+- Node.js 22 LTS
 - GitHub Copilot integration
 - Pre-configured extensions and settings
 - Automatic dependency installation
@@ -70,7 +70,7 @@ The project includes a modern DevContainer configuration with:
 8. Submit PR with change files included
 
 ### Local Development
-1. **Prerequisites**: Node.js >=20.0.0, Rush CLI
+1. **Prerequisites**: Node.js >=20.0.0 (Node.js 22 LTS recommended), Rush CLI
 2. Install Rush CLI: `npm install -g @microsoft/rush`
 3. Run `rush update` to install dependencies
 4. Follow same workflow as DevContainer

@@ -47,7 +47,7 @@ See [COMPLEMENTARY_APIS.md](./COMPLEMENTARY_APIS.md) for a comprehensive enumera
 
 ### Prerequisites
 
-- Node.js >=18.20.3
+- Node.js >=18.20.3 <19.0.0 or >=20.14.0 <21.0.0 (LTS versions)
 - Rush CLI: `npm install -g @microsoft/rush`
 
 ### Installation
@@ -71,9 +71,10 @@ rush build
 
 This repository includes DevContainer configuration for consistent development environments. The DevContainer provides:
 
-- Node.js 20 (LTS)
+- Node.js 20 LTS (Bookworm base image)
 - Rush CLI pre-installed
 - VS Code extensions for TypeScript, React, ESLint, and Jest
+- GitHub Copilot integration
 - Automatic dependency installation
 
 ### Using DevContainer
@@ -135,10 +136,28 @@ This monorepo contains two main packages:
 
 The core compatibility library containing optimized FluentUI components and utilities:
 
+#### Components
 - **bundleIcon**: Optimized higher-order component for creating compound icons
+- **SmartFluentProvider / FluentProvider**: Context providers for FluentUI theme integration
+- **FluentThemeConsumer**: Consumer component for accessing FluentUI theme
+
+#### Hooks
 - **useAsync**: React hook that provides an Async instance with automatic cleanup
+- **useBoolean**: React hook for managing boolean state with stable callbacks
 - **useConst**: React hook for creating constant values that don't change between renders
+- **useEventCallback**: React hook for creating stable event handlers that access fresh values
+- **useForceUpdate**: React hook to force component re-renders when needed
+- **useId**: React hook for generating unique IDs with SSR support
+- **useIsomorphicLayoutEffect**: React hook that uses useLayoutEffect on client and useEffect on server
+- **useMergedRefs**: React hook for merging multiple refs into a single callback ref
+- **useOnEvent**: React hook for attaching event listeners to DOM elements with automatic cleanup
+- **usePrevious**: React hook for accessing the previous value of a prop or state
+- **useSetTimeout**: React hook for setTimeout with automatic cleanup
+
+#### Utilities
+- **Async**: Class for managing async operations with cancellation support
 - **memoizeFunction**: High-performance memoization utilities with configurable cache management
+- **getWindow**: Utility for safely accessing the window object in SSR environments
 
 ### `@cascadiacollections/fluentui-compat-webpack-plugin`
 
@@ -338,6 +357,330 @@ Resets all memoized function caches globally.
 - **Primitive Value Support**: Efficient caching of primitive arguments using shared dictionary
 - **Global Reset Capability**: Bulk cache invalidation for testing and development
 - **Performance Optimized**: Minimized object allocation and fast argument normalization
+
+## Additional Hooks and Utilities
+
+### useBoolean
+
+A React hook for managing boolean state with stable callback references to prevent unnecessary re-renders.
+
+```typescript
+import { useBoolean } from "@cascadiacollections/fluentui-compat";
+
+function MyComponent() {
+  const [isOpen, { setTrue: open, setFalse: close, toggle }] = useBoolean(false);
+
+  return (
+    <div>
+      <button onClick={toggle}>Toggle: {isOpen ? 'Open' : 'Closed'}</button>
+      <button onClick={open}>Open</button>
+      <button onClick={close}>Close</button>
+    </div>
+  );
+}
+```
+
+**Features:**
+- Stable callback references prevent child re-renders
+- 88% less boilerplate than useState with separate handlers
+- Full TypeScript support
+
+### useForceUpdate
+
+A React hook that forces a component to re-render. Useful for integrating with non-React state management.
+
+```typescript
+import { useForceUpdate } from "@cascadiacollections/fluentui-compat";
+
+function MyComponent() {
+  const forceUpdate = useForceUpdate();
+
+  const handleExternalStateChange = () => {
+    // When external state changes, force re-render
+    forceUpdate();
+  };
+
+  return <div>Component content</div>;
+}
+```
+
+**Features:**
+- Development warnings for excessive usage
+- Optimized with useReducer for best performance
+- Type-safe implementation
+
+### useSetTimeout
+
+A React hook for setTimeout with automatic cleanup on unmount, preventing memory leaks.
+
+```typescript
+import { useSetTimeout } from "@cascadiacollections/fluentui-compat";
+
+function MyComponent() {
+  const { setTimeout, clearTimeout } = useSetTimeout();
+
+  const handleClick = () => {
+    const timeoutId = setTimeout(() => {
+      console.log('Delayed action');
+    }, 1000);
+    
+    // Optionally clear manually
+    // clearTimeout(timeoutId);
+  };
+
+  return <button onClick={handleClick}>Start Timer</button>;
+  // Automatically cleaned up on unmount
+}
+```
+
+**Features:**
+- Automatic cleanup prevents memory leaks
+- 36-60% less code than manual cleanup
+- Compatible API with native setTimeout
+
+### useId
+
+A React hook for generating unique IDs with SSR (Server-Side Rendering) support.
+
+```typescript
+import { useId, resetIdCounter } from "@cascadiacollections/fluentui-compat";
+
+function FormField({ label }: { label: string }) {
+  const id = useId('field');
+
+  return (
+    <div>
+      <label htmlFor={id}>{label}</label>
+      <input id={id} type="text" />
+    </div>
+  );
+}
+
+// Reset ID counter for testing
+resetIdCounter(); // Typically used in test setup
+```
+
+**Features:**
+- SSR-compatible ID generation
+- Deterministic for server/client hydration
+- Optional prefix for debugging
+
+### useIsomorphicLayoutEffect
+
+A React hook that uses `useLayoutEffect` on the client and `useEffect` on the server, preventing SSR warnings.
+
+```typescript
+import { useIsomorphicLayoutEffect } from "@cascadiacollections/fluentui-compat";
+
+function MyComponent() {
+  useIsomorphicLayoutEffect(() => {
+    // Runs synchronously after DOM updates on client
+    // Runs as useEffect on server (no warnings)
+    measureAndUpdateLayout();
+  }, []);
+
+  return <div>Content</div>;
+}
+```
+
+**Features:**
+- Prevents SSR warnings
+- Synchronous layout updates on client
+- Safe for server rendering
+
+### useMergedRefs
+
+A React hook for merging multiple refs (callback refs, ref objects) into a single callback ref.
+
+```typescript
+import { useMergedRefs } from "@cascadiacollections/fluentui-compat";
+import { useRef, forwardRef } from "react";
+
+const MyComponent = forwardRef((props, forwardedRef) => {
+  const localRef = useRef<HTMLDivElement>(null);
+  const mergedRef = useMergedRefs(localRef, forwardedRef);
+
+  return <div ref={mergedRef}>Content</div>;
+});
+```
+
+**Features:**
+- Handles callback refs and ref objects
+- Null-safe implementation
+- Optimized for performance
+
+### useOnEvent
+
+A React hook for attaching event listeners to DOM elements with automatic cleanup.
+
+```typescript
+import { useOnEvent } from "@cascadiacollections/fluentui-compat";
+import { useRef } from "react";
+
+function MyComponent() {
+  const elementRef = useRef<HTMLDivElement>(null);
+
+  useOnEvent(
+    elementRef,
+    'click',
+    (event) => {
+      console.log('Element clicked', event);
+    },
+    true // useCapture
+  );
+
+  return <div ref={elementRef}>Click me</div>;
+  // Event listener automatically cleaned up on unmount
+}
+```
+
+**Features:**
+- Automatic cleanup on unmount
+- Supports capture phase
+- Type-safe event handling
+
+### usePrevious
+
+A React hook for accessing the previous value of a prop or state.
+
+```typescript
+import { usePrevious } from "@cascadiacollections/fluentui-compat";
+import { useState } from "react";
+
+function MyComponent() {
+  const [count, setCount] = useState(0);
+  const previousCount = usePrevious(count);
+
+  return (
+    <div>
+      <p>Current: {count}</p>
+      <p>Previous: {previousCount}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
+}
+```
+
+**Features:**
+- Tracks previous render value
+- Useful for detecting changes
+- Minimal performance overhead
+
+### Async Class
+
+A utility class for managing async operations with cancellation support, based on `@fluentui/utilities`.
+
+```typescript
+import { Async } from "@cascadiacollections/fluentui-compat";
+
+const async = new Async();
+
+// Set a timeout
+const timeoutId = async.setTimeout(() => {
+  console.log('Delayed action');
+}, 1000);
+
+// Set an interval
+async.setInterval(() => {
+  console.log('Repeating action');
+}, 1000);
+
+// Request animation frame
+async.requestAnimationFrame(() => {
+  console.log('Animation frame');
+});
+
+// Cancel all pending operations
+async.dispose();
+```
+
+**Features:**
+- Unified API for setTimeout, setInterval, requestAnimationFrame
+- Automatic cancellation via dispose()
+- Prevents memory leaks in long-lived objects
+
+**Note:** For React components, use `useAsync` hook instead for automatic cleanup.
+
+### FluentProvider Components
+
+Context providers for FluentUI theme integration with automatic detection and optimization.
+
+```typescript
+import { SmartFluentProvider, FluentProvider } from "@cascadiacollections/fluentui-compat";
+import { webLightTheme } from "@fluentui/react-components";
+
+// SmartFluentProvider only renders if theme is not already provided
+function App() {
+  return (
+    <SmartFluentProvider theme={webLightTheme}>
+      <YourApp />
+    </SmartFluentProvider>
+  );
+}
+
+// FluentProvider always renders (standard behavior)
+function AppWithForced() {
+  return (
+    <FluentProvider theme={webLightTheme}>
+      <YourApp />
+    </FluentProvider>
+  );
+}
+```
+
+**Features:**
+- **SmartFluentProvider**: Only provides theme if not already in context (prevents nested providers)
+- **FluentProvider**: Standard FluentUI provider behavior
+- Optimized for re-render performance
+
+### FluentThemeConsumer
+
+A consumer component for accessing FluentUI theme context.
+
+```typescript
+import { FluentThemeConsumer } from "@cascadiacollections/fluentui-compat";
+
+function ThemedComponent() {
+  return (
+    <FluentThemeConsumer>
+      {(theme) => (
+        <div style={{ color: theme.colorNeutralForeground1 }}>
+          Themed content
+        </div>
+      )}
+    </FluentThemeConsumer>
+  );
+}
+```
+
+**Features:**
+- Render props pattern for theme access
+- Type-safe theme object
+- Works with FluentUI v9 themes
+
+### getWindow
+
+A utility function for safely accessing the window object in SSR environments.
+
+```typescript
+import { getWindow } from "@cascadiacollections/fluentui-compat";
+
+function MyComponent() {
+  const win = getWindow();
+  
+  if (win) {
+    // Safe to use window APIs
+    console.log(win.innerWidth);
+  }
+  
+  return <div>Content</div>;
+}
+```
+
+**Features:**
+- Returns `undefined` in SSR environments
+- Prevents "window is not defined" errors
+- Type-safe window access
 
 ## Webpack Plugin Usage
 

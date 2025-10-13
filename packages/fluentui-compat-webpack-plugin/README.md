@@ -41,6 +41,7 @@ By default, the plugin includes these mappings:
 
 | Original Import | Rewritten To | Benefit |
 |----------------|-------------|---------|
+| `@fluentui/utilities` → `Async` | `@cascadiacollections/fluentui-compat` → `Async` | Optimized async operations manager |
 | `@fluentui/utilities` → `useAsync` | `@cascadiacollections/fluentui-compat` → `useAsync` | React hook with automatic cleanup |
 | `@fluentui/utilities` → `useConst` | `@cascadiacollections/fluentui-compat` → `useConst` | Optimized memoization hook |
 
@@ -48,7 +49,7 @@ By default, the plugin includes these mappings:
 
 **Before:**
 ```typescript
-import { useAsync } from '@fluentui/utilities';
+import { Async, useAsync } from '@fluentui/utilities';
 
 function MyComponent() {
   const async = useAsync(); // React hook usage
@@ -59,7 +60,7 @@ function MyComponent() {
 
 **After (automatically rewritten):**
 ```typescript
-import { useAsync } from '@cascadiacollections/fluentui-compat';
+import { Async, useAsync } from '@cascadiacollections/fluentui-compat';
 
 function MyComponent() {
   const async = useAsync(); // Optimized hook with automatic cleanup
@@ -222,7 +223,7 @@ module.exports = {
 2. **Add the plugin** to your webpack configuration
 3. **Build your project** - imports will be automatically rewritten
 4. **Test thoroughly** to ensure all functionality works correctly
-5. **Update import statements** if you were using the old `Async` class to use the `useAsync` hook instead
+5. **Optional**: The `Async` class and `useAsync` hook are fully compatible - both are now available from `@cascadiacollections/fluentui-compat`
 
 ## Troubleshooting
 

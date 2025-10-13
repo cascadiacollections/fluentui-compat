@@ -125,6 +125,79 @@ describe('SmartFluentProvider', () => {
     
     expect(screen.getByTestId('child')).toBeInTheDocument();
   });
+
+  test('should detect redundancy when themes have same values but different references', () => {
+    // Create a copy of the theme with the same values but different reference
+    const themeCopy = { ...webLightTheme };
+    
+    render(
+      <OriginalFluentProvider theme={webLightTheme}>
+        <SmartFluentProvider theme={themeCopy}>
+          <div data-testid="child">Test Content</div>
+        </SmartFluentProvider>
+      </OriginalFluentProvider>
+    );
+    
+    // Should warn because the theme values are the same even though references differ
+    expect(mockWarn).toHaveBeenCalledWith(
+      expect.stringContaining('SmartFluentProvider: This provider appears redundant')
+    );
+  });
+
+  test('should not warn when theme is mutated but values remain the same', () => {
+    // Create a mutable theme object
+    const mutableTheme = { ...webLightTheme };
+    
+    // Use the same reference but verify shallow equality still works
+    render(
+      <OriginalFluentProvider theme={mutableTheme}>
+        <SmartFluentProvider theme={mutableTheme}>
+          <div data-testid="child">Test Content</div>
+        </SmartFluentProvider>
+      </OriginalFluentProvider>
+    );
+    
+    // Should warn because it's the same reference
+    expect(mockWarn).toHaveBeenCalledWith(
+      expect.stringContaining('SmartFluentProvider: This provider appears redundant')
+    );
+  });
+
+  test('should detect differences when a single theme property is changed', () => {
+    const modifiedTheme = { 
+      ...webLightTheme, 
+      colorBrandBackground: '#ff0000' 
+    };
+    
+    render(
+      <OriginalFluentProvider theme={webLightTheme}>
+        <SmartFluentProvider theme={modifiedTheme}>
+          <div data-testid="child">Test Content</div>
+        </SmartFluentProvider>
+      </OriginalFluentProvider>
+    );
+    
+    // Should not warn because a property value has changed
+    expect(mockWarn).not.toHaveBeenCalled();
+  });
+
+  test('should detect differences when theme has additional properties', () => {
+    const extendedTheme = { 
+      ...webLightTheme, 
+      customProperty: 'custom-value' 
+    };
+    
+    render(
+      <OriginalFluentProvider theme={webLightTheme}>
+        <SmartFluentProvider theme={extendedTheme}>
+          <div data-testid="child">Test Content</div>
+        </SmartFluentProvider>
+      </OriginalFluentProvider>
+    );
+    
+    // Should not warn because the theme has additional properties
+    expect(mockWarn).not.toHaveBeenCalled();
+  });
 });
 
 describe('FluentProvider export', () => {

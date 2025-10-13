@@ -9,13 +9,43 @@ import {
 import type { FluentProviderProps } from '@fluentui/react-components';
 
 /**
- * Helper to compare theme objects using reference equality.
- * This is a conservative approach that avoids false positives.
+ * Helper to compare theme objects for equality.
+ * Performs a shallow equality check on theme properties to handle cases where
+ * developers mutate theme objects but the values remain the same.
+ * 
+ * This follows React best practices by avoiding deep recursion and focusing
+ * on the actual theme properties that FluentUI uses.
  */
 function areThemesEqual(theme1: unknown, theme2: unknown): boolean {
+  // Fast path: referential equality
   if (theme1 === theme2) return true;
+  
+  // If either is null/undefined, they're not equal unless both are
   if (!theme1 || !theme2) return false;
-  return false;
+  
+  // Type guard: ensure both are objects
+  if (typeof theme1 !== 'object' || typeof theme2 !== 'object') return false;
+  
+  const t1 = theme1 as Record<string, unknown>;
+  const t2 = theme2 as Record<string, unknown>;
+  
+  // Get all keys from both objects
+  const keys1 = Object.keys(t1);
+  const keys2 = Object.keys(t2);
+  
+  // Different number of properties means different themes
+  if (keys1.length !== keys2.length) return false;
+  
+  // Shallow compare all properties
+  for (const key of keys1) {
+    // Check if key exists in both objects
+    if (!(key in t2)) return false;
+    
+    // Shallow equality check for values
+    if (t1[key] !== t2[key]) return false;
+  }
+  
+  return true;
 }
 
 export interface SmartFluentProviderProps extends FluentProviderProps {

@@ -26,8 +26,8 @@ importers:
         specifier: ^7.44.0
         version: 7.53.1(@types/node@24.7.1)
       '@rushstack/heft':
-        specifier: ^0.74.0
-        version: 0.74.5(@types/node@24.7.1)
+        specifier: ^1.1.1
+        version: 1.1.1(@types/node@24.7.1)
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.1
@@ -2820,30 +2820,30 @@ packages:
     dev: true
     optional: true
 
-  /@rushstack/heft-config-file@0.18.4(@types/node@24.7.1):
-    resolution: {integrity: sha512-FYHF9FSQ7K3yWgrx1G6j6ZmM8+SAp62ia4wFwgj5mhzcwQ9G0AJqOofQkkHxe33bFYvF/OP848zIWrWwuwk1Qw==}
+  /@rushstack/heft-config-file@0.19.1(@types/node@24.7.1):
+    resolution: {integrity: sha512-Wnx6LxTExjr9Xgsd117r0JKua0dAVv/PbtvasZFp+136pnrr+io07QMSalrHj4p4KKygjhMJSl6CcjHYwkRTuA==}
     engines: {node: '>=10.13.0'}
     dependencies:
-      '@rushstack/node-core-library': 5.14.0(@types/node@24.7.1)
-      '@rushstack/rig-package': 0.5.3
-      '@rushstack/terminal': 0.16.0(@types/node@24.7.1)
+      '@rushstack/node-core-library': 5.17.0(@types/node@24.7.1)
+      '@rushstack/rig-package': 0.6.0
+      '@rushstack/terminal': 0.19.1(@types/node@24.7.1)
       '@ungap/structured-clone': 1.3.0
       jsonpath-plus: 10.3.0
     transitivePeerDependencies:
       - '@types/node'
     dev: true
 
-  /@rushstack/heft@0.74.5(@types/node@24.7.1):
-    resolution: {integrity: sha512-LSMofwrMXpcYirziEO3y1MJLDcGDyj4846ui5MbM2nrdKPBnjHIQrcm/VHX8o6TTy9mNDs7YK59uAQlZZfA6Tw==}
+  /@rushstack/heft@1.1.1(@types/node@24.7.1):
+    resolution: {integrity: sha512-JAeIV/SE8rj2Qeq5aKP5Quegf/q6nd4Wm29VmZVUr9083spoNhXavfcV/xQAz/Osm7MMfnfQN0LjIoRS+5wp1A==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     dependencies:
-      '@rushstack/heft-config-file': 0.18.4(@types/node@24.7.1)
-      '@rushstack/node-core-library': 5.14.0(@types/node@24.7.1)
-      '@rushstack/operation-graph': 0.3.2(@types/node@24.7.1)
-      '@rushstack/rig-package': 0.5.3
-      '@rushstack/terminal': 0.16.0(@types/node@24.7.1)
-      '@rushstack/ts-command-line': 5.0.3(@types/node@24.7.1)
+      '@rushstack/heft-config-file': 0.19.1(@types/node@24.7.1)
+      '@rushstack/node-core-library': 5.17.0(@types/node@24.7.1)
+      '@rushstack/operation-graph': 0.5.1(@types/node@24.7.1)
+      '@rushstack/rig-package': 0.6.0
+      '@rushstack/terminal': 0.19.1(@types/node@24.7.1)
+      '@rushstack/ts-command-line': 5.1.1(@types/node@24.7.1)
       '@types/tapable': 1.0.6
       fast-glob: 3.3.3
       git-repo-info: 2.1.1
@@ -2852,25 +2852,6 @@ packages:
       watchpack: 2.4.0
     transitivePeerDependencies:
       - '@types/node'
-    dev: true
-
-  /@rushstack/node-core-library@5.14.0(@types/node@24.7.1):
-    resolution: {integrity: sha512-eRong84/rwQUlATGFW3TMTYVyqL1vfW9Lf10PH+mVGfIb9HzU3h5AASNIw+axnBLjnD0n3rT5uQBwu9fvzATrg==}
-    peerDependencies:
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-    dependencies:
-      '@types/node': 24.7.1
-      ajv: 8.13.0
-      ajv-draft-04: 1.0.0(ajv@8.13.0)
-      ajv-formats: 3.0.1(ajv@8.13.0)
-      fs-extra: 11.3.2
-      import-lazy: 4.0.0
-      jju: 1.4.0
-      resolve: 1.22.10
-      semver: 7.5.4
     dev: true
 
   /@rushstack/node-core-library@5.17.0(@types/node@24.7.1):
@@ -2892,16 +2873,16 @@ packages:
       semver: 7.5.4
     dev: true
 
-  /@rushstack/operation-graph@0.3.2(@types/node@24.7.1):
-    resolution: {integrity: sha512-7hqUywwme2Y7Dnv5Tzuzsvy/NJq4hV5ylV9bLUkTyssqIhPzStIp8uXuvDmiZyA1qm0kvyipXnEmjyQfNucWHQ==}
+  /@rushstack/operation-graph@0.5.1(@types/node@24.7.1):
+    resolution: {integrity: sha512-yaTOiegt900UOMArgijzKh35ukBPluKfnMDn4T2A9RVJcfV9/VY2GLKe439hGhadYYgBxyi56WCV/1/nnJYkJQ==}
     peerDependencies:
       '@types/node': '*'
     peerDependenciesMeta:
       '@types/node':
         optional: true
     dependencies:
-      '@rushstack/node-core-library': 5.14.0(@types/node@24.7.1)
-      '@rushstack/terminal': 0.16.0(@types/node@24.7.1)
+      '@rushstack/node-core-library': 5.17.0(@types/node@24.7.1)
+      '@rushstack/terminal': 0.19.1(@types/node@24.7.1)
       '@types/node': 24.7.1
     dev: true
 
@@ -2916,31 +2897,11 @@ packages:
       '@types/node': 24.7.1
     dev: true
 
-  /@rushstack/rig-package@0.5.3:
-    resolution: {integrity: sha512-olzSSjYrvCNxUFZowevC3uz8gvKr3WTpHQ7BkpjtRpA3wK+T0ybep/SRUMfr195gBzJm5gaXw0ZMgjIyHqJUow==}
-    dependencies:
-      resolve: 1.22.10
-      strip-json-comments: 3.1.1
-    dev: true
-
   /@rushstack/rig-package@0.6.0:
     resolution: {integrity: sha512-ZQmfzsLE2+Y91GF15c65L/slMRVhF6Hycq04D4TwtdGaUAbIXXg9c5pKA5KFU7M4QMaihoobp9JJYpYcaY3zOw==}
     dependencies:
       resolve: 1.22.10
       strip-json-comments: 3.1.1
-    dev: true
-
-  /@rushstack/terminal@0.16.0(@types/node@24.7.1):
-    resolution: {integrity: sha512-WEvNuKkoR1PXorr9SxO0dqFdSp1BA+xzDrIm/Bwlc5YHg2FFg6oS+uCTYjerOhFuqCW+A3vKBm6EmKWSHfgx/A==}
-    peerDependencies:
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-    dependencies:
-      '@rushstack/node-core-library': 5.14.0(@types/node@24.7.1)
-      '@types/node': 24.7.1
-      supports-color: 8.1.1
     dev: true
 
   /@rushstack/terminal@0.19.1(@types/node@24.7.1):
@@ -2955,17 +2916,6 @@ packages:
       '@rushstack/problem-matcher': 0.1.1(@types/node@24.7.1)
       '@types/node': 24.7.1
       supports-color: 8.1.1
-    dev: true
-
-  /@rushstack/ts-command-line@5.0.3(@types/node@24.7.1):
-    resolution: {integrity: sha512-bgPhQEqLVv/2hwKLYv/XvsTWNZ9B/+X1zJ7WgQE9rO5oiLzrOZvkIW4pk13yOQBhHyjcND5qMOa6p83t+Z66iQ==}
-    dependencies:
-      '@rushstack/terminal': 0.16.0(@types/node@24.7.1)
-      '@types/argparse': 1.0.38
-      argparse: 1.0.10
-      string-argv: 0.3.2
-    transitivePeerDependencies:
-      - '@types/node'
     dev: true
 
   /@rushstack/ts-command-line@5.1.1(@types/node@24.7.1):

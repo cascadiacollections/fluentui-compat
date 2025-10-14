@@ -1,0 +1,351 @@
+/**
+ * Modern theme for DocFX documentation
+ * Inspired by doxygen-awesome-css with clean, minimal design
+ */
+
+:root {
+  /* Modern color palette */
+  --primary-color: #0078d4;
+  --primary-hover: #106ebe;
+  --secondary-color: #605e5c;
+  --background-color: #ffffff;
+  --surface-color: #faf9f8;
+  --border-color: #edebe9;
+  --text-color: #323130;
+  --text-secondary: #605e5c;
+  --link-color: #0078d4;
+  --link-hover: #106ebe;
+  --code-background: #f3f2f1;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-large: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --border-radius: 4px;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Monaco, "Courier New", monospace;
+}
+
+/* Global styles */
+body {
+  font-family: var(--font-family);
+  color: var(--text-color);
+  line-height: 1.6;
+  background-color: var(--background-color);
+}
+
+/* Header improvements */
+.navbar {
+  background-color: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+.navbar-brand {
+  font-weight: 600;
+  color: var(--text-color) !important;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover {
+  color: var(--primary-color);
+}
+
+/* Content area */
+article.content {
+  max-width: 900px;
+  padding: 2rem;
+}
+
+/* Typography improvements */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  line-height: 1.3;
+  color: var(--text-color);
+}
+
+h1 {
+  font-size: 2rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.4rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+/* Links */
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
+/* Code blocks */
+code {
+  font-family: var(--font-family-mono);
+  background-color: var(--code-background);
+  padding: 0.2em 0.4em;
+  border-radius: var(--border-radius);
+  font-size: 0.875em;
+}
+
+pre {
+  background-color: var(--code-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  overflow-x: auto;
+  box-shadow: var(--shadow);
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  box-shadow: var(--shadow);
+}
+
+table thead {
+  background-color: var(--surface-color);
+}
+
+table th,
+table td {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  text-align: left;
+}
+
+table th {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+table tbody tr:hover {
+  background-color: var(--surface-color);
+}
+
+/* Sidebar/TOC */
+.sidetoc {
+  background-color: var(--surface-color);
+  border-right: 1px solid var(--border-color);
+}
+
+.toc ul {
+  padding-left: 1rem;
+}
+
+.toc li {
+  margin: 0.25rem 0;
+}
+
+.toc a {
+  color: var(--text-secondary);
+  display: block;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+}
+
+.toc a:hover {
+  background-color: var(--background-color);
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.toc .active > a {
+  color: var(--primary-color);
+  font-weight: 600;
+  background-color: var(--background-color);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  background-color: transparent;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+}
+
+.breadcrumb > li + li:before {
+  content: "›";
+  padding: 0 0.5rem;
+  color: var(--text-secondary);
+}
+
+/* Alert boxes */
+.alert {
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: var(--shadow);
+}
+
+.alert-info {
+  background-color: #e7f3ff;
+  border-color: #b3d9ff;
+  color: #004578;
+}
+
+.alert-warning {
+  background-color: #fff4ce;
+  border-color: #ffe69c;
+  color: #664d03;
+}
+
+.alert-danger {
+  background-color: #fde7e9;
+  border-color: #f1aeb5;
+  color: #842029;
+}
+
+/* Search box */
+#search-query {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+#search-query:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
+}
+
+/* Footer */
+footer {
+  background-color: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+  padding: 2rem 0;
+  margin-top: 3rem;
+  color: var(--text-secondary);
+}
+
+/* API documentation specific */
+.inheritance,
+.inheritedMembers {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: var(--surface-color);
+  border-left: 3px solid var(--primary-color);
+  border-radius: var(--border-radius);
+}
+
+.markdown-alert {
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 4px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  background-color: var(--surface-color);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  article.content {
+    padding: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  .sidetoc {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #4ba3ff;
+    --primary-hover: #6eb8ff;
+    --secondary-color: #b3b0ad;
+    --background-color: #1e1e1e;
+    --surface-color: #252525;
+    --border-color: #3c3c3c;
+    --text-color: #e1e1e1;
+    --text-secondary: #b3b0ad;
+    --link-color: #4ba3ff;
+    --link-hover: #6eb8ff;
+    --code-background: #2d2d2d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-large: 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  .navbar {
+    background-color: var(--surface-color);
+  }
+  
+  .alert-info {
+    background-color: #1a3a52;
+    border-color: #2d5a7b;
+    color: #9ec9e8;
+  }
+  
+  .alert-warning {
+    background-color: #4d3800;
+    border-color: #735400;
+    color: #ffd966;
+  }
+  
+  .alert-danger {
+    background-color: #4a1f24;
+    border-color: #6d2f36;
+    color: #f1aeb5;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .navbar,
+  .sidetoc,
+  footer,
+  .affix {
+    display: none;
+  }
+  
+  article.content {
+    max-width: 100%;
+  }
+}

@@ -197,29 +197,6 @@ export class EventGroup {
     this._parent = parent;
   }
 
-  /**
-   * Gets a cached window reference or retrieves a fresh one if cache is stale.
-   * This optimization reduces repeated DOM queries for window access.
-   * 
-   * @param targetElement - Optional element to determine the correct window context
-   * @returns The window object or null if unavailable
-   * @internal
-   */
-  private _getCachedWindow(targetElement?: Element | null): Window | null {
-    const currentTime = performance.now();
-    
-    // Return cached window if still valid
-    if (this._cachedWindow && 
-        (currentTime - this._windowCacheTimestamp) < EventGroup.WINDOW_CACHE_TTL_MS) {
-      return this._cachedWindow;
-    }
-    
-    // Refresh cache with new window reference
-    this._cachedWindow = getWindow(targetElement) ?? null;
-    this._windowCacheTimestamp = currentTime;
-    
-    return this._cachedWindow;
-  }
 
   /**
    * Generates a unique identifier for an event target.

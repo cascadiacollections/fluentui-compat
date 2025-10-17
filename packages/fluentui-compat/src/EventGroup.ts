@@ -174,24 +174,6 @@ export class EventGroup {
    */
   private _parent: any;
   
-  /** 
-   * Cached window reference to reduce DOM queries.
-   * @internal
-   */
-  private _cachedWindow: Window | null = null;
-  
-  /** 
-   * Timestamp when window was last cached.
-   * @internal
-   */
-  private _windowCacheTimestamp = 0;
-  
-  /** 
-   * Window cache time-to-live in milliseconds.
-   * @internal
-   */
-  private static readonly WINDOW_CACHE_TTL_MS = 1000;
-  
   /**
    * Counter for generating unique IDs for anonymous targets.
    * Ensures Map keys are unique even for targets without native identity.

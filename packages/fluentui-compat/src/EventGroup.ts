@@ -1,5 +1,3 @@
-import { getWindow } from "./getWindow";
-
 /**
  * Event listener options that can be passed to addEventListener.
  * 
@@ -529,6 +527,5 @@ export class EventGroup {
     
     // Clear object references to help garbage collection
     this._parent = undefined;
-    this._cachedWindow = null;
   }
 }

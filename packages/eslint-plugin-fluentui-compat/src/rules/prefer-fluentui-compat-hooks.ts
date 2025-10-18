@@ -44,60 +44,61 @@ export const preferCompatHooks = createRule({
           );
 
           if (compatHookImports.length > 0) {
-            compatHookImports.forEach(hookImport => {
-              if (hookImport.type === 'ImportSpecifier' && hookImport.imported.type === 'Identifier') {
-                context.report({
-                  node: hookImport,
-                  messageId: 'preferCompatHook',
-                  data: {
-                    hookName: hookImport.imported.name,
-                  },
-                  fix(fixer) {
-                    const sourceCode = context.getSourceCode();
-                    
-                    // Get all compat hooks from this import
-                    const allCompatHooks = node.specifiers.filter(
-                      spec =>
-                        spec.type === 'ImportSpecifier' &&
-                        spec.imported.type === 'Identifier' &&
-                        COMPAT_HOOKS.includes(spec.imported.name as any)
-                    );
-                    
-                    // Get other (non-compat) imports
-                    const otherImports = node.specifiers.filter(
-                      spec => !allCompatHooks.includes(spec)
-                    );
-                    
-                    const compatHooksText = allCompatHooks
-                      .map(spec => sourceCode.getText(spec))
-                      .join(', ');
-                    
-                    if (otherImports.length === 0) {
-                      // Replace entire import with fluentui-compat import
-                      return fixer.replaceText(
-                        node,
-                        `import { ${compatHooksText} } from '@cascadiacollections/fluentui-compat';`
-                      );
-                    } else {
-                      // Keep other imports from @fluentui/react-hooks and add new import
-                      const otherImportsText = otherImports
-                        .map(spec => sourceCode.getText(spec))
-                        .join(', ');
-                      
-                      return [
-                        fixer.replaceText(
-                          node,
-                          `import { ${otherImportsText} } from '@fluentui/react-hooks';`
-                        ),
-                        fixer.insertTextAfter(
-                          node,
-                          `\nimport { ${compatHooksText} } from '@cascadiacollections/fluentui-compat';`
-                        ),
-                      ];
-                    }
-                  },
-                });
-              }
+            // Aggregate all compat hook names for the message
+            const compatHookNames = compatHookImports
+              .map(hookImport => hookImport.imported.name)
+              .join(', ');
+
+            context.report({
+              node,
+              messageId: 'preferCompatHook',
+              data: {
+                hookName: compatHookNames,
+              },
+              fix(fixer) {
+                const sourceCode = context.getSourceCode();
+
+                // Get all compat hooks from this import
+                const allCompatHooks = node.specifiers.filter(
+                  spec =>
+                    spec.type === 'ImportSpecifier' &&
+                    spec.imported.type === 'Identifier' &&
+                    COMPAT_HOOKS.includes(spec.imported.name as any)
+                );
+
+                // Get other (non-compat) imports
+                const otherImports = node.specifiers.filter(
+                  spec => !allCompatHooks.includes(spec)
+                );
+
+                const compatHooksText = allCompatHooks
+                  .map(spec => sourceCode.getText(spec))
+                  .join(', ');
+
+                if (otherImports.length === 0) {
+                  // Replace entire import with fluentui-compat import
+                  return fixer.replaceText(
+                    node,
+                    `import { ${compatHooksText} } from '@cascadiacollections/fluentui-compat';`
+                  );
+                } else {
+                  // Keep other imports from @fluentui/react-hooks and add new import
+                  const otherImportsText = otherImports
+                    .map(spec => sourceCode.getText(spec))
+                    .join(', ');
+
+                  return [
+                    fixer.replaceText(
+                      node,
+                      `import { ${otherImportsText} } from '@fluentui/react-hooks';`
+                    ),
+                    fixer.insertTextAfter(
+                      node,
+                      `\nimport { ${compatHooksText} } from '@cascadiacollections/fluentui-compat';`
+                    ),
+                  ];
+                }
+              },
             });
           }
         }

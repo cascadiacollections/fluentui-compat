@@ -99,6 +99,85 @@ The `Async` class provides the following methods:
 - **Window Caching**: Reduces repeated DOM queries
 - **Development Metrics**: Tracks usage patterns in development mode
 
+## EventGroup Class
+
+The `EventGroup` class provides centralized management of DOM event listeners with automatic cleanup. It's particularly useful in React class components for preventing memory leaks from forgotten event listeners.
+
+### Usage
+
+```typescript
+import { EventGroup } from 'fluentui-compat';
+
+class MyComponent extends React.Component {
+  private events: EventGroup;
+  
+  constructor(props) {
+    super(props);
+    this.events = new EventGroup(this);
+  }
+  
+  componentDidMount() {
+    this.events.on(window, 'resize', this.handleResize);
+    this.events.on(document, 'keydown', this.handleKeyDown);
+  }
+  
+  componentWillUnmount() {
+    this.events.dispose();
+  }
+  
+  handleResize = () => {
+    console.log('Window resized');
+  }
+  
+  handleKeyDown = (event: KeyboardEvent) => {
+    console.log('Key pressed:', event.key);
+  }
+  
+  render() {
+    return <div>Event management example</div>;
+  }
+}
+```
+
+### API
+
+The `EventGroup` class provides the following methods:
+
+- `on(target, eventName, callback, options?)` - Adds an event listener with tracking
+- `off(target?, eventName?, callback?, options?)` - Removes event listeners
+  - No arguments: Removes all events
+  - Target only: Removes all events from target
+  - Target + eventName: Removes all events of that type from target
+  - All arguments: Removes specific event listener
+- `raise(eventName, eventArgs?)` - Programmatically triggers registered callbacks
+- `declare(eventName)` - No-op for API compatibility with FluentUI
+- `dispose()` - Removes all event listeners and cleans up
+
+### Features
+
+- **Automatic Cleanup**: All event listeners removed on dispose
+- **Multiple Events**: Manage many event listeners efficiently
+- **Type Safe**: Full TypeScript support with proper event types
+- **Performance Optimized**: Uses Map for O(1) lookups and efficient batch cleanup
+- **Context Binding**: Automatically binds callbacks to parent context
+- **Memory Safe**: No memory leaks from orphaned event listeners
+
+### React Hook Alternative
+
+For functional components, consider using the `useOnEvent` hook instead, which provides automatic cleanup via React's effect system:
+
+```typescript
+import { useOnEvent } from 'fluentui-compat';
+
+function MyComponent() {
+  useOnEvent(window, 'resize', () => {
+    console.log('Window resized');
+  });
+  
+  return <div>Event management example</div>;
+}
+```
+
 ## Additional React Hooks
 
 The fluentui-compat package provides several additional high-performance React hooks optimized for modern applications:

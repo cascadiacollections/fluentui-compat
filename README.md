@@ -156,6 +156,7 @@ The core compatibility library containing optimized FluentUI components and util
 
 #### Utilities
 - **Async**: Class for managing async operations with cancellation support
+- **EventGroup**: Centralized management of DOM event listeners with automatic cleanup
 - **memoizeFunction**: High-performance memoization utilities with configurable cache management
 - **getWindow**: Utility for safely accessing the window object in SSR environments
 

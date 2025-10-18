@@ -1,0 +1,52 @@
+{
+  "name": "@cascadiacollections/eslint-plugin-fluentui-compat",
+  "version": "1.0.0",
+  "description": "ESLint rules to encourage using fluentui-compat optimized APIs over source FluentUI APIs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src --ext .ts",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cascadiacollections/fluentui-compat.git",
+    "directory": "packages/eslint-plugin-fluentui-compat"
+  },
+  "homepage": "https://github.com/cascadiacollections/fluentui-compat#readme",
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "fluentui",
+    "compat",
+    "performance",
+    "react"
+  ],
+  "author": "Cascadia Collections",
+  "license": "MIT",
+  "peerDependencies": {
+    "eslint": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.12",
+    "@types/estree": "^1.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.7.2",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@typescript-eslint/utils": "^7.18.0",
+    "eslint": "^8.57.1",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "@typescript-eslint/utils": "^7.18.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

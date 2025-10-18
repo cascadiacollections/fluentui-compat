@@ -40,11 +40,7 @@ ruleTester.run('prefer-fluentui-compat-hooks', preferCompatHooks as any, {
       errors: [
         {
           messageId: 'preferCompatHook',
-          data: { hookName: 'useBoolean' },
-        },
-        {
-          messageId: 'preferCompatHook',
-          data: { hookName: 'useConst' },
+          data: { hookName: 'useBoolean, useConst' },
         },
       ],
       output: `import { useBoolean, useConst } from '@cascadiacollections/fluentui-compat';`,
@@ -64,15 +60,7 @@ ruleTester.run('prefer-fluentui-compat-hooks', preferCompatHooks as any, {
       errors: [
         {
           messageId: 'preferCompatHook',
-          data: { hookName: 'useId' },
-        },
-        {
-          messageId: 'preferCompatHook',
-          data: { hookName: 'useForceUpdate' },
-        },
-        {
-          messageId: 'preferCompatHook',
-          data: { hookName: 'usePrevious' },
+          data: { hookName: 'useId, useForceUpdate, usePrevious' },
         },
       ],
       output: `import { useId, useForceUpdate, usePrevious } from '@cascadiacollections/fluentui-compat';`,

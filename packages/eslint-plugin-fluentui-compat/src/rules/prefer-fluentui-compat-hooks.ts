@@ -46,7 +46,13 @@ export const preferCompatHooks = createRule({
           if (compatHookImports.length > 0) {
             // Aggregate all compat hook names for the message
             const compatHookNames = compatHookImports
-              .map(hookImport => hookImport.imported.name)
+              .map(hookImport => {
+                if (hookImport.type === 'ImportSpecifier' && hookImport.imported.type === 'Identifier') {
+                  return hookImport.imported.name;
+                }
+                return '';
+              })
+              .filter(name => name !== '')
               .join(', ');
 
             context.report({

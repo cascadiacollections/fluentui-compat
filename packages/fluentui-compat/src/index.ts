@@ -2,6 +2,8 @@ export { bundleIcon } from './bundleIcon';
 export type { BundledIconProps } from './bundleIcon';
 export { Async } from './Async';
 export type { ICancelable } from './Async';
+export { EventGroup } from './EventGroup';
+export type { EventListenerOptions, IEventTarget } from './EventGroup';
 export { useAsync } from './useAsync';
 export { useBoolean } from './useBoolean';
 export type { IUseBooleanCallbacks } from './useBoolean';

@@ -12,6 +12,7 @@ npm install --save-dev @cascadiacollections/eslint-plugin-fluentui-compat
 
 Add `@cascadiacollections/fluentui-compat` to the plugins section of your `.eslintrc` configuration file:
 
+> **Note:** The plugin key in the configuration omits the `eslint-plugin-` prefix by ESLint convention. For scoped packages like `@cascadiacollections/eslint-plugin-fluentui-compat`, the plugin identifier is `@cascadiacollections/fluentui-compat`.
 ```json
 {
   "plugins": ["@cascadiacollections/fluentui-compat"]

@@ -86,9 +86,11 @@ export const noDirectFluentuiUtilities = createRule({
                     const compatImportsText = allCompatImports
                       .map(spec => {
                         if (spec.type === 'ImportSpecifier') {
-                          // Handle special case: Async -> useAsync
+                          // Handle special case: Async -> useAsync, preserving local alias
                           if (spec.imported.type === 'Identifier' && spec.imported.name === 'Async') {
-                            return 'useAsync';
+                            return spec.local.name !== 'Async'
+                              ? `useAsync as ${spec.local.name}`
+                              : 'useAsync';
                           }
                           return sourceCode.getText(spec);
                         }

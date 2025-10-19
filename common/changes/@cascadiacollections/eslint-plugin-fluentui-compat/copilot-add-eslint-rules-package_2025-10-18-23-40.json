@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Add ESLint rules package to help migrate to and maintain fluentui-compat usages over source FluentUI APIs",
+      "type": "minor",
+      "packageName": "@cascadiacollections/eslint-plugin-fluentui-compat"
+    }
+  ],
+  "packageName": "@cascadiacollections/eslint-plugin-fluentui-compat",
+  "email": "198982749+Copilot@users.noreply.github.com"
+}

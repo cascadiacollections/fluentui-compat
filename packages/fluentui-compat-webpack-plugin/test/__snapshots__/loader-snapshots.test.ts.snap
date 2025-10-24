@@ -1,0 +1,451 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`importRewriteLoader snapshots should match snapshot for JSX transformation 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import React from 'react';
+import { useAsync } from '@fluentui/utilities';
+
+export const MyComponent = () => {
+  const async = useAsync();
+  
+  return (
+    <div>
+      <h1>Test</h1>
+      <button onClick={() => async.flush()}>Flush</button>
+    </div>
+  );
+};
+
+🔄 REWRITES APPLIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "@fluentui/utilities" → "@cascadiacollections/fluentui-compat"
+   Exports: useAsync
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import React from 'react';
+import { useAsync } from "@cascadiacollections/fluentui-compat";
+export const MyComponent = () => {
+  const async = useAsync();
+  return <div>
+      <h1>Test</h1>
+      <button onClick={() => async.flush()}>Flush</button>
+    </div>;
+};
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for TypeScript with type annotations 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync, useConst } from '@fluentui/utilities';
+
+const MyComponent: React.FC = () => {
+  const async = useAsync();
+  const value: number = useConst(() => 42);
+  
+  return null;
+};
+
+🔄 REWRITES APPLIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "@fluentui/utilities" → "@cascadiacollections/fluentui-compat"
+   Exports: useAsync, useConst
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync, useConst } from "@cascadiacollections/fluentui-compat";
+const MyComponent: React.FC = () => {
+  const async = useAsync();
+  const value: number = useConst(() => 42);
+  return null;
+};
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for aliased import 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync as myAsync } from '@fluentui/utilities';
+
+🔄 REWRITES APPLIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "@fluentui/utilities" → "@cascadiacollections/fluentui-compat"
+   Exports: useAsync
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync as myAsync } from "@cascadiacollections/fluentui-compat";
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for complex code with multiple imports 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import React from 'react';
+import { useAsync, useConst, OtherThing } from '@fluentui/utilities';
+import { Button } from '@material-ui/core';
+
+function MyComponent() {
+  const async = useAsync();
+  const constant = useConst(() => ({ value: 42 }));
+  
+  return <Button onClick={() => console.log(async, constant, OtherThing)}>Click</Button>;
+}
+
+export default MyComponent;
+
+🔄 REWRITES APPLIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "@fluentui/utilities" → "@cascadiacollections/fluentui-compat"
+   Exports: useAsync, useConst
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import React from 'react';
+import { useAsync, useConst } from "@cascadiacollections/fluentui-compat";
+import { OtherThing } from '@fluentui/utilities';
+import { Button } from '@material-ui/core';
+function MyComponent() {
+  const async = useAsync();
+  const constant = useConst(() => ({
+    value: 42
+  }));
+  return <Button onClick={() => console.log(async, constant, OtherThing)}>Click</Button>;
+}
+export default MyComponent;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for complex real-world component 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAsync, useConst, useBoolean } from '@fluentui/utilities';
+import { Button, TextField } from '@fluentui/react-components';
+
+interface Props {
+  onSubmit: (data: string) => Promise<void>;
+}
+
+export const ComplexComponent: React.FC<Props> = ({ onSubmit }) => {
+  const [value, setValue] = useState('');
+  const async = useAsync();
+  const [isLoading, { setTrue: startLoading, setFalse: stopLoading }] = useBoolean(false);
+  const initialConfig = useConst(() => ({ apiUrl: '/api/data' }));
+  
+  const handleSubmit = useCallback(async () => {
+    startLoading();
+    try {
+      await onSubmit(value);
+    } finally {
+      stopLoading();
+    }
+  }, [value, onSubmit, startLoading, stopLoading]);
+  
+  useEffect(() => {
+    return () => async.dispose();
+  }, [async]);
+  
+  return (
+    <div>
+      <TextField 
+        value={value} 
+        onChange={(_, data) => setValue(data.value)} 
+      />
+      <Button 
+        onClick={handleSubmit} 
+        disabled={isLoading}
+      >
+        Submit
+      </Button>
+    </div>
+  );
+};
+
+🔄 REWRITES APPLIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "@fluentui/utilities" → "@cascadiacollections/fluentui-compat"
+   Exports: useAsync, useConst
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAsync, useConst } from "@cascadiacollections/fluentui-compat";
+import { useBoolean } from '@fluentui/utilities';
+import { Button, TextField } from '@fluentui/react-components';
+interface Props {
+  onSubmit: (data: string) => Promise<void>;
+}
+export const ComplexComponent: React.FC<Props> = ({
+  onSubmit
+}) => {
+  const [value, setValue] = useState('');
+  const async = useAsync();
+  const [isLoading, {
+    setTrue: startLoading,
+    setFalse: stopLoading
+  }] = useBoolean(false);
+  const initialConfig = useConst(() => ({
+    apiUrl: '/api/data'
+  }));
+  const handleSubmit = useCallback(async () => {
+    startLoading();
+    try {
+      await onSubmit(value);
+    } finally {
+      stopLoading();
+    }
+  }, [value, onSubmit, startLoading, stopLoading]);
+  useEffect(() => {
+    return () => async.dispose();
+  }, [async]);
+  return <div>
+      <TextField value={value} onChange={(_, data) => setValue(data.value)} />
+      <Button onClick={handleSubmit} disabled={isLoading}>
+        Submit
+      </Button>
+    </div>;
+};
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for custom mapping configuration 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { CustomHook, OtherThing } from '@custom/lib';
+
+🔄 REWRITES APPLIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "@custom/lib" → "@custom/compat"
+   Exports: CustomHook
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { CustomHook } from "@custom/compat";
+import { OtherThing } from '@custom/lib';
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for default import (no rewrite) 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import FluentUI from '@fluentui/utilities';
+
+✓ NO REWRITES (No matching imports found)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import FluentUI from '@fluentui/utilities';
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for mixed default and named imports 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import Utilities, { useAsync, OtherThing } from '@fluentui/utilities';
+
+✓ NO REWRITES (No matching imports found)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync } from "@cascadiacollections/fluentui-compat";
+import Utilities, { OtherThing } from '@fluentui/utilities';
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for mixed mapped and unmapped imports 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync, UnmappedExport } from '@fluentui/utilities';
+
+🔄 REWRITES APPLIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "@fluentui/utilities" → "@cascadiacollections/fluentui-compat"
+   Exports: useAsync
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync } from "@cascadiacollections/fluentui-compat";
+import { UnmappedExport } from '@fluentui/utilities';
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for multiple mapped imports 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync, useConst } from '@fluentui/utilities';
+
+🔄 REWRITES APPLIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "@fluentui/utilities" → "@cascadiacollections/fluentui-compat"
+   Exports: useAsync, useConst
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync, useConst } from "@cascadiacollections/fluentui-compat";
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for multiple separate imports from same package 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync } from '@fluentui/utilities';
+import { useConst } from '@fluentui/utilities';
+import { OtherThing } from '@fluentui/utilities';
+
+🔄 REWRITES APPLIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "@fluentui/utilities" → "@cascadiacollections/fluentui-compat"
+   Exports: useAsync
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync } from "@cascadiacollections/fluentui-compat";
+import { useConst } from "@cascadiacollections/fluentui-compat";
+import { OtherThing } from '@fluentui/utilities';
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for namespace import (no rewrite) 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import * as FluentUI from '@fluentui/utilities';
+
+✓ NO REWRITES (No matching imports found)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import * as FluentUI from '@fluentui/utilities';
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for side-effect only import 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import '@fluentui/utilities';
+
+✓ NO REWRITES (No matching imports found)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import '@fluentui/utilities';
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for simple mapped import 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync } from '@fluentui/utilities';
+
+🔄 REWRITES APPLIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "@fluentui/utilities" → "@cascadiacollections/fluentui-compat"
+   Exports: useAsync
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { useAsync } from "@cascadiacollections/fluentui-compat";
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot for unmapped import only 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { UnmappedExport } from '@fluentui/utilities';
+
+✓ NO REWRITES (No matching imports found)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import { UnmappedExport } from '@fluentui/utilities';
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+
+exports[`importRewriteLoader snapshots should match snapshot when no imports need rewriting 1`] = `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 BEFORE (Original Import)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import React from 'react';
+import { Button } from '@material-ui/core';
+
+const MyButton = () => <Button>Click me</Button>;
+
+export default MyButton;
+
+✓ NO REWRITES (No matching imports found)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 AFTER (Transformed Output)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import React from 'react';
+import { Button } from '@material-ui/core';
+
+const MyButton = () => <Button>Click me</Button>;
+
+export default MyButton;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;

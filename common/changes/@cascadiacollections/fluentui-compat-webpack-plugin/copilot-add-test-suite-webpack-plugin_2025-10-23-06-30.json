@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+      "comment": "Add comprehensive unit and integration test suite with modern patterns. Added 59 new tests including error handling, snapshot tests, and enhanced integration tests. Improved branch coverage from 87.69% to 90.76% while maintaining 100% statement coverage.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+  "email": "copilot@github.com"
+}

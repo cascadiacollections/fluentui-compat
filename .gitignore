@@ -157,6 +157,8 @@ packages/*/_site/
 
 # Test results and reports
 **/test-results/
+**/test/fixtures/
+**/test/output/
 
 # Rush logs
 **/*.log

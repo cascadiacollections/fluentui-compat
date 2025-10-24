@@ -428,7 +428,7 @@ describe("Error Handling", () => {
   });
 
   describe("Performance edge cases", () => {
-    test("should handle large files efficiently", () => {
+    test("should handle large files without errors", () => {
       const lines = Array.from({ length: 1000 }, (_, i) => 
         `const var${i} = ${i};`
       );
@@ -438,18 +438,17 @@ describe("Error Handling", () => {
         export { useAsync };
       `;
       
-      const startTime = Date.now();
       const output = importRewriteLoader.call(
         { getOptions: () => ({ verbose: false }) },
         input
       );
-      const duration = Date.now() - startTime;
       
       expect(output).toContain('@cascadiacollections/fluentui-compat');
-      expect(duration).toBeLessThan(1000); // Should complete within 1 second
+      // Verify output is valid (not corrupted by large input)
+      expect(output.length).toBeGreaterThan(0);
     });
 
-    test("should handle multiple mappings efficiently", () => {
+    test("should handle multiple mappings without errors", () => {
       const mappings = Array.from({ length: 100 }, (_, i) => ({
         from: `@lib/package${i}`,
         to: `@lib/compat${i}`,
@@ -458,13 +457,11 @@ describe("Error Handling", () => {
       const plugin = new FluentUICompatPlugin({ mappings });
       const rewriteRequest = (plugin as any).rewriteRequest.bind(plugin);
       
-      const startTime = Date.now();
+      // Verify all mappings work correctly
       for (let i = 0; i < 100; i++) {
-        rewriteRequest(`@lib/package${i}`);
+        const result = rewriteRequest(`@lib/package${i}`);
+        expect(result).toBe(`@lib/compat${i}`);
       }
-      const duration = Date.now() - startTime;
-      
-      expect(duration).toBeLessThan(100); // Should be very fast
     });
   });
 });

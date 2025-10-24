@@ -63,6 +63,8 @@ jobs:
         run: |
           cd packages/fluentui-compat
           npm test
+          cd ../fluentui-compat-webpack-plugin
+          npm test
 
       - name: Package and test publish
         run: |

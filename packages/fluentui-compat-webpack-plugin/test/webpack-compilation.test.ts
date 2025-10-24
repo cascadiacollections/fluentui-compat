@@ -38,12 +38,15 @@ describe('Plugin Integration Tests', () => {
       const loaderRule = mockCompiler.options.module.rules[0] as any;
       expect(loaderRule.use.loader).toContain('importRewriteLoader');
       
-      // Verify the loader path exists after build
+      // Verify the loader path can be resolved
       const loaderPath = loaderRule.use.loader;
       const resolvedPath = path.isAbsolute(loaderPath) ? loaderPath : path.resolve(__dirname, '..', loaderPath);
       
       // The loader should be in dist/ after build
       expect(loaderPath).toContain('importRewriteLoader');
+      // Verify path resolution works correctly
+      expect(resolvedPath).toBeTruthy();
+      expect(path.isAbsolute(resolvedPath)).toBe(true);
     });
 
     test('should pass correct options to loader', () => {

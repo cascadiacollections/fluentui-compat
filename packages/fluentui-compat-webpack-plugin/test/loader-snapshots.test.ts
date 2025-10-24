@@ -1,9 +1,14 @@
 /// <reference types="jest" />
 import importRewriteLoader from "../src/importRewriteLoader";
+import { createImportRewriteSnapshot, importRewriteSnapshotSerializer } from "./snapshot-serializer";
+
+// Register custom snapshot serializer for better readability
+expect.addSnapshotSerializer(importRewriteSnapshotSerializer);
 
 /**
  * Snapshot tests for import rewrite transformations
  * These tests capture the exact output of the loader for regression testing
+ * with clear before/after comparison showing which imports were rewritten
  */
 describe("importRewriteLoader snapshots", () => {
   const loaderContext = {
@@ -13,31 +18,31 @@ describe("importRewriteLoader snapshots", () => {
   test("should match snapshot for simple mapped import", () => {
     const input = `import { useAsync } from '@fluentui/utilities';`;
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for multiple mapped imports", () => {
     const input = `import { useAsync, useConst } from '@fluentui/utilities';`;
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for mixed mapped and unmapped imports", () => {
     const input = `import { useAsync, UnmappedExport } from '@fluentui/utilities';`;
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for unmapped import only", () => {
     const input = `import { UnmappedExport } from '@fluentui/utilities';`;
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for aliased import", () => {
     const input = `import { useAsync as myAsync } from '@fluentui/utilities';`;
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for complex code with multiple imports", () => {
@@ -56,7 +61,7 @@ function MyComponent() {
 export default MyComponent;
     `.trim();
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for TypeScript with type annotations", () => {
@@ -71,19 +76,19 @@ const MyComponent: React.FC = () => {
 };
     `.trim();
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for default import (no rewrite)", () => {
     const input = `import FluentUI from '@fluentui/utilities';`;
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for namespace import (no rewrite)", () => {
     const input = `import * as FluentUI from '@fluentui/utilities';`;
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for JSX transformation", () => {
@@ -103,7 +108,7 @@ export const MyComponent = () => {
 };
     `.trim();
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for custom mapping configuration", () => {
@@ -124,7 +129,7 @@ export const MyComponent = () => {
 
     const input = `import { CustomHook, OtherThing } from '@custom/lib';`;
     const output = importRewriteLoader.call(customContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for multiple separate imports from same package", () => {
@@ -134,7 +139,7 @@ import { useConst } from '@fluentui/utilities';
 import { OtherThing } from '@fluentui/utilities';
     `.trim();
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for complex real-world component", () => {
@@ -183,7 +188,7 @@ export const ComplexComponent: React.FC<Props> = ({ onSubmit }) => {
 };
     `.trim();
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot when no imports need rewriting", () => {
@@ -196,18 +201,18 @@ const MyButton = () => <Button>Click me</Button>;
 export default MyButton;
     `.trim();
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for side-effect only import", () => {
     const input = `import '@fluentui/utilities';`;
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 
   test("should match snapshot for mixed default and named imports", () => {
     const input = `import Utilities, { useAsync, OtherThing } from '@fluentui/utilities';`;
     const output = importRewriteLoader.call(loaderContext, input);
-    expect(output).toMatchSnapshot();
+    expect(createImportRewriteSnapshot(input, output)).toMatchSnapshot();
   });
 });

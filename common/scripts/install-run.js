@@ -768,33 +768,9 @@ function _getBinPath(packageInstallFolder, binName) {
     const resolvedBinName = _utilities_executionUtilities__WEBPACK_IMPORTED_MODULE_5__.IS_WINDOWS ? `${binName}.cmd` : binName;
     return node_path__WEBPACK_IMPORTED_MODULE_3__.resolve(binFolderPath, resolvedBinName);
 }
-/**
- * Escape a single command-line argument for use in a shell command string.
- *
- * On non-Windows platforms, this delegates to the existing escapeArgumentIfNeeded implementation.
- * On Windows, it additionally escapes cmd.exe metacharacters so that they are passed literally to the
- * underlying tool instead of being interpreted by the shell.
- */
-function _escapeShellCommandArg(arg) {
-    if (!_utilities_executionUtilities__WEBPACK_IMPORTED_MODULE_5__.IS_WINDOWS) {
-        return (0,_utilities_executionUtilities__WEBPACK_IMPORTED_MODULE_5__.escapeArgumentIfNeeded)(arg);
-    }
-    // For Windows / cmd.exe:
-    // 1. Escape cmd metacharacters by prefixing them with ^.
-    // 2. If the argument contains spaces or special characters, wrap it in double quotes,
-    //    doubling any embedded double quotes for proper cmd.exe parsing.
-    const needsQuoting = /[\s"&|<>^()%!]/.test(arg);
-    // Escape cmd.exe metacharacters
-    let escaped = arg.replace(/([&|<>^()%!])/g, '^$1');
-    if (needsQuoting) {
-        // Double any embedded quotes before surrounding with quotes
-        escaped = '"' + escaped.replace(/"/g, '""') + '"';
-    }
-    return escaped;
-}
 function _buildShellCommand(command, args) {
-    const escapedCommand = _escapeShellCommandArg(command);
-    const escapedArgs = args.map((arg) => _escapeShellCommandArg(arg));
+    const escapedCommand = (0,_utilities_executionUtilities__WEBPACK_IMPORTED_MODULE_5__.escapeArgumentIfNeeded)(command);
+    const escapedArgs = args.map((arg) => (0,_utilities_executionUtilities__WEBPACK_IMPORTED_MODULE_5__.escapeArgumentIfNeeded)(arg));
     return [escapedCommand, ...escapedArgs].join(' ');
 }
 /**

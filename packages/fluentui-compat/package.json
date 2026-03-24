@@ -58,7 +58,7 @@
     "react-dom": "^19.1.1",
     "scheduler": "^0.27.0",
     "ts-jest": "^29.2.5",
-    "typescript": "~5.9.2"
+    "typescript": "~6.0.2"
   },
   "files": [
     "dist",

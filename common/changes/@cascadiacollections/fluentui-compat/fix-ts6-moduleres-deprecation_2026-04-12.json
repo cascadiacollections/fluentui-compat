@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "fix: suppress TypeScript 6.0 moduleResolution=node10 deprecation error by adding ignoreDeprecations: \"6.0\" to tsconfig.json",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "41898282+github-actions[bot]@users.noreply.github.com"
+}

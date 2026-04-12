@@ -8,6 +8,7 @@
     "lib": ["es2020", "dom", "dom.iterable"],
     "module": "commonjs",
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

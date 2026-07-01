@@ -132,7 +132,7 @@ All tests are written in TypeScript with proper type checking enabled, ensuring 
 ### 6. **Modern Jest APIs**
 - Uses Jest 30.x APIs
 - Proper cleanup with `beforeEach`, `afterEach`, `beforeAll`, `afterAll`
-- `clearMocks`, `resetMocks`, `restoreMocks` enabled in config
+- Mock reset behavior is managed explicitly in tests
 - No legacy fake timers
 
 ### 7. **Performance Testing**

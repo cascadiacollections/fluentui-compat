@@ -17,9 +17,9 @@ module.exports = {
   silent: false,
   roots: ["<rootDir>/src", "<rootDir>/test"],
   testTimeout: 10000,
-  clearMocks: true,
-  resetMocks: true,
-  restoreMocks: true,
+  clearMocks: false,
+  resetMocks: false,
+  restoreMocks: false,
   // Optimized for VS Code Jest extension
   reporters: [
     "default",

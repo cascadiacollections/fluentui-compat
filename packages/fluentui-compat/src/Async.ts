@@ -440,8 +440,8 @@ export class Async {
    * @param targetElement - Optional element for window context (unused but maintained for API compatibility)
    * @public
    */
-  // eslint-disable-next-line no-unused-vars
   public clearImmediate(timerId: number, targetElement?: Element | null): void {
+    void targetElement;
     this.clearTimeout(timerId);
   }
 
@@ -807,8 +807,8 @@ export class Async {
    * @param targetElement - Optional element for window context (maintained for API compatibility)
    * @public
    */
-  // eslint-disable-next-line no-unused-vars
   public cancelAnimationFrame(frameId: number, targetElement?: Element | null): void {
+    void targetElement;
     this._timerManager.removeTimer(frameId);
   }
 

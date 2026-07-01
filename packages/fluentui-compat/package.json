@@ -6,7 +6,7 @@
   "types": "dist/fluentui-compat.d.ts",
   "scripts": {
     "build": "tsc && npm run api-extract",
-    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint src --ext .ts,.tsx",
+    "lint": "eslint src --ext .ts,.tsx",
     "test": "jest",
     "api-extract": "api-extractor run --local --verbose",
     "docs": "npm run api-extract && api-documenter markdown --input-folder temp --output-folder docs && docfx build docfx.json",
@@ -49,7 +49,7 @@
     "@typescript-eslint/eslint-plugin": "^8.34.0",
     "@typescript-eslint/parser": "^8.33.1",
     "ajv": "^8.17.1",
-    "eslint": "^10.0.0",
+    "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^7.0.0",
     "jest": "^30.0.0",

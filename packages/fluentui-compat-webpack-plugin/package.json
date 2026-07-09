@@ -31,7 +31,7 @@
   "dependencies": {
     "@babel/generator": "^7.29.1",
     "@babel/parser": "^8.0.4",
-    "@babel/traverse": "^7.29.0",
+    "@babel/traverse": "^8.0.4",
     "@babel/types": "^8.0.4"
   },
   "devDependencies": {

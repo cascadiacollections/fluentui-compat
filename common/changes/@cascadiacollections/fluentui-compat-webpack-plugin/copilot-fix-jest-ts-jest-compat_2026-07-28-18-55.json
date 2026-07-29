@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Downgrade jest to ^29.7.0 to match ts-jest@29.x compatibility",
+      "type": "patch",
+      "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+  "email": "198982749+Copilot@users.noreply.github.com"
+}

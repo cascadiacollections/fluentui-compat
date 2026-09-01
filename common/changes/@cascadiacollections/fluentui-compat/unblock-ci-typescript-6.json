@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Pin typescript to ~6.0.3 so the package builds and its tests run; TypeScript 7 removed moduleResolution=node10 and no ts-jest release supports TypeScript 7 yet",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "kevin@cascadiacollections.com"
+}

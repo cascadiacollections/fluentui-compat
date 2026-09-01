@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
-      "comment": "Bump jest to ^30.5.0, webpack to ^5.110.1 and @types/node to ^26.4.0",
+      "comment": "Bump jest to ^30.5.0, webpack to ^5.110.1 and @types/node to ^26.4.0; run jest with --experimental-vm-modules so it can require the ESM-only @babel/* v8 packages",
       "type": "patch"
     }
   ],

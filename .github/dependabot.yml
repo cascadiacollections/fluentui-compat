@@ -54,6 +54,15 @@ updates:
       prefix: "chore(deps)"
       include: "scope"
     open-pull-requests-limit: 10
+    # ts-jest does not support TypeScript 7 yet (its peer range is
+    # ">=4.3 <7"), and TypeScript 7 removed moduleResolution=node10, which
+    # this package's tsconfig relies on. A major bump breaks `tsc` and every
+    # test suite (see #244). Re-evaluate once ts-jest ships TypeScript 7
+    # support. Minor and patch updates still flow through the typescript group.
+    ignore:
+      - dependency-name: "typescript"
+        update-types:
+          - "version-update:semver-major"
     groups:
       fluentui:
         patterns:
@@ -106,6 +115,15 @@ updates:
       prefix: "chore(deps)"
       include: "scope"
     open-pull-requests-limit: 10
+    # ts-jest does not support TypeScript 7 yet: ts-jest 29.4.12 declares a
+    # peer range of "typescript >=4.3 <7", so a major bump stops every test
+    # suite in this package from running. Re-evaluate once ts-jest ships
+    # TypeScript 7 support. Minor and patch updates still flow through the
+    # typescript group below.
+    ignore:
+      - dependency-name: "typescript"
+        update-types:
+          - "version-update:semver-major"
     groups:
       babel:
         patterns:

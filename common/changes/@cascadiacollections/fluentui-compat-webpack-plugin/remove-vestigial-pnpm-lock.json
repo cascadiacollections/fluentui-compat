@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+      "comment": "Remove the unused per-package pnpm-lock.yaml; Rush installs from the workspace shrinkwrap at common/config/rush/pnpm-lock.yaml",
+      "type": "none"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat-webpack-plugin",
+  "email": "kevin@cascadiacollections.com"
+}

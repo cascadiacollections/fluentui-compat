@@ -83,8 +83,11 @@ jobs:
         if: steps.check-lockfile.outputs.needs_update == 'true' && steps.check-changes.outputs.has_changes == 'true'
         run: |
           echo "Committing lockfile changes..."
-          # Add all pnpm lockfiles that may have been updated
-          git add common/config/rush/pnpm-lock.yaml packages/fluentui-compat-webpack-plugin/pnpm-lock.yaml
+          # Rush uses pnpm workspaces, so every package installs from the
+          # shrinkwrap at common/config/rush/pnpm-lock.yaml. (Autoinstallers
+          # under common/autoinstallers/ keep their own lockfiles, but those
+          # are managed by "rush update-autoinstaller", not by this job.)
+          git add common/config/rush/pnpm-lock.yaml
 
           # Check if anything was actually staged
           if git diff --staged --quiet; then

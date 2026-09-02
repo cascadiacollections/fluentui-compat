@@ -44,6 +44,11 @@ jspm_packages/
 
 # Package lock files (in monorepo, should use central lockfile)
 package-lock.json
+# Rush uses pnpm workspaces: every package installs from the shrinkwrap at
+# common/config/rush/pnpm-lock.yaml, never a per-package lockfile. Scoped to
+# packages/ so that shrinkwrap and the autoinstaller lockfiles under
+# common/autoinstallers/ stay tracked.
+packages/*/pnpm-lock.yaml
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/

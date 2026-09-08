@@ -41,7 +41,7 @@
     "@types/node": "^26.4.0",
     "@types/webpack": "^4.41.0 || ^5.28.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
+    "@typescript-eslint/parser": "^8.69.0",
     "eslint": "^8.57.1",
     "jest": "^30.5.0",
     "jest-junit": "^17.0.0",

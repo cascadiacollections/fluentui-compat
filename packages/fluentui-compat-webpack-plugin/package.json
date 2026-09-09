@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint src",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "repository": {
@@ -35,14 +35,16 @@
     "@babel/types": "^8.0.4"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/babel__generator": "^7.27.0",
     "@types/babel__traverse": "^7.28.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.4.0",
     "@types/webpack": "^4.41.0 || ^5.28.0",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "eslint": "^8.57.1",
+    "@typescript-eslint/eslint-plugin": "^8.69.0",
+    "@typescript-eslint/parser": "^8.69.0",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
     "jest": "^30.5.0",
     "jest-junit": "^17.0.0",
     "ts-jest": "29.4.12",

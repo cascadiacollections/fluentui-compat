@@ -202,6 +202,8 @@
   "globalOverrides": {
     // "example1": "^1.0.0",
     // "example2": "npm:@company/example2@^1.0.0"
+    // Security: @microsoft/api-documenter pins js-yaml ~4.1.0 (GHSA advisories fixed in 4.3.2)
+    "@microsoft/api-documenter>js-yaml": "^4.3.2"
   },
 
   /**

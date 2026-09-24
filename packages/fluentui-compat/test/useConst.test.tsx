@@ -224,7 +224,7 @@ describe('useConst', () => {
     
     const firstDate = result.current;
     expect(firstDate).toBeInstanceOf(Date);
-    expect(firstDate.getFullYear()).toBe(2023);
+    expect(firstDate.getUTCFullYear()).toBe(2023);
     
     // Re-render should return same instance
     rerender();

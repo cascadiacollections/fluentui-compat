@@ -5,5 +5,11 @@
   "description": "Autoinstaller for @rushstack/mcp-server to enable AI coding assistants",
   "dependencies": {
     "@rushstack/mcp-server": "^0.3.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "@modelcontextprotocol/sdk": "^1.26.0",
+      "ajv@^8": "^8.18.0"
+    }
   }
 }

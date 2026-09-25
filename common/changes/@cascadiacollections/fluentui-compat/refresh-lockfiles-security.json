@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Migrate to ESLint flat config and refresh lockfiles to clear Dependabot security alerts (dev-only)",
+      "type": "none"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat",
+  "email": "kevin@cascadiacollections.com"
+}

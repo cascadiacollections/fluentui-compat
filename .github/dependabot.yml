@@ -15,6 +15,11 @@ updates:
       include: "scope"
     # Allow immediate security updates
     open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns: ["*"]
+    cooldown:
+      default-days: 7
 
   # Root npm dependencies (Rush configuration)
   - package-ecosystem: "npm"
@@ -38,6 +43,8 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    cooldown:
+      default-days: 7
 
   # Main fluentui-compat package
   - package-ecosystem: "npm"
@@ -99,6 +106,8 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    cooldown:
+      default-days: 7
 
   # Webpack plugin package
   - package-ecosystem: "npm"
@@ -154,3 +163,5 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    cooldown:
+      default-days: 7

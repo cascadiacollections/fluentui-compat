@@ -8,8 +8,9 @@
   },
   "pnpm": {
     "overrides": {
-      "@modelcontextprotocol/sdk": "^1.26.0",
-      "ajv@^8": "^8.18.0"
+      "@modelcontextprotocol/sdk": "^1.32.0",
+      "ajv@^8": "^8.18.0",
+      "zod": "^4.6.6"
     }
   }
 }

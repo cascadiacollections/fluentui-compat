@@ -1,4 +1,6 @@
 version: 2
+# Each ecosystem is grouped into one PR and waits 7 days before proposing a new
+# release. Security updates are not grouped or delayed by this file.
 updates:
   # GitHub Actions
   - package-ecosystem: "github-actions"
@@ -13,7 +15,6 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
-    # Allow immediate security updates
     open-pull-requests-limit: 5
     groups:
       github-actions:
@@ -21,34 +22,14 @@ updates:
     cooldown:
       default-days: 7
 
-  # Root npm dependencies (Rush configuration)
+  # npm packages. There is no root package.json: Rush itself is pinned in
+  # rush.json. Both packages share common/config/rush/pnpm-lock.yaml, so one
+  # PR across both directories avoids two PRs conflicting on the lockfile
+  # (dependabot-lockfile-update.yml refreshes it on the PR).
   - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
-    labels:
-      - "dependencies"
-      - "npm"
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-    open-pull-requests-limit: 5
-    groups:
-      rush-stack:
-        patterns:
-          - "@microsoft/rush*"
-          - "@rushstack/*"
-        update-types:
-          - "minor"
-          - "patch"
-    cooldown:
-      default-days: 7
-
-  # Main fluentui-compat package
-  - package-ecosystem: "npm"
-    directory: "/packages/fluentui-compat"
+    directories:
+      - "/packages/fluentui-compat"
+      - "/packages/fluentui-compat-webpack-plugin"
     schedule:
       interval: "weekly"
       day: "tuesday"
@@ -56,112 +37,21 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-      - "fluentui-compat"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
     open-pull-requests-limit: 10
     # ts-jest does not support TypeScript 7 yet (its peer range is
     # ">=4.3 <7"), and TypeScript 7 removed moduleResolution=node10, which
-    # this package's tsconfig relies on. A major bump breaks `tsc` and every
+    # fluentui-compat's tsconfig relies on. A major bump breaks `tsc` and every
     # test suite (see #244). Re-evaluate once ts-jest ships TypeScript 7
-    # support. Minor and patch updates still flow through the typescript group.
+    # support. Minor and patch updates still flow through the npm group.
     ignore:
       - dependency-name: "typescript"
         update-types:
           - "version-update:semver-major"
     groups:
-      fluentui:
-        patterns:
-          - "@fluentui/*"
-        update-types:
-          - "minor"
-          - "patch"
-      microsoft-tools:
-        patterns:
-          - "@microsoft/*"
-        update-types:
-          - "minor"
-          - "patch"
-      typescript:
-        patterns:
-          - "typescript"
-          - "@typescript-eslint/*"
-          - "@types/*"
-        update-types:
-          - "minor"
-          - "patch"
-      testing:
-        patterns:
-          - "jest*"
-          - "@testing-library/*"
-          - "ts-jest"
-        update-types:
-          - "minor"
-          - "patch"
-      linting:
-        patterns:
-          - "eslint*"
-          - "@typescript-eslint/*"
-        update-types:
-          - "minor"
-          - "patch"
-    cooldown:
-      default-days: 7
-
-  # Webpack plugin package
-  - package-ecosystem: "npm"
-    directory: "/packages/fluentui-compat-webpack-plugin"
-    schedule:
-      interval: "weekly"
-      day: "tuesday"
-      time: "06:00"
-    labels:
-      - "dependencies"
-      - "npm"
-      - "webpack-plugin"
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-    open-pull-requests-limit: 10
-    # ts-jest does not support TypeScript 7 yet: ts-jest 29.4.12 declares a
-    # peer range of "typescript >=4.3 <7", so a major bump stops every test
-    # suite in this package from running. Re-evaluate once ts-jest ships
-    # TypeScript 7 support. Minor and patch updates still flow through the
-    # typescript group below.
-    ignore:
-      - dependency-name: "typescript"
-        update-types:
-          - "version-update:semver-major"
-    groups:
-      babel:
-        patterns:
-          - "@babel/*"
-        update-types:
-          - "minor"
-          - "patch"
-      typescript:
-        patterns:
-          - "typescript"
-          - "@typescript-eslint/*"
-          - "@types/*"
-        update-types:
-          - "minor"
-          - "patch"
-      testing:
-        patterns:
-          - "jest*"
-          - "ts-jest"
-          - "jest-junit"
-        update-types:
-          - "minor"
-          - "patch"
-      webpack:
-        patterns:
-          - "webpack*"
-          - "@types/webpack"
-        update-types:
-          - "minor"
-          - "patch"
+      npm:
+        patterns: ["*"]
     cooldown:
       default-days: 7

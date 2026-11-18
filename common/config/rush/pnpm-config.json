@@ -203,7 +203,14 @@
     // "example1": "^1.0.0",
     // "example2": "npm:@company/example2@^1.0.0"
     // Security: @microsoft/api-documenter pins js-yaml ~4.1.0 (GHSA advisories fixed in 4.3.2)
-    "@microsoft/api-documenter>js-yaml": "^4.3.2"
+    "@microsoft/api-documenter>js-yaml": "^4.3.2",
+    // Security: GHSA-g3hv-75wg-m249 (minimatch, fixed in 11.0.1) and GHSA-3g3m-2fjr-6pw4 (glob,
+    // fixed in 14.0.2). Neither fix is backported. Dev-only consumers (api-extractor,
+    // typescript-estree, eslint, jest, test-exclude) still declare minimatch 9/10 and glob 10/13;
+    // they use only the named minimatch() and glob.sync()/hasMagic() APIs, which the new majors
+    // keep. Drop these once those packages release on minimatch >=11.0.1 / glob >=14.0.2.
+    "minimatch@>=7.0.0 <11.0.1": "^11.0.9",
+    "glob@>=9.0.0 <14.0.2": "^14.0.6"
   },
 
   /**

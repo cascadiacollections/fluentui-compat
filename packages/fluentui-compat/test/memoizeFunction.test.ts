@@ -162,36 +162,143 @@ describe('memoizeFunction', () => {
   });
 
   describe('ignoreNullOrUndefinedResult option', () => {
-    test('should re-compute null results when ignoreNullOrUndefinedResult is true', () => {
+    test('should re-compute null results on a later call when ignoreNullOrUndefinedResult is true', () => {
       let callCount = 0;
       const mockFn = jest.fn(() => {
         callCount++;
-        return callCount <= 2 ? null : 'success';
+        return callCount === 1 ? null : 'success';
       });
-      
+
       const memoized = memoizeFunction(mockFn, 100, true);
 
-      expect(memoized()).toBeNull(); // First call returns null
-      expect(memoized()).toBe('success'); // Second call re-computes and gets success
-      expect(memoized()).toBe('success'); // Third call uses cached success
+      expect(memoized()).toBeNull();
+      expect(mockFn).toHaveBeenCalledTimes(1);
 
-      expect(mockFn).toHaveBeenCalledTimes(3); // Called 3 times total
+      expect(memoized()).toBe('success');
+      expect(mockFn).toHaveBeenCalledTimes(2);
+
+      expect(memoized()).toBe('success');
+      expect(mockFn).toHaveBeenCalledTimes(2);
     });
 
-    test('should re-compute undefined results when ignoreNullOrUndefinedResult is true', () => {
+    test('should re-compute undefined results on a later call when ignoreNullOrUndefinedResult is true', () => {
       let callCount = 0;
       const mockFn = jest.fn(() => {
         callCount++;
-        return callCount <= 2 ? undefined : 'success';
+        return callCount === 1 ? undefined : 'success';
       });
-      
+
       const memoized = memoizeFunction(mockFn, 100, true);
 
-      expect(memoized()).toBeUndefined(); // First call returns undefined
-      expect(memoized()).toBe('success'); // Second call re-computes and gets success
-      expect(memoized()).toBe('success'); // Third call uses cached success
+      expect(memoized()).toBeUndefined();
+      expect(mockFn).toHaveBeenCalledTimes(1);
 
-      expect(mockFn).toHaveBeenCalledTimes(3); // Called 3 times total
+      expect(memoized()).toBe('success');
+      expect(mockFn).toHaveBeenCalledTimes(2);
+
+      expect(memoized()).toBe('success');
+      expect(mockFn).toHaveBeenCalledTimes(2);
+    });
+
+    test('computes once on the first call when the result is null or undefined', () => {
+      const nullFn = jest.fn((_value: string) => null);
+      const undefinedFn = jest.fn((_value: string) => undefined);
+      const nullMemo = memoizeFunction(nullFn, 100, true);
+      const undefinedMemo = memoizeFunction(undefinedFn, 100, true);
+
+      expect(nullMemo('x')).toBeNull();
+      expect(nullFn).toHaveBeenCalledTimes(1);
+      expect(nullFn).toHaveBeenCalledWith('x');
+
+      expect(undefinedMemo('x')).toBeUndefined();
+      expect(undefinedFn).toHaveBeenCalledTimes(1);
+
+      // A later call is the one that recomputes.
+      expect(nullMemo('x')).toBeNull();
+      expect(nullFn).toHaveBeenCalledTimes(2);
+      expect(undefinedMemo('x')).toBeUndefined();
+      expect(undefinedFn).toHaveBeenCalledTimes(2);
+    });
+
+    test('caches a non-null result and does not recompute it', () => {
+      const mockFn = jest.fn((value: string) => value.toUpperCase());
+      const memoized = memoizeFunction(mockFn, 100, true);
+
+      expect(memoized('x')).toBe('X');
+      expect(memoized('x')).toBe('X');
+      expect(mockFn).toHaveBeenCalledTimes(1);
+    });
+
+    test('does not recompute other falsy results', () => {
+      const mockFn = jest.fn((value: number) => {
+        if (value === 1) {
+          return 0;
+        }
+        if (value === 2) {
+          return false;
+        }
+        return '';
+      });
+      const memoized = memoizeFunction(mockFn, 100, true);
+
+      expect(memoized(1)).toBe(0);
+      expect(memoized(1)).toBe(0);
+      expect(memoized(2)).toBe(false);
+      expect(memoized(2)).toBe(false);
+      expect(memoized(3)).toBe('');
+      expect(memoized(3)).toBe('');
+      expect(mockFn).toHaveBeenCalledTimes(3);
+    });
+
+    test('recomputes only the argument whose cached result is null', () => {
+      const mockFn = jest.fn((value: string) => (value === 'x' ? null : 'kept'));
+      const memoized = memoizeFunction(mockFn, 100, true);
+
+      expect(memoized('x')).toBeNull();
+      expect(memoized('y')).toBe('kept');
+      expect(mockFn).toHaveBeenCalledTimes(2);
+
+      expect(memoized('y')).toBe('kept');
+      expect(mockFn).toHaveBeenCalledTimes(2);
+
+      expect(memoized('x')).toBeNull();
+      expect(mockFn).toHaveBeenCalledTimes(3);
+    });
+
+    test('does not cache an error thrown while recomputing a null result', () => {
+      let calls = 0;
+      const mockFn = jest.fn((_value: string) => {
+        calls += 1;
+        if (calls === 1) {
+          return null;
+        }
+        if (calls === 2) {
+          throw new Error('transient');
+        }
+        return 'ok';
+      });
+      const memoized = memoizeFunction(mockFn, 100, true);
+
+      expect(memoized('x')).toBeNull();
+      expect(mockFn).toHaveBeenCalledTimes(1);
+
+      expect(() => memoized('x')).toThrow('transient');
+      expect(mockFn).toHaveBeenCalledTimes(2);
+
+      expect(memoized('x')).toBe('ok');
+      expect(memoized('x')).toBe('ok');
+      expect(mockFn).toHaveBeenCalledTimes(3);
+    });
+
+    test('still caches an error from the first computation', () => {
+      const mockFn = jest.fn((_value: string) => {
+        throw new Error('permanent');
+      });
+      const memoized = memoizeFunction(mockFn, 100, true);
+
+      expect(() => memoized('x')).toThrow('permanent');
+      expect(() => memoized('x')).toThrow('permanent');
+      expect(mockFn).toHaveBeenCalledTimes(1);
     });
 
     test('should cache null/undefined results when ignoreNullOrUndefinedResult is false', () => {
@@ -294,6 +401,56 @@ describe('memoizeFunction', () => {
       expect(fn1).toBe(fn2); // Same function reference
       expect(fn1()).toBe(10);
       expect(mockFn).toHaveBeenCalledTimes(1);
+    });
+
+    test('bounds primitive argument wrappers and eviction only misses', () => {
+      // Same cap as primitiveCacheThreshold. Keys start high so they are not
+      // wrappers already created by earlier tests. maxCacheSize 0 keeps the
+      // result trie from resetting on its own.
+      const cap = 1000;
+      const base = 1_000_000;
+      const mockFn = jest.fn((value: number) => ({ value }));
+      const memoized = memoizeFunction(mockFn, 0);
+
+      const first = memoized(base);
+      expect(first.value).toBe(base);
+
+      let newest: { value: number } | undefined;
+      for (let i = 1; i <= cap; i++) {
+        const result = memoized(base + i);
+        expect(result.value).toBe(base + i);
+        if (i === cap) {
+          newest = result;
+        }
+      }
+
+      const recomputed = memoized(base);
+      expect(recomputed.value).toBe(base);
+      expect(recomputed).not.toBe(first);
+      expect(mockFn).toHaveBeenCalledTimes(cap + 2);
+
+      expect(memoized(base + cap)).toBe(newest);
+      expect(mockFn).toHaveBeenCalledTimes(cap + 2);
+
+      // A second wave still returns each key's own result after further evictions.
+      for (let i = cap + 1; i <= cap + 50; i++) {
+        expect(memoized(base + i).value).toBe(base + i);
+      }
+      expect(memoized(base + 25).value).toBe(base + 25);
+    });
+
+    test('evicting primitive wrappers does not drop cached object arguments', () => {
+      const mockFn = jest.fn((value: object | number) => ({ value }));
+      const memoized = memoizeFunction(mockFn, 0);
+      const obj = { id: 'stable' };
+      const first = memoized(obj);
+
+      for (let i = 0; i < 1100; i++) {
+        expect(memoized(3_000_000 + i).value).toBe(3_000_000 + i);
+      }
+
+      expect(memoized(obj)).toBe(first);
+      expect(mockFn).toHaveBeenCalledTimes(1101);
     });
 
     test('should distinguish between different falsy values', () => {

@@ -15,10 +15,12 @@ let _resetCounter = 0;
 const _nullObject = Object.freeze({ __null: true });
 const _undefinedObject = Object.freeze({ __undefined: true });
 
-// Dictionary for primitive value caching (more memory efficient than creating objects each time)
+// Wrapper objects so primitives can be used as WeakMap keys. One entry per
+// distinct primitive, shared by every memoized function.
 const _primitiveCache = new Map<any, { val: any }>();
 
-// Threshold for clearing primitive cache to prevent unbounded growth
+// Inserts keep the map at this size. resetMemoizations() is not required
+// for the bound to hold.
 const primitiveCacheThreshold = 1000;
 
 interface IMemoizeNode {
@@ -35,7 +37,7 @@ interface IMemoizeNode {
  */
 export function resetMemoizations(): void {
   _resetCounter++;
-  // Also clear the primitive cache periodically to prevent memory leaks
+  // Inserts already cap the map. This only runs if it somehow grows past the cap.
   if (_primitiveCache.size > primitiveCacheThreshold) {
     _primitiveCache.clear();
   }
@@ -117,7 +119,8 @@ export function createMemoizer<F extends (input: any) => any>(getValue: F): F {
  * 
  * @param fn - Function to memoize
  * @param maxCacheSize - Maximum cache entries before reset (0 = unlimited, default 100)
- * @param ignoreNullOrUndefinedResult - Re-compute if result is null/undefined until non-null result
+ * @param ignoreNullOrUndefinedResult - When true, a later call recomputes while the cached
+ * result is null or undefined. The call that produced that result runs the function once.
  * @returns Memoized version of the function
  * 
  * @example
@@ -173,37 +176,33 @@ export function memoizeFunction<T extends (...args: any[]) => RetType, RetType>(
       currentNode = currentNode.map!.get(normalizedArg);
     }
 
-    // Check if we have a cached value or error
-    let needsComputation = !Object.prototype.hasOwnProperty.call(currentNode, 'value') && 
-                          !Object.prototype.hasOwnProperty.call(currentNode, 'error');
-    
-    if (needsComputation) {
+    // Read before computing. A null/undefined result from this call must not
+    // fall through into the recompute below, or the function runs twice.
+    const hasValue = Object.prototype.hasOwnProperty.call(currentNode, 'value');
+    const hasError = Object.prototype.hasOwnProperty.call(currentNode, 'error');
+
+    if (!hasValue && !hasError) {
       try {
         currentNode.value = fn(...args);
       } catch (error) {
-        // Cache errors too
+        // Cache errors from the initial computation. Later calls rethrow this.
         currentNode.error = error;
       }
       cacheSize++;
+    } else if (
+      ignoreNullOrUndefinedResult &&
+      hasValue &&
+      !hasError &&
+      (currentNode.value === null || currentNode.value === undefined)
+    ) {
+      // Previous call cached null/undefined. Try again on this later call.
+      // A throw leaves that cached result in place so the next call can retry.
+      // Storing the error would make every later call throw it and never retry.
+      currentNode.value = fn(...args);
     }
 
-    // If we have a cached error, throw it
     if (Object.prototype.hasOwnProperty.call(currentNode, 'error')) {
       throw currentNode.error;
-    }
-
-    // Handle null/undefined result re-computation
-    // If flag is set and we have null/undefined cached, always re-compute and replace cache
-    if (ignoreNullOrUndefinedResult && 
-        (currentNode.value === null || currentNode.value === undefined)) {
-      try {
-        currentNode.value = fn(...args);
-      } catch (error) {
-        // Cache the error and throw it
-        currentNode.error = error;
-        delete currentNode.value; // Remove any cached null/undefined value
-        throw error;
-      }
     }
 
     return currentNode.value;
@@ -228,14 +227,23 @@ function _normalizeArg(val: any): any {
     return val;
   }
 
-  // For primitives, use a cached wrapper object to enable WeakMap usage
-  let cached = _primitiveCache.get(val);
-  if (!cached) {
-    cached = { val };
-    _primitiveCache.set(val, cached);
+  // Primitives need a stable object so they can be WeakMap keys.
+  const cached = _primitiveCache.get(val);
+  if (cached) {
+    return cached;
   }
 
-  return cached;
+  // Drop the oldest wrapper instead of growing without bound. The trie stores
+  // the wrapper object, not the primitive, so a dropped wrapper can only miss.
+  // Reusing the object for a new primitive would return the wrong result.
+  if (_primitiveCache.size >= primitiveCacheThreshold) {
+    const oldest = _primitiveCache.keys().next().value;
+    _primitiveCache.delete(oldest);
+  }
+
+  const created = { val };
+  _primitiveCache.set(val, created);
+  return created;
 }
 
 /**

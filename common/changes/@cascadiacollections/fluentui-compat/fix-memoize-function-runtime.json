@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@cascadiacollections/fluentui-compat",
+      "comment": "Fix memoizeFunction so a null or undefined result is computed once per call, and cap the shared primitive argument cache so distinct strings and numbers cannot grow it without bound",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat"
+}

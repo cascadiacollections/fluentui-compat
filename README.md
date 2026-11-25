@@ -1,5 +1,7 @@
 # fluentui-compat
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/cascadiacollections/fluentui-compat/badge)](https://scorecard.dev/viewer/?uri=github.com/cascadiacollections/fluentui-compat)
+
 > FluentUI React complimentary components and utilities focused on render performance
 
 This is a Rush monorepo containing performant utilities and components for FluentUI React.

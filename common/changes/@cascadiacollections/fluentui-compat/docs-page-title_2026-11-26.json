@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "comment": "Fix the docs site title so the home page is not doubled, and add a meta description.",
+      "type": "none",
+      "packageName": "@cascadiacollections/fluentui-compat"
+    }
+  ],
+  "packageName": "@cascadiacollections/fluentui-compat"
+}

@@ -45,11 +45,21 @@
       "_appTitle": "FluentUI Compat",
       "_appName": "FluentUI Compat",
       "_appFooter": "FluentUI React complimentary components and utilities focused on render performance",
+      "_description": "FluentUI React complementary components and utilities focused on render performance.",
       "_gitContribute": {
         "repo": "https://github.com/cascadiacollections/fluentui-compat",
         "branch": "main"
       },
       "_gitUrlPattern": "github"
+    },
+    "fileMetadata": {
+      "_appTitle": {
+        "index.md": ""
+      },
+      "title": {
+        "docs/index.md": "API Reference",
+        "docs/fluentui-compat.md": "fluentui-compat package"
+      }
     }
   }
 }

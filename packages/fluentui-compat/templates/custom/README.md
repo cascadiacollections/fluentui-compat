@@ -6,9 +6,13 @@ This directory contains custom styling for the DocFX-generated API documentation
 
 ```
 custom/
+├── partials/
+│   └── head.tmpl.partial  # Page title and meta description
 └── styles/
-    └── main.css    # Custom CSS overrides
+    └── main.css           # Custom CSS overrides
 ```
+
+The head partial appends `_appTitle` only when it is set, as `<Page> | FluentUI Compat`. `docfx.json` clears `_appTitle` for the home page so that title stays `FluentUI Compat`, and it sets titles for the generated API pages, which have no heading level 1 for DocFX to use. `_description` supplies the meta description.
 
 ## Features
 
